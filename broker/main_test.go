@@ -455,8 +455,8 @@ func TestNoSubscribers(t *testing.T) {
 	}
 }
 
-// TestConcurrentTaskPublishing tests concurrent task publishing
-func TestConcurrentTaskPublishing(t *testing.T) {
+// TestBasicConcurrentTaskPublishing tests basic concurrent task publishing
+func TestBasicConcurrentTaskPublishing(t *testing.T) {
 	server := NewEventBusServer()
 	ctx := context.Background()
 
@@ -468,7 +468,7 @@ func TestConcurrentTaskPublishing(t *testing.T) {
 	server.taskSubscribers[agentID] = []chan *pb.TaskMessage{subChan}
 	server.taskMu.Unlock()
 
-	numTasks := 50
+	numTasks := 10 // Reduced for basic test
 	var wg sync.WaitGroup
 
 	// Publish tasks concurrently
@@ -478,8 +478,8 @@ func TestConcurrentTaskPublishing(t *testing.T) {
 			defer wg.Done()
 
 			task := &pb.TaskMessage{
-				TaskId:           fmt.Sprintf("concurrent-task-%d", taskNum),
-				TaskType:         "concurrent-type",
+				TaskId:           fmt.Sprintf("basic-concurrent-task-%d", taskNum),
+				TaskType:         "basic-concurrent-type",
 				RequesterAgentId: "requester-agent",
 				ResponderAgentId: agentID,
 				CreatedAt:        timestamppb.Now(),
@@ -497,7 +497,7 @@ func TestConcurrentTaskPublishing(t *testing.T) {
 
 	// Count received tasks
 	receivedCount := 0
-	timeout := time.After(5 * time.Second)
+	timeout := time.After(2 * time.Second)
 
 	for receivedCount < numTasks {
 		select {

@@ -80,6 +80,12 @@ func (s *eventBusServer) PublishTask(ctx context.Context, req *pb.PublishTaskReq
 	for _, subChan := range targetChannels {
 		taskToSend := *req.GetTask()
 		go func(ch chan *pb.TaskMessage, task pb.TaskMessage) {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("Recovered from panic while sending task %s: %v", task.GetTaskId(), r)
+				}
+			}()
+
 			select {
 			case ch <- &task:
 				// Message sent successfully
@@ -124,6 +130,12 @@ func (s *eventBusServer) PublishTaskResult(ctx context.Context, req *pb.PublishT
 	for _, subChan := range targetChannels {
 		resultToSend := *req.GetResult()
 		go func(ch chan *pb.TaskResult, result pb.TaskResult) {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("Recovered from panic while sending task result %s: %v", result.GetTaskId(), r)
+				}
+			}()
+
 			select {
 			case ch <- &result:
 				// Message sent successfully
@@ -167,6 +179,12 @@ func (s *eventBusServer) PublishTaskProgress(ctx context.Context, req *pb.Publis
 	for _, subChan := range targetChannels {
 		progressToSend := *req.GetProgress()
 		go func(ch chan *pb.TaskProgress, progress pb.TaskProgress) {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("Recovered from panic while sending task progress %s: %v", progress.GetTaskId(), r)
+				}
+			}()
+
 			select {
 			case ch <- &progress:
 				// Message sent successfully
