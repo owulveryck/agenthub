@@ -75,13 +75,13 @@ The Agent2Agent broker enables autonomous agents to collaborate by exchanging st
 ## 🛠️ Technologies Used
 
 - **Protocol**: gRPC with Protocol Buffers
-- **Language**: Go 1.19+
+- **Language**: Go 1.24+
 - **Message Format**: Structured protobuf messages with flexible JSON-like parameters
 - **Architecture**: Event-driven with pub/sub patterns
 
 ## 📋 Prerequisites
 
-- Go 1.19 or later
+- Go 1.24 or later
 - Protocol Buffers compiler (`protoc`)
 - Basic understanding of gRPC and distributed systems
 

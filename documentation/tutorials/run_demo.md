@@ -4,7 +4,7 @@ This tutorial will walk you through setting up and running the complete AgentHub
 
 ## Prerequisites
 
-- Go 1.19 or later installed
+- Go 1.24 or later installed
 - Protocol Buffers compiler (protoc) installed
 - Basic understanding of gRPC and message brokers
 
@@ -14,13 +14,13 @@ First, let's build all the necessary components:
 
 ```bash
 # Build the event bus server
-go build -o bin/eventbus-server ./cmd/eventbus_server
+go build -o bin/eventbus-server ./broker
 
 # Build the subscriber (agent)
-go build -o bin/subscriber ./cmd/subscriber
+go build -o bin/subscriber ./agents/subscriber
 
 # Build the publisher
-go build -o bin/publisher ./cmd/publisher
+go build -o bin/publisher ./agents/publisher
 ```
 
 If you encounter any build errors, ensure the protocol buffer files are generated:
