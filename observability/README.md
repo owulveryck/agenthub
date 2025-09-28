@@ -21,10 +21,17 @@ docker-compose up -d
 
 This starts:
 - **Jaeger** (http://localhost:16686) - Distributed tracing UI
+  - OTLP gRPC receiver: `localhost:4317`
+  - OTLP HTTP receiver: `localhost:4318`
 - **Prometheus** (http://localhost:9090) - Metrics collection
-- **Grafana** (http://localhost:3000) - Visualization dashboard (admin/admin)
+- **Grafana** (http://localhost:3333) - Visualization dashboard (admin/admin)
 - **OpenTelemetry Collector** - Telemetry data processing
+  - OTLP gRPC receiver: `localhost:4320` (mapped to avoid conflict with Jaeger)
+  - OTLP HTTP receiver: `localhost:4321` (mapped to avoid conflict with Jaeger)
+  - Prometheus metrics: `localhost:8888`
+  - Prometheus exporter metrics: `localhost:8889`
 - **AlertManager** (http://localhost:9093) - Alert management
+- **Node Exporter** (http://localhost:9100) - System metrics collection
 
 ### 2. Run the Observable AgentHub Components
 
@@ -41,7 +48,7 @@ go run agents/publisher/main_observability.go
 
 ### 3. Access the Dashboards
 
-- **Grafana Dashboard**: http://localhost:3000 (admin/admin)
+- **Grafana Dashboard**: http://localhost:3333 (admin/admin)
 - **Jaeger Traces**: http://localhost:16686
 - **Prometheus Metrics**: http://localhost:9090
 

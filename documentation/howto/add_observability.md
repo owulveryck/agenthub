@@ -403,7 +403,15 @@ func main() {
 
 ## Step 7: Add Build Tags
 
-Add build tags to separate observable and basic versions:
+Build tags allow you to create different versions of your agent - one with observability and one without. This is essential for:
+
+- **Development flexibility**: Switch between observable and basic versions
+- **Performance testing**: Compare overhead of observability
+- **Deployment options**: Choose appropriate version for different environments
+
+### Understanding Go Build Tags
+
+Build tags are special comments that tell Go which files to include during compilation:
 
 ```go
 //go:build observability
@@ -411,7 +419,78 @@ Add build tags to separate observable and basic versions:
 
 package main
 
-// ... rest of your observable agent code
+// This file is ONLY compiled when using: go build -tags observability
+```
+
+### Creating Your Observable Version
+
+1. **Create observable version**: `your-agent/main_observability.go`
+```go
+//go:build observability
+// +build observability
+
+package main
+
+import (
+    // ... observability imports
+    "github.com/owulveryck/agenthub/internal/observability"
+)
+
+func main() {
+    // Observable agent implementation (all the code from previous steps)
+}
+```
+
+2. **Create basic version**: `your-agent/main.go`
+```go
+//go:build !observability
+// +build !observability
+
+package main
+
+import (
+    // ... basic imports only
+)
+
+func main() {
+    // Basic agent implementation without observability
+}
+```
+
+### Build Tag Options
+
+| **Command** | **Result** | **Use Case** |
+|-------------|------------|--------------|
+| `go build` | Builds basic version (no observability) | Default development |
+| `go build -tags observability` | Builds observable version | Production monitoring |
+| `go build -tags "observability,debug"` | Multiple tags | Advanced configurations |
+
+### File Organization Strategy
+
+```
+your-agent/
+├── main.go                 # Basic version (no build tag)
+├── main_observability.go   # Observable version (+build observability)
+├── shared.go              # Common code (no build tag)
+└── config.go              # Configuration (no build tag)
+```
+
+### Build Tag Best Practices
+
+1. **Use consistent naming**:
+   - `main.go` for basic version
+   - `main_observability.go` for observable version
+
+2. **Share common code**: Place shared logic in files without build tags
+
+3. **Document build options**: Add to README or Makefile:
+```bash
+# Makefile example
+build-basic:
+	go build -o bin/agent ./your-agent/
+
+build-observable:
+	go build -tags observability -o bin/agent-obs ./your-agent/
 ```
 
 ## Step 8: Build and Test

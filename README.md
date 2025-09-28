@@ -32,9 +32,10 @@ go run -tags observability agents/publisher/main_observability.go
 ```
 
 **🎯 Instant Results:**
-- **Grafana Dashboard**: http://localhost:3000 (admin/admin) - Real-time metrics and visualizations
+- **Grafana Dashboard**: http://localhost:3333 (admin/admin) - Real-time metrics and visualizations
 - **Jaeger Tracing**: http://localhost:16686 - Complete event flow traces
 - **Prometheus Metrics**: http://localhost:9090 - Raw metrics and alerts
+- **AlertManager**: http://localhost:9093 - Alert management and notifications
 
 ## ✨ What Makes AgentHub Special
 
@@ -62,9 +63,10 @@ When you run the demo, you'll see:
 
 | **Component** | **What You'll See** | **URL** |
 |--------------|-------------------|---------|
-| **Grafana Dashboard** | Event processing rates, error rates, latency percentiles, system health | http://localhost:3000 |
+| **Grafana Dashboard** | Event processing rates, error rates, latency percentiles, system health | http://localhost:3333 |
 | **Jaeger Traces** | Complete event lineage: Publisher → Broker → Subscriber → Results | http://localhost:16686 |
 | **Prometheus** | Raw metrics, alert rules, and targets status | http://localhost:9090 |
+| **AlertManager** | Alert status, notification routing, and silence management | http://localhost:9093 |
 | **Health Checks** | Service health endpoints for all components | Various :808x/health |
 
 ## 🏗️ Architecture Overview
@@ -114,6 +116,7 @@ Our documentation follows the [Diátaxis framework](https://diataxis.fr/) for di
 
 ### 🧠 [Explanations](documentation/explanation/) - *Understanding the Why*
 - **[🔍 Distributed Tracing & OpenTelemetry](documentation/explanation/distributed_tracing.md)** - Deep dive into observability concepts
+- **[🏗️ Go Build Tags](documentation/explanation/go_build_tags.md)** - How AgentHub uses conditional compilation for flexible deployments
 - **[🏗️ Observability Architecture](documentation/explanation/observability_architecture.md)** - How the monitoring stack works
 - **[🤝 The Agent2Agent Principle](documentation/explanation/the_agent_to_agent_principle.md)** - Core communication patterns
 - **[📋 Understanding Tasks](documentation/explanation/the_tasks.md)** - Task semantics and lifecycle
