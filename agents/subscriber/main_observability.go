@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -63,8 +64,11 @@ func NewObservableSubscriber() (*ObservableSubscriber, error) {
 		return nil // Simple health check
 	}))
 
-	// Set up gRPC connection
-	conn, err := grpc.Dial(agentHubAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// Set up gRPC connection with OpenTelemetry instrumentation
+	conn, err := grpc.Dial(agentHubAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to agent hub: %w", err)
 	}
