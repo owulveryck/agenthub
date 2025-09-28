@@ -7,26 +7,36 @@ This documentation provides comprehensive guidance for understanding and using t
 ### [Tutorials](tutorials/)
 *Learning-oriented guides that take you through practical exercises*
 
+- **[Installation and Setup](tutorials/installation_and_setup.md)** - Step-by-step guide to install AgentHub and set up your development environment
 - **[Running the Demo](tutorials/run_demo.md)** - Complete walkthrough of setting up and running the Agent2Agent broker system with example agents exchanging tasks
+- **[Building Multi-Agent Workflows](tutorials/building_multi_agent_workflows.md)** - Advanced tutorial for creating complex multi-agent systems with workflow orchestration
 
 ### [How-to Guides](howto/)
 *Goal-oriented guides that solve specific problems*
 
 - **[Create a Publisher](howto/create_publisher.md)** - Step-by-step guide to building agents that publish tasks to other agents
 - **[Create a Subscriber](howto/create_subscriber.md)** - Complete guide to building agents that receive and process tasks from other agents
+- **[Debugging Agent Issues](howto/debugging_agent_issues.md)** - Practical troubleshooting guide for common agent development and deployment issues
 
 ### [Explanation](explanation/)
 *Understanding-oriented discussions that provide context and background*
 
 - **[The Agent2Agent Principle](explanation/the_agent_to_agent_principle.md)** - Deep dive into the philosophy and design principles behind Agent2Agent communication
 - **[Understanding Tasks](explanation/the_tasks.md)** - Comprehensive explanation of task semantics, lifecycle, and design patterns
+- **[Broker Architecture](explanation/broker_architecture.md)** - Detailed explanation of AgentHub's internal architecture and design decisions
+- **[Performance and Scaling](explanation/performance_and_scaling.md)** - Understanding performance characteristics and scaling strategies
 
 ### [Reference](reference/)
 *Information-oriented materials that describe the technical details*
 
 - **[Task Reference](reference/the_tasks.md)** - Detailed reference for all task-related messages and operations
+- **[API Reference](reference/api_reference.md)** - Complete gRPC API documentation with examples and error handling
+- **[Configuration Reference](reference/configuration_reference.md)** - Comprehensive guide to configuring brokers and agents
 
 ## 🎯 Quick Start
+
+### I'm new to AgentHub and want to get started
+→ Begin with **[Installation and Setup](tutorials/installation_and_setup.md)** then **[Running the Demo](tutorials/run_demo.md)**
 
 ### I want to understand what this is about
 → Start with **[The Agent2Agent Principle](explanation/the_agent_to_agent_principle.md)**
@@ -38,7 +48,10 @@ This documentation provides comprehensive guidance for understanding and using t
 → Use the **[Create a Publisher](howto/create_publisher.md)** or **[Create a Subscriber](howto/create_subscriber.md)** guides
 
 ### I need technical details
-→ Check the **[Task Reference](reference/the_tasks.md)**
+→ Check the **[API Reference](reference/api_reference.md)** and **[Configuration Reference](reference/configuration_reference.md)**
+
+### I'm having issues
+→ Consult the **[Debugging Agent Issues](howto/debugging_agent_issues.md)** guide
 
 ## 🏗️ System Overview
 
@@ -87,29 +100,35 @@ The Agent2Agent broker enables autonomous agents to collaborate by exchanging st
 
 ## 🚀 Getting Started
 
-1. **Understand the concepts**: Read [The Agent2Agent Principle](explanation/the_agent_to_agent_principle.md)
-2. **See it in action**: Follow [Running the Demo](tutorials/run_demo.md)
-3. **Build your first agent**: Use the [Create a Subscriber](howto/create_subscriber.md) guide
-4. **Create task workflows**: Follow [Create a Publisher](howto/create_publisher.md)
+1. **Install and setup**: Follow [Installation and Setup](tutorials/installation_and_setup.md)
+2. **Understand the concepts**: Read [The Agent2Agent Principle](explanation/the_agent_to_agent_principle.md)
+3. **See it in action**: Follow [Running the Demo](tutorials/run_demo.md)
+4. **Build your first agent**: Use the [Create a Subscriber](howto/create_subscriber.md) guide
+5. **Create task workflows**: Follow [Create a Publisher](howto/create_publisher.md)
+6. **Build complex systems**: Try [Building Multi-Agent Workflows](tutorials/building_multi_agent_workflows.md)
 
 ## 📖 Learning Path
 
 ### For Developers New to Agent Systems
-1. [The Agent2Agent Principle](explanation/the_agent_to_agent_principle.md) - Understand the why
-2. [Running the Demo](tutorials/run_demo.md) - See it working
-3. [Understanding Tasks](explanation/the_tasks.md) - Learn the core concepts
-4. [Create a Subscriber](howto/create_subscriber.md) - Build your first agent
+1. [Installation and Setup](tutorials/installation_and_setup.md) - Get your environment ready
+2. [The Agent2Agent Principle](explanation/the_agent_to_agent_principle.md) - Understand the why
+3. [Running the Demo](tutorials/run_demo.md) - See it working
+4. [Understanding Tasks](explanation/the_tasks.md) - Learn the core concepts
+5. [Create a Subscriber](howto/create_subscriber.md) - Build your first agent
 
 ### For Experienced Distributed Systems Developers
-1. [Running the Demo](tutorials/run_demo.md) - Quick hands-on experience
-2. [Task Reference](reference/the_tasks.md) - Technical specifications
-3. [Create a Publisher](howto/create_publisher.md) - Build task orchestrators
+1. [Installation and Setup](tutorials/installation_and_setup.md) - Quick setup
+2. [Running the Demo](tutorials/run_demo.md) - Hands-on experience
+3. [API Reference](reference/api_reference.md) - Technical specifications
+4. [Create a Publisher](howto/create_publisher.md) - Build task orchestrators
+5. [Performance and Scaling](explanation/performance_and_scaling.md) - Optimization strategies
 
 ### For System Architects
 1. [The Agent2Agent Principle](explanation/the_agent_to_agent_principle.md) - Design philosophy
-2. [Understanding Tasks](explanation/the_tasks.md) - Task patterns and semantics
-3. [Task Reference](reference/the_tasks.md) - Integration patterns
-4. [Create a Publisher](howto/create_publisher.md) - Orchestration patterns
+2. [Broker Architecture](explanation/broker_architecture.md) - Internal design and trade-offs
+3. [Performance and Scaling](explanation/performance_and_scaling.md) - Scaling patterns
+4. [Configuration Reference](reference/configuration_reference.md) - Production deployment
+5. [Building Multi-Agent Workflows](tutorials/building_multi_agent_workflows.md) - Complex system patterns
 
 ## 🤝 Contributing
 
