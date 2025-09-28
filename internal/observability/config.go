@@ -115,7 +115,7 @@ func DefaultConfig(serviceName string) Config {
 	return Config{
 		ServiceName:    serviceName,
 		ServiceVersion: "1.0.0",
-		JaegerEndpoint: "localhost:4317",
+		JaegerEndpoint: "localhost:4320",
 		PrometheusPort: "9090",
 		Environment:    "development",
 	}

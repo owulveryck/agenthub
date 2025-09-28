@@ -10,6 +10,15 @@ The observability stack provides end-to-end visibility across all agents and eve
 - **Traces**: Request flow tracking via Jaeger + OpenTelemetry
 - **Logs**: Structured event logging via slog with trace correlation
 
+### Data Flow Architecture
+
+```
+AgentHub Services → OpenTelemetry Collector → Jaeger/Prometheus
+     (port 4320)         (processes data)         (storage)
+```
+
+**Important**: AgentHub services send telemetry to the **OpenTelemetry Collector** (port 4320), which then forwards traces to Jaeger and metrics to Prometheus. This provides better data processing, filtering, and reliability.
+
 ## Quick Start
 
 ### 1. Start the Observability Stack
@@ -148,7 +157,7 @@ Publisher (span: publish_event)
 ## Configuration
 
 ### Environment Variables
-- `JAEGER_ENDPOINT`: OpenTelemetry collector endpoint (default: localhost:4317)
+- `JAEGER_ENDPOINT`: OpenTelemetry collector endpoint (default: localhost:4320)
 - `PROMETHEUS_PORT`: Prometheus scraping port (default: 9090)
 - `SERVICE_NAME`: Service identifier for observability
 - `SERVICE_VERSION`: Service version (default: 1.0.0)
