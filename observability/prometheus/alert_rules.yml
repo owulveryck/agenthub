@@ -1,0 +1,118 @@
+groups:
+  - name: agenthub_critical_alerts
+    rules:
+      # Event processing error rate > 5% for 5 minutes
+      - alert: HighEventProcessingErrorRate
+        expr: (
+          rate(event_errors_total[5m]) /
+          rate(events_processed_total[5m])
+        ) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High event processing error rate"
+          description: "Event processing error rate is {{ $value }}% for {{ $labels.instance }}"
+
+      # Event processing latency p95 > 5 seconds for 10 minutes
+      - alert: HighEventProcessingLatency
+        expr: histogram_quantile(0.95, rate(event_processing_duration_seconds_bucket[5m])) > 5
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High event processing latency"
+          description: "95th percentile event processing latency is {{ $value }}s for {{ $labels.instance }}"
+
+      # Service memory usage > 80% for 15 minutes
+      - alert: HighMemoryUsage
+        expr: (go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100 > 80
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}% for {{ $labels.instance }}"
+
+      # Message broker connection failures > 0 for 2 minutes
+      - alert: MessageBrokerConnectionFailures
+        expr: rate(message_broker_connection_errors_total[2m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Message broker connection failures"
+          description: "Message broker connection failures detected for {{ $labels.instance }}"
+
+  - name: agenthub_warning_alerts
+    rules:
+      # Event processing rate drops by 50% for 10 minutes
+      - alert: LowEventProcessingRate
+        expr: (
+          rate(events_processed_total[10m]) /
+          rate(events_processed_total[20m] offset 10m)
+        ) < 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low event processing rate"
+          description: "Event processing rate has dropped significantly for {{ $labels.instance }}"
+
+      # Service CPU usage > 70% for 20 minutes
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[5m]) * 100 > 70
+        for: 20m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}% for {{ $labels.instance }}"
+
+      # Trace error rate > 1% for 15 minutes
+      - alert: HighTraceErrorRate
+        expr: (
+          rate(traces_error_total[5m]) /
+          rate(traces_total[5m])
+        ) * 100 > 1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High trace error rate"
+          description: "Trace error rate is {{ $value }}% for {{ $labels.instance }}"
+
+      # Low goroutine count (potential issue)
+      - alert: AbnormalGoroutineCount
+        expr: go_goroutines < 5 or go_goroutines > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Abnormal goroutine count"
+          description: "Goroutine count is {{ $value }} for {{ $labels.instance }}"
+
+  - name: agenthub_service_health
+    rules:
+      # Service down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.instance }} is down"
+
+      # High number of failed requests
+      - alert: HighFailureRate
+        expr: (
+          rate(grpc_server_handled_total{grpc_code!="OK"}[5m]) /
+          rate(grpc_server_handled_total[5m])
+        ) * 100 > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High gRPC failure rate"
+          description: "gRPC failure rate is {{ $value }}% for {{ $labels.instance }}"
