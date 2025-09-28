@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package eventbus;
+
+// Specify the Go package for generated code.
+// This should match your module path and the directory where generated files will reside.
+option go_package = "internal/grpc;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// Priority levels for tasks
+enum Priority {
+  PRIORITY_UNSPECIFIED = 0;
+  PRIORITY_LOW = 1;
+  PRIORITY_MEDIUM = 2;
+  PRIORITY_HIGH = 3;
+  PRIORITY_CRITICAL = 4;
+}
+
+// Task status for tracking progress
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_PENDING = 1;
+  TASK_STATUS_IN_PROGRESS = 2;
+  TASK_STATUS_COMPLETED = 3;
+  TASK_STATUS_FAILED = 4;
+  TASK_STATUS_CANCELLED = 5;
+}
+
+// Task Message following Agent2Agent protocol structure
+message TaskMessage {
+  string task_id = 1;                                    // Unique identifier
+  string task_type = 2;                                  // Type of task (e.g., "data_analysis", "image_generation")
+  google.protobuf.Struct parameters = 3;                // Task parameters as flexible JSON-like structure
+  string requester_agent_id = 4;                        // ID of requesting agent
+  string responder_agent_id = 5;                        // ID of target agent (optional)
+  google.protobuf.Timestamp deadline = 6;               // Optional deadline
+  Priority priority = 7;                                // Task priority
+  google.protobuf.Struct metadata = 8;                  // Optional additional metadata
+  google.protobuf.Timestamp created_at = 9;             // When task was created
+}
+
+// Task Result for task completion responses
+message TaskResult {
+  string task_id = 1;                                    // Reference to original task
+  TaskStatus status = 2;                                 // Final status
+  google.protobuf.Struct result = 3;                    // Task results as flexible structure
+  string error_message = 4;                             // Error details if failed
+  string executor_agent_id = 5;                         // ID of agent that executed the task
+  google.protobuf.Timestamp completed_at = 6;           // When task was completed
+  google.protobuf.Struct execution_metadata = 7;        // Optional execution details
+}
+
+// Task Progress for status updates during execution
+message TaskProgress {
+  string task_id = 1;                                    // Reference to original task
+  TaskStatus status = 2;                                 // Current status
+  string progress_message = 3;                           // Human-readable progress description
+  int32 progress_percentage = 4;                         // Progress as percentage (0-100)
+  google.protobuf.Struct progress_data = 5;             // Optional structured progress data
+  string executor_agent_id = 6;                         // ID of agent executing the task
+  google.protobuf.Timestamp updated_at = 7;             // When this progress was reported
+}
+
+// Response for publishing requests
+message PublishResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+// Request for publishing a task
+message PublishTaskRequest {
+  TaskMessage task = 1;
+}
+
+// Request for publishing a task result
+message PublishTaskResultRequest {
+  TaskResult result = 1;
+}
+
+// Request for publishing task progress
+message PublishTaskProgressRequest {
+  TaskProgress progress = 1;
+}
+
+// Request for subscribing to tasks for a specific agent
+message SubscribeToTasksRequest {
+  string agent_id = 1;                                   // Agent ID to receive tasks for
+  repeated string task_types = 2;                        // Optional: filter by task types
+}
+
+// Request for subscribing to task results
+message SubscribeToTaskResultsRequest {
+  string requester_agent_id = 1;                         // Agent ID that requested tasks
+  repeated string task_ids = 2;                          // Optional: filter by specific task IDs
+}
+
+// AgentHub service definition - implements broker for Agent2Agent protocol tasks
+service EventBus {
+  // AgentHub broker methods for Agent2Agent protocol tasks
+  rpc PublishTask (PublishTaskRequest) returns (PublishResponse);
+  rpc PublishTaskResult (PublishTaskResultRequest) returns (PublishResponse);
+  rpc PublishTaskProgress (PublishTaskProgressRequest) returns (PublishResponse);
+
+  // Subscribe to tasks assigned to a specific agent
+  rpc SubscribeToTasks (SubscribeToTasksRequest) returns (stream TaskMessage);
+
+  // Subscribe to task results for tasks you requested
+  rpc SubscribeToTaskResults (SubscribeToTaskResultsRequest) returns (stream TaskResult);
+
+  // Subscribe to task progress updates
+  rpc SubscribeToTaskProgress (SubscribeToTaskResultsRequest) returns (stream TaskProgress);
+}

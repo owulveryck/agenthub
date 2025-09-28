@@ -8,6 +8,8 @@
 !Makefile
 !go.mod
 !go.sum
+!*.proto
+!*.pb
 # etc...
 
 # ...even if they are in subdirectories
