@@ -4,16 +4,15 @@ services:
     image: jaegertracing/jaeger:2.0.0
     container_name: agenthub-jaeger
     ports:
-      - "16686:16686" # Jaeger UI
-      - "4317:4317" # OTLP gRPC receiver
-      - "4318:4318" # OTLP HTTP receiver
+      - "${JAEGER_UI_PORT:-16686}:16686"   # Jaeger UI
+      - "${JAEGER_OTLP_PORT:-4317}:4317"   # OTLP gRPC receiver
+      - "4318:4318"                        # OTLP HTTP receiver
     environment:
       - SPAN_STORAGE_TYPE=memory
-      - OTEL_EXPORTER_OTLP_ENDPOINT=0.0.0.0:4317
     networks:
       - agenthub-observability
 
-  # OpenTelemetry Collector
+  # OpenTelemetry Collector (optional - can be bypassed)
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     container_name: agenthub-otel-collector
@@ -21,10 +20,10 @@ services:
     volumes:
       - ./otel-collector/otel-collector.yml:/etc/otel-collector.yml
     ports:
-      - "4320:4317" # OTLP gRPC receiver (mapped to avoid conflict)
-      - "4321:4318" # OTLP HTTP receiver (mapped to avoid conflict)
-      - "8888:8888" # Prometheus metrics
-      - "8889:8889" # Prometheus exporter metrics
+      - "${OTLP_GRPC_PORT:-4320}:4317"     # OTLP gRPC receiver (alternative to direct Jaeger)
+      - "${OTLP_HTTP_PORT:-4321}:4318"     # OTLP HTTP receiver (alternative to direct Jaeger)
+      - "8888:8888"                        # Prometheus metrics
+      - "8889:8889"                        # Prometheus exporter metrics
     depends_on:
       - jaeger
       - prometheus
@@ -43,7 +42,7 @@ services:
       - "--storage.tsdb.retention.time=30d"
       - "--web.enable-lifecycle"
     ports:
-      - "9090:9090"
+      - "${PROMETHEUS_PORT:-9090}:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml
@@ -56,7 +55,7 @@ services:
     image: grafana/grafana:10.0.0
     container_name: agenthub-grafana
     ports:
-      - "3333:3000"
+      - "${GRAFANA_PORT:-3333}:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -69,19 +68,19 @@ services:
     networks:
       - agenthub-observability
 
-  # AlertManager for alerting (optional)
+  # AlertManager for alerting
   alertmanager:
     image: prom/alertmanager:v0.25.0
     container_name: agenthub-alertmanager
     ports:
-      - "9093:9093"
+      - "${ALERTMANAGER_PORT:-9093}:9093"
     volumes:
       - ./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml
       - alertmanager_data:/alertmanager
     networks:
       - agenthub-observability
 
-  # Node Exporter for system metrics (optional)
+  # Node Exporter for system metrics
   node-exporter:
     image: prom/node-exporter:v1.6.0
     container_name: agenthub-node-exporter

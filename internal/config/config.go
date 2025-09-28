@@ -30,6 +30,7 @@ type AppConfig struct {
 	ServiceName    string
 	ServiceVersion string
 	Environment    string
+	LogLevel       string
 }
 
 // Load loads configuration from environment variables with defaults
@@ -58,6 +59,7 @@ func Load() *AppConfig {
 		ServiceName:    getEnv("SERVICE_NAME", "agenthub-service"),
 		ServiceVersion: getEnv("SERVICE_VERSION", "1.0.0"),
 		Environment:    getEnv("ENVIRONMENT", "development"),
+		LogLevel:       getEnv("LOG_LEVEL", "INFO"),
 	}
 }
 

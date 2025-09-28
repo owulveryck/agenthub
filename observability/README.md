@@ -21,45 +21,57 @@ AgentHub Services → OpenTelemetry Collector → Jaeger/Prometheus
 
 ## Quick Start
 
-### 1. Start the Observability Stack
+### 1. Configure Environment Variables
+
+First, ensure your environment variables are set (see `.envrc` in project root):
+
+```bash
+# Source environment configuration
+source .envrc
+```
+
+### 2. Start the Observability Stack
 
 ```bash
 cd observability
 docker-compose up -d
 ```
 
-This starts:
-- **Jaeger** (http://localhost:16686) - Distributed tracing UI
-  - OTLP gRPC receiver: `localhost:4317`
+This starts (ports configured via environment variables):
+- **Jaeger** (http://localhost:${JAEGER_UI_PORT}) - Distributed tracing UI
+  - OTLP gRPC receiver: `localhost:${JAEGER_OTLP_PORT}`
   - OTLP HTTP receiver: `localhost:4318`
-- **Prometheus** (http://localhost:9090) - Metrics collection
-- **Grafana** (http://localhost:3333) - Visualization dashboard (admin/admin)
-- **OpenTelemetry Collector** - Telemetry data processing
-  - OTLP gRPC receiver: `localhost:4320` (mapped to avoid conflict with Jaeger)
-  - OTLP HTTP receiver: `localhost:4321` (mapped to avoid conflict with Jaeger)
+- **Prometheus** (http://localhost:${PROMETHEUS_PORT}) - Metrics collection
+- **Grafana** (http://localhost:${GRAFANA_PORT}) - Visualization dashboard (admin/admin)
+- **OpenTelemetry Collector** - Telemetry data processing (optional)
+  - OTLP gRPC receiver: `localhost:${OTLP_GRPC_PORT}`
+  - OTLP HTTP receiver: `localhost:${OTLP_HTTP_PORT}`
   - Prometheus metrics: `localhost:8888`
   - Prometheus exporter metrics: `localhost:8889`
-- **AlertManager** (http://localhost:9093) - Alert management
+- **AlertManager** (http://localhost:${ALERTMANAGER_PORT}) - Alert management
 - **Node Exporter** (http://localhost:9100) - System metrics collection
 
-### 2. Run the Observable AgentHub Components
+### 3. Run the Observable AgentHub Components
 
 ```bash
+# Ensure environment is loaded
+source .envrc
+
 # Terminal 1: Start the observable broker
-go run broker/main_observability.go
+go run -tags observability broker/main_observability.go
 
 # Terminal 2: Start the observable subscriber
-go run agents/subscriber/main_observability.go
+go run -tags observability agents/subscriber/main_observability.go
 
 # Terminal 3: Start the observable publisher
-go run agents/publisher/main_observability.go
+go run -tags observability agents/publisher/main_observability.go
 ```
 
-### 3. Access the Dashboards
+### 4. Access the Dashboards
 
-- **Grafana Dashboard**: http://localhost:3333 (admin/admin)
-- **Jaeger Traces**: http://localhost:16686
-- **Prometheus Metrics**: http://localhost:9090
+- **Grafana Dashboard**: http://localhost:${GRAFANA_PORT} (admin/admin)
+- **Jaeger Traces**: http://localhost:${JAEGER_UI_PORT}
+- **Prometheus Metrics**: http://localhost:${PROMETHEUS_PORT}
 
 ## Service Endpoints
 
@@ -67,9 +79,9 @@ Each service exposes observability endpoints:
 
 | Service | Health | Metrics | Port |
 |---------|--------|---------|------|
-| Broker | http://localhost:8080/health | http://localhost:8080/metrics | 8080 |
-| Publisher | http://localhost:8081/health | http://localhost:8081/metrics | 8081 |
-| Subscriber | http://localhost:8082/health | http://localhost:8082/metrics | 8082 |
+| Broker | http://localhost:${BROKER_HEALTH_PORT}/health | http://localhost:${BROKER_HEALTH_PORT}/metrics | ${BROKER_HEALTH_PORT} |
+| Publisher | http://localhost:${PUBLISHER_HEALTH_PORT}/health | http://localhost:${PUBLISHER_HEALTH_PORT}/metrics | ${PUBLISHER_HEALTH_PORT} |
+| Subscriber | http://localhost:${SUBSCRIBER_HEALTH_PORT}/health | http://localhost:${SUBSCRIBER_HEALTH_PORT}/metrics | ${SUBSCRIBER_HEALTH_PORT} |
 
 ## Key Features Implemented
 
@@ -157,11 +169,41 @@ Publisher (span: publish_event)
 ## Configuration
 
 ### Environment Variables
-- `JAEGER_ENDPOINT`: OpenTelemetry collector endpoint (default: localhost:4320)
-- `PROMETHEUS_PORT`: Prometheus scraping port (default: 9090)
-- `SERVICE_NAME`: Service identifier for observability
+
+All configuration is managed through environment variables (see `.envrc` in project root):
+
+#### Core AgentHub Settings
+- `AGENTHUB_BROKER_ADDR`: Broker address (default: localhost)
+- `AGENTHUB_BROKER_PORT`: Broker port (default: 50051)
+
+#### Observability Stack Endpoints
+- `JAEGER_ENDPOINT`: OTLP traces endpoint (default: 127.0.0.1:4317)
+- `PROMETHEUS_PORT`: Prometheus web port (default: 9090)
+- `GRAFANA_PORT`: Grafana web port (default: 3333)
+- `ALERTMANAGER_PORT`: AlertManager web port (default: 9093)
+
+#### Health Check Ports (unique per service)
+- `BROKER_HEALTH_PORT`: Broker health endpoint (default: 8080)
+- `PUBLISHER_HEALTH_PORT`: Publisher health endpoint (default: 8081)
+- `SUBSCRIBER_HEALTH_PORT`: Subscriber health endpoint (default: 8082)
+
+#### OpenTelemetry Collector Ports (alternative path)
+- `OTLP_GRPC_PORT`: OTLP Collector gRPC port (default: 4320)
+- `OTLP_HTTP_PORT`: OTLP Collector HTTP port (default: 4321)
+
+#### Jaeger Direct Ports (internal Docker network + UI access)
+- `JAEGER_OTLP_PORT`: Jaeger OTLP receiver port (default: 4317)
+- `JAEGER_UI_PORT`: Jaeger web UI port (default: 16686)
+
+#### Service Metadata
+- `SERVICE_NAME`: Service identifier for observability (default: agenthub-service)
 - `SERVICE_VERSION`: Service version (default: 1.0.0)
 - `ENVIRONMENT`: Deployment environment (default: development)
+
+#### Logging Configuration
+- `LOG_LEVEL`: Logging level - DEBUG, INFO, WARN, ERROR (default: INFO)
+  - **DEBUG**: Enables detailed stdout logging + observability
+  - **INFO+**: Only observability logging
 
 ### Log Structure
 All logs follow this structure:

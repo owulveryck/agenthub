@@ -565,7 +565,11 @@ func (s *observableEventBusServer) Shutdown(ctx context.Context) error {
 	}
 
 	if err := s.obs.Shutdown(ctx); err != nil {
-		s.logger.ErrorContext(ctx, "Error shutting down observability", slog.Any("error", err))
+		s.logger.ErrorContext(ctx, "Broker observability shutdown failed - likely OTLP trace export issue",
+			slog.Any("error", err),
+			slog.String("service", "broker"),
+			slog.String("otlp_endpoint", s.obs.Config.JaegerEndpoint),
+		)
 		return err
 	}
 

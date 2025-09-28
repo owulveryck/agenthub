@@ -21,6 +21,7 @@ import (
 
 	pb "github.com/owulveryck/agenthub/internal/grpc"
 	"github.com/owulveryck/agenthub/internal/observability"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 const (
@@ -101,6 +102,36 @@ func (s *ObservableSubscriber) processTask(ctx context.Context, task *pb.TaskMes
 	ctx, span := s.traceManager.StartEventProcessingSpan(ctx, task.GetTaskId(), task.GetTaskType(), task.GetRequesterAgentId(), "")
 	defer span.End()
 
+	// Extract task parameters for tracing
+	taskParams := make(map[string]interface{})
+	if task.GetParameters() != nil {
+		for key, value := range task.GetParameters().Fields {
+			switch v := value.Kind.(type) {
+			case *structpb.Value_StringValue:
+				taskParams[key] = v.StringValue
+			case *structpb.Value_NumberValue:
+				taskParams[key] = v.NumberValue
+			case *structpb.Value_BoolValue:
+				taskParams[key] = v.BoolValue
+			default:
+				taskParams[key] = value.String()
+			}
+		}
+	}
+
+	// Add rich task information to the span
+	s.traceManager.AddTaskAttributes(span, task.GetTaskId(), task.GetTaskType(), taskParams)
+	s.traceManager.AddSpanEvent(span, "task.processing.started",
+		attribute.String("requester", task.GetRequesterAgentId()),
+		attribute.String("executor", agentID))
+
+	// Debug logging: task parameters
+	s.logger.DebugContext(ctx, "Task received with parameters",
+		slog.String("task_id", task.GetTaskId()),
+		slog.String("task_type", task.GetTaskType()),
+		slog.Any("parameters", taskParams),
+		slog.String("requester", task.GetRequesterAgentId()))
+
 	// Start timing
 	timer := s.metricsManager.StartTimer()
 	defer timer(ctx, task.GetTaskType(), agentID)
@@ -116,14 +147,30 @@ func (s *ObservableSubscriber) processTask(ctx context.Context, task *pb.TaskMes
 	var errorMessage string
 
 	// Process different task types
+	s.traceManager.AddSpanEvent(span, "task.processing.dispatch",
+		attribute.String("task_type", task.GetTaskType()))
+
 	switch task.GetTaskType() {
 	case "greeting":
+		s.traceManager.AddSpanEvent(span, "task.type.greeting.started")
+		if name, ok := taskParams["name"]; ok {
+			s.logger.DebugContext(ctx, "Processing greeting task", slog.Any("name", name))
+		}
 		result, status, errorMessage = s.processGreetingTask(ctx, task)
 	case "math_calculation":
+		s.traceManager.AddSpanEvent(span, "task.type.math.started")
+		s.logger.DebugContext(ctx, "Processing math calculation",
+			slog.Any("operation", taskParams["operation"]),
+			slog.Any("a", taskParams["a"]),
+			slog.Any("b", taskParams["b"]))
 		result, status, errorMessage = s.processMathTask(ctx, task)
 	case "random_number":
+		s.traceManager.AddSpanEvent(span, "task.type.random.started")
+		s.logger.DebugContext(ctx, "Processing random number task")
 		result, status, errorMessage = s.processRandomNumberTask(ctx, task)
 	default:
+		s.traceManager.AddSpanEvent(span, "task.type.unknown.error",
+			attribute.String("unknown_type", task.GetTaskType()))
 		errorMessage = fmt.Sprintf("Unknown task type: %s", task.GetTaskType())
 		status = pb.TaskStatus_TASK_STATUS_FAILED
 		s.logger.ErrorContext(ctx, "Unknown task type",
@@ -133,8 +180,39 @@ func (s *ObservableSubscriber) processTask(ctx context.Context, task *pb.TaskMes
 		s.metricsManager.IncrementEventErrors(ctx, task.GetTaskType(), agentID, "unknown_task_type")
 	}
 
+	// Add result information to trace
+	taskResult := make(map[string]interface{})
+	if result != nil {
+		for key, value := range result.Fields {
+			switch v := value.Kind.(type) {
+			case *structpb.Value_StringValue:
+				taskResult[key] = v.StringValue
+			case *structpb.Value_NumberValue:
+				taskResult[key] = v.NumberValue
+			case *structpb.Value_BoolValue:
+				taskResult[key] = v.BoolValue
+			default:
+				taskResult[key] = value.String()
+			}
+		}
+	}
+
+	// Add result to span
+	s.traceManager.AddTaskResult(span, status.String(), taskResult, errorMessage)
+	s.traceManager.AddSpanEvent(span, "task.processing.completed",
+		attribute.String("status", status.String()),
+		attribute.String("executor", agentID))
+
+	// Debug logging: task result
+	s.logger.DebugContext(ctx, "Task processing completed",
+		slog.String("task_id", task.GetTaskId()),
+		slog.String("status", status.String()),
+		slog.Any("result", taskResult),
+		slog.String("error_message", errorMessage),
+		slog.String("executor", agentID))
+
 	// Create task result
-	taskResult := &pb.TaskResult{
+	taskResultProto := &pb.TaskResult{
 		TaskId:            task.GetTaskId(),
 		Status:            status,
 		Result:            result,
@@ -145,7 +223,7 @@ func (s *ObservableSubscriber) processTask(ctx context.Context, task *pb.TaskMes
 	}
 
 	// Publish the result
-	if err := s.publishTaskResult(ctx, taskResult); err != nil {
+	if err := s.publishTaskResult(ctx, taskResultProto); err != nil {
 		s.logger.ErrorContext(ctx, "Failed to publish task result",
 			slog.String("task_id", task.GetTaskId()),
 			slog.Any("error", err),
@@ -400,7 +478,11 @@ func (s *ObservableSubscriber) Shutdown(ctx context.Context) error {
 	}
 
 	if err := s.obs.Shutdown(ctx); err != nil {
-		s.logger.ErrorContext(ctx, "Error shutting down observability", slog.Any("error", err))
+		s.logger.ErrorContext(ctx, "Subscriber observability shutdown failed - likely OTLP trace export issue",
+			slog.Any("error", err),
+			slog.String("service", "subscriber"),
+			slog.String("otlp_endpoint", s.obs.Config.JaegerEndpoint),
+		)
 		return err
 	}
 

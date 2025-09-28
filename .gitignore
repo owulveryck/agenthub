@@ -11,6 +11,7 @@
 !*.proto
 !*.pb
 !*.yml
+!test-demo.sh
 # etc...
 
 # ...even if they are in subdirectories

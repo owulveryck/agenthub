@@ -258,7 +258,11 @@ func (p *ObservablePublisher) Shutdown(ctx context.Context) error {
 	}
 
 	if err := p.obs.Shutdown(ctx); err != nil {
-		p.logger.ErrorContext(ctx, "Error shutting down observability", slog.Any("error", err))
+		p.logger.ErrorContext(ctx, "Publisher observability shutdown failed - likely OTLP trace export issue",
+			slog.Any("error", err),
+			slog.String("service", "publisher"),
+			slog.String("otlp_endpoint", p.obs.Config.JaegerEndpoint),
+		)
 		return err
 	}
 
