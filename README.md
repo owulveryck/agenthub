@@ -16,11 +16,16 @@ Experience the full observability stack in under 5 minutes:
 git clone https://github.com/owulveryck/agenthub.git
 cd agenthub
 
-# 2. Start the observability stack
+# 2. Load environment configuration (if using direnv)
+direnv allow
+# OR source manually: source .envrc
+
+# 3. Start the observability stack
 cd observability
 docker-compose up -d
+cd ..
 
-# 3. Run the observable demo (3 terminals)
+# 4. Run the observable demo (3 terminals)
 # Terminal 1 - Broker with full observability
 go run -tags observability broker/main_observability.go
 
@@ -127,12 +132,63 @@ Our documentation follows the [Diátaxis framework](https://diataxis.fr/) for di
 - **[🏥 Health Endpoints](documentation/reference/health_endpoints.md)** - Health check and monitoring APIs
 - **[📋 Task Reference](documentation/reference/the_tasks.md)** - Complete task message specifications
 
+## ⚙️ Configuration
+
+AgentHub uses environment variables for configuration. The project includes a `.envrc` file with sensible defaults.
+
+### Environment Variables
+
+| **Variable** | **Default** | **Description** |
+|--------------|-------------|-----------------|
+| `AGENTHUB_BROKER_ADDR` | `localhost` | Broker server address |
+| `AGENTHUB_BROKER_PORT` | `50051` | Broker gRPC port |
+| `JAEGER_ENDPOINT` | `127.0.0.1:4317` | Jaeger OTLP endpoint for traces |
+| `PROMETHEUS_PORT` | `9090` | Prometheus metrics port |
+| `GRAFANA_PORT` | `3333` | Grafana dashboard port |
+| `ALERTMANAGER_PORT` | `9093` | AlertManager web interface port |
+| `BROKER_HEALTH_PORT` | `8080` | Broker health check port |
+| `PUBLISHER_HEALTH_PORT` | `8081` | Publisher health check port |
+| `SUBSCRIBER_HEALTH_PORT` | `8082` | Subscriber health check port |
+| `OTLP_GRPC_PORT` | `4320` | OpenTelemetry Collector gRPC port |
+| `OTLP_HTTP_PORT` | `4321` | OpenTelemetry Collector HTTP port |
+| `SERVICE_VERSION` | `1.0.0` | Service version for telemetry |
+| `ENVIRONMENT` | `development` | Deployment environment |
+
+### Using the Configuration
+
+```bash
+# Option 1: Use direnv (recommended)
+direnv allow
+
+# Option 2: Source manually
+source .envrc
+
+# Option 3: Set individual variables
+export JAEGER_ENDPOINT=127.0.0.1:4317
+export GRAFANA_PORT=3333
+```
+
+### Custom Configuration
+
+To override defaults, either:
+1. **Modify `.envrc`** for project-wide changes
+2. **Set environment variables** before running commands
+3. **Create local overrides** (not committed to git)
+
+```bash
+# Example: Use different ports to avoid conflicts
+export GRAFANA_PORT=3334
+export BROKER_HEALTH_PORT=8083
+go run -tags observability broker/main_observability.go
+```
+
 ## 🛠️ Development
 
 ### Prerequisites
 - **Go 1.24+** - [Download here](https://golang.org/doc/install)
 - **Docker & Docker Compose** - For observability stack
 - **Protocol Buffers compiler (protoc)** - [Installation guide](https://grpc.io/docs/protoc-installation/)
+- **direnv** (optional) - For automatic environment loading
 
 ### Building from Source
 

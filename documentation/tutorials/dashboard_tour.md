@@ -6,7 +6,7 @@
 
 - **Observability stack running** (from the [Observability Demo](observability_demo.md))
 - **Observable agents running** (broker, publisher, subscriber)
-- **Grafana open** at http://localhost:3000
+- **Grafana open** at http://localhost:3333
 - **10-15 minutes** for the complete tour
 
 ## Quick Setup Reminder
@@ -28,10 +28,10 @@ go run -tags observability agents/publisher/main_observability.go
 
 ### Accessing the Main Dashboard
 
-1. **Open Grafana**: http://localhost:3000
+1. **Open Grafana**: http://localhost:3333
 2. **Login**: admin / admin (skip password change for demo)
 3. **Navigate**: Dashboards → Browse → AgentHub → "AgentHub EDA System Observatory"
-4. **Bookmark**: Save this URL for quick access: http://localhost:3000/d/agenthub-eda-dashboard
+4. **Bookmark**: Save this URL for quick access: http://localhost:3333/d/agenthub-eda-dashboard
 
 ### Dashboard Layout Overview
 

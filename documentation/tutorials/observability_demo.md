@@ -60,7 +60,7 @@ Open these URLs in your browser (keep them open in tabs):
 
 | **Service** | **URL** | **Purpose** |
 |-------------|---------|-------------|
-| **Grafana** | http://localhost:3000 | Main observability dashboard |
+| **Grafana** | http://localhost:3333 | Main observability dashboard |
 | **Jaeger** | http://localhost:16686 | Distributed tracing |
 | **Prometheus** | http://localhost:9090 | Raw metrics and alerts |
 
@@ -130,7 +130,7 @@ time=2025-09-28T21:00:02.000Z level=INFO msg="Task published successfully" task_
 
 ## Step 7: Explore Real-time Metrics in Grafana (2 minutes)
 
-1. **Go to Grafana**: http://localhost:3000
+1. **Go to Grafana**: http://localhost:3333
 2. **Navigate to Dashboards** → Browse → AgentHub → "AgentHub EDA System Observatory"
 3. **Observe the real-time data**:
 

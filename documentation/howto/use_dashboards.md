@@ -11,8 +11,8 @@
 
 ## Quick Access
 
-- **Grafana Dashboard**: http://localhost:3000 (admin/admin)
-- **Direct Dashboard**: http://localhost:3000/d/agenthub-eda-dashboard
+- **Grafana Dashboard**: http://localhost:3333 (admin/admin)
+- **Direct Dashboard**: http://localhost:3333/d/agenthub-eda-dashboard
 
 ## Dashboard Overview
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/owulveryck/agenthub/internal/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/prometheus"
@@ -118,11 +119,12 @@ func (o *Observability) Shutdown(ctx context.Context) error {
 }
 
 func DefaultConfig(serviceName string) Config {
+	appConfig := config.Load()
 	return Config{
 		ServiceName:    serviceName,
-		ServiceVersion: "1.0.0",
-		JaegerEndpoint: "127.0.0.1:4317",
-		PrometheusPort: "9090",
-		Environment:    "development",
+		ServiceVersion: appConfig.ServiceVersion,
+		JaegerEndpoint: appConfig.JaegerEndpoint,
+		PrometheusPort: appConfig.PrometheusPort,
+		Environment:    appConfig.Environment,
 	}
 }
