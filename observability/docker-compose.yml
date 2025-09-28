@@ -1,15 +1,14 @@
 services:
-  # Jaeger all-in-one for distributed tracing
+  # Jaeger v2 all-in-one for distributed tracing
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/jaeger:2.0.0
     container_name: agenthub-jaeger
     ports:
-      - "16686:16686"   # Jaeger UI
-      - "14268:14268"   # Jaeger HTTP collector
-      - "4317:4317"     # OTLP gRPC receiver
-      - "4318:4318"     # OTLP HTTP receiver
+      - "16686:16686" # Jaeger UI
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
     environment:
-      - COLLECTOR_OTLP_ENABLED=true
+      - SPAN_STORAGE_TYPE=memory
     networks:
       - agenthub-observability
 
@@ -21,10 +20,10 @@ services:
     volumes:
       - ./otel-collector/otel-collector.yml:/etc/otel-collector.yml
     ports:
-      - "4317:4317"     # OTLP gRPC receiver
-      - "4318:4318"     # OTLP HTTP receiver
-      - "8888:8888"     # Prometheus metrics
-      - "8889:8889"     # Prometheus exporter metrics
+      - "4320:4317" # OTLP gRPC receiver (mapped to avoid conflict)
+      - "4321:4318" # OTLP HTTP receiver (mapped to avoid conflict)
+      - "8888:8888" # Prometheus metrics
+      - "8889:8889" # Prometheus exporter metrics
     depends_on:
       - jaeger
       - prometheus
@@ -36,12 +35,12 @@ services:
     image: prom/prometheus:v2.45.0
     container_name: agenthub-prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=30d'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
     ports:
       - "9090:9090"
     volumes:
@@ -56,7 +55,7 @@ services:
     image: grafana/grafana:10.0.0
     container_name: agenthub-grafana
     ports:
-      - "3000:3000"
+      - "3333:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -88,10 +87,10 @@ services:
     ports:
       - "9100:9100"
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
