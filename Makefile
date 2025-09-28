@@ -10,8 +10,8 @@ PROTOC := protoc
 GO_PROTOC_GEN := $(shell go env GOPATH)/bin/protoc-gen-go
 GO_GRPC_PROTOC_GEN := $(shell go env GOPATH)/bin/protoc-gen-go-grpc
 
-# Source proto file
-PROTO_SRC := proto/eventbus.proto
+# Source proto files
+PROTO_SRC := proto/eventbus.proto proto/events.proto
 
 # Target directory for generated Go code
 GO_OUT_DIR := internal/grpc
@@ -33,13 +33,14 @@ GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller bi
 all: build
 
 # Target to generate protobuf Go code
-proto: $(GO_OUT_DIR)/eventbus.pb.go $(GO_OUT_DIR)/eventbus_grpc.pb.go
+proto: $(GO_OUT_DIR)/eventbus.pb.go $(GO_OUT_DIR)/eventbus_grpc.pb.go $(GO_OUT_DIR)/events.pb.go
 
 # Rule to generate .pb.go files
 $(GO_OUT_DIR)/%.pb.go: $(PROTO_SRC)
-	@echo "Generating protobuf code for $<..."
+	@echo "Generating protobuf code..."
 	@mkdir -p $(GO_OUT_DIR) # Ensure output directory exists
-	$(PROTOC) --go_out=. --go-grpc_out=. $(PROTO_SRC)
+	$(PROTOC) --go_out=. --go-grpc_out=. proto/eventbus.proto
+	$(PROTOC) --go_out=. proto/events.proto
 	@echo "Protobuf code generated successfully."
 
 # Rule to generate .pb.gw.go files (if you add gRPC-Gateway later)

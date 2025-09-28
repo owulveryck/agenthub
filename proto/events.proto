@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package events;
+
+// Specify the Go package for generated code.
+option go_package = "internal/grpc;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// Event data structure for observability as specified in eventflow.md
+message EventData {
+  string id = 1;                                      // Event identifier
+  string type = 2;                                    // Event type (e.g., "task.published", "task.completed")
+  string source = 3;                                  // Source service/agent name
+  string subject = 4;                                 // Event subject/description
+  google.protobuf.Timestamp time = 5;                // Event timestamp
+  google.protobuf.Struct data = 6;                   // Event payload data
+  map<string, string> headers = 7;                   // Event headers (including trace context)
+  string trace_id = 8;                               // Distributed trace ID
+  string span_id = 9;                                // Span ID within trace
+  string data_content_type = 10;                     // Content type of data
+  string data_schema = 11;                           // Schema version/type
+  string spec_version = 12;                          // CloudEvents spec version
+}
+
+// Cloud Events compliant structure for interoperability
+message CloudEvent {
+  string id = 1;                                      // Required: Identifies the event
+  string source = 2;                                  // Required: Identifies the context in which an event happened
+  string spec_version = 3;                            // Required: CloudEvents specification version
+  string type = 4;                                    // Required: Event type
+  map<string, string> attributes = 5;                // Optional: Additional metadata
+  oneof data {
+    bytes binary_data = 6;
+    string text_data = 7;
+    google.protobuf.Struct json_data = 8;
+  }
+}
+
+// Log entry structure for structured logging
+message LogEntry {
+  google.protobuf.Timestamp time = 1;                // Log timestamp
+  string level = 2;                                   // Log level (INFO, WARN, ERROR, DEBUG)
+  string message = 3;                                 // Log message
+  string trace_id = 4;                               // Trace context
+  string span_id = 5;                                // Span context
+  string service = 6;                                // Service name
+  string event_id = 7;                               // Related event ID
+  string event_type = 8;                             // Related event type
+  int64 duration_ms = 9;                             // Operation duration in milliseconds
+  string source = 10;                                // Source file:line
+  map<string, string> attributes = 11;               // Additional log attributes
+}
+
+// Metric data point for custom metrics
+message MetricDataPoint {
+  string name = 1;                                    // Metric name
+  string description = 2;                            // Metric description
+  string unit = 3;                                    // Metric unit
+  google.protobuf.Timestamp timestamp = 4;          // Measurement timestamp
+  map<string, string> labels = 5;                   // Metric labels/tags
+  oneof value {
+    double gauge_value = 6;                          // Gauge metric value
+    int64 counter_value = 7;                         // Counter metric value
+    HistogramValue histogram_value = 8;              // Histogram metric value
+  }
+}
+
+// Histogram value structure
+message HistogramValue {
+  int64 count = 1;                                    // Number of observations
+  double sum = 2;                                     // Sum of all observations
+  repeated double buckets = 3;                        // Histogram buckets
+  repeated int64 bucket_counts = 4;                   // Count per bucket
+}
+
+// Span data for distributed tracing
+message SpanData {
+  string trace_id = 1;                               // Trace ID
+  string span_id = 2;                                // Span ID
+  string parent_span_id = 3;                         // Parent span ID
+  string operation_name = 4;                         // Operation name
+  google.protobuf.Timestamp start_time = 5;         // Span start time
+  google.protobuf.Timestamp end_time = 6;           // Span end time
+  int64 duration_us = 7;                             // Duration in microseconds
+  map<string, string> tags = 8;                     // Span tags
+  repeated SpanLog logs = 9;                         // Span logs
+  string status = 10;                                // Span status (OK, ERROR, etc.)
+  string service_name = 11;                          // Service name
+}
+
+// Span log entry
+message SpanLog {
+  google.protobuf.Timestamp timestamp = 1;          // Log timestamp
+  map<string, string> fields = 2;                   // Log fields
+}
