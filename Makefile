@@ -68,7 +68,7 @@ build: proto
 # Target to run the event bus server
 run-server:
 	@echo "Starting Event Bus gRPC Server..."
-	go run broketmain.go
+	go run broker/main.go
 
 # Target to run the publisher client
 run-publisher:
