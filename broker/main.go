@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/owulveryck/agenthub/broker/internal/grpc"
+	pb "github.com/owulveryck/agenthub/internal/grpc"
 )
 
 const (

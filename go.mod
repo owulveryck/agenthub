@@ -1,4 +1,4 @@
-module github.com/owulveryck/gomcptest/broker
+module github.com/owulveryck/agenthub
 
 go 1.24.0
 

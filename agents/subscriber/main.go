@@ -14,7 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/owulveryck/agenthub/broker/internal/grpc"
+	pb "github.com/owulveryck/agenthub/internal/grpc"
 )
 
 const (

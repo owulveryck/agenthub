@@ -3,7 +3,7 @@
 # ==============================================================================
 
 # Define your Go module path (must match the one used in go.mod)
-MODULE_PATH := github.com/owulveryck/gomcptest/broker # <<<--- CHANGE THIS
+MODULE_PATH := github.com/owulveryck/agenthub
 
 # Protobuf compiler and plugins
 PROTOC := protoc
@@ -55,30 +55,30 @@ $(GO_OUT_DIR)/%.pb.go: $(PROTO_SRC)
 # Target to build all binaries
 build: proto
 	@echo "Building server binary..."
-	go build $(GO_BUILD_FLAGS) -o bin/$(SERVER_BINARY) cmd/eventbus_server/main.go
+	go build $(GO_BUILD_FLAGS) -o bin/$(SERVER_BINARY) broker/main.go
 
 	@echo "Building publisher binary..."
-	go build $(GO_BUILD_FLAGS) -o bin/$(PUBLISHER_BINARY) cmd/publisher/main.go
+	go build $(GO_BUILD_FLAGS) -o bin/$(PUBLISHER_BINARY) agents/publisher/main.go
 
 	@echo "Building subscriber binary..."
-	go build $(GO_BUILD_FLAGS) -o bin/$(SUBSCRIBER_BINARY) cmd/subscriber/main.go
+	go build $(GO_BUILD_FLAGS) -o bin/$(SUBSCRIBER_BINARY) agents/subscriber/main.go
 
 	@echo "Build complete. Binaries are in the 'bin/' directory."
 
 # Target to run the event bus server
 run-server:
 	@echo "Starting Event Bus gRPC Server..."
-	go run cmd/eventbus_server/main.go
+	go run broketmain.go
 
 # Target to run the publisher client
 run-publisher:
 	@echo "Starting Publisher Client..."
-	go run cmd/publisher/main.go
+	go run agents/publisher/main.go
 
 # Target to run the subscriber client
 run-subscriber:
 	@echo "Starting Subscriber Client..."
-	go run cmd/subscriber/main.go
+	go run agents/subscriber/main.go
 
 # Target to clean up generated files and binaries
 clean:

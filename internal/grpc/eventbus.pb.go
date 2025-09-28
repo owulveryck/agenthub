@@ -799,7 +799,7 @@ const file_proto_eventbus_proto_rawDesc = "" +
 	"\x13PublishTaskProgress\x12$.eventbus.PublishTaskProgressRequest\x1a\x19.eventbus.PublishResponse\x12N\n" +
 	"\x10SubscribeToTasks\x12!.eventbus.SubscribeToTasksRequest\x1a\x15.eventbus.TaskMessage0\x01\x12Y\n" +
 	"\x16SubscribeToTaskResults\x12'.eventbus.SubscribeToTaskResultsRequest\x1a\x14.eventbus.TaskResult0\x01\x12\\\n" +
-	"\x17SubscribeToTaskProgress\x12'.eventbus.SubscribeToTaskResultsRequest\x1a\x16.eventbus.TaskProgress0\x01B9Z7github.com/owulveryck/agenthub/broker/internal/grpc;pbb\x06proto3"
+	"\x17SubscribeToTaskProgress\x12'.eventbus.SubscribeToTaskResultsRequest\x1a\x16.eventbus.TaskProgress0\x01B\x12Z\x10internal/grpc;pbb\x06proto3"
 
 var (
 	file_proto_eventbus_proto_rawDescOnce sync.Once
