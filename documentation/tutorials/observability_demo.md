@@ -74,7 +74,7 @@ Open a new terminal and navigate back to the project root:
 
 ```bash
 # From agenthub root directory
-go run -tags observability broker/main_observability.go
+go run broker/main.go
 ```
 
 **Expected Output:**
@@ -93,7 +93,7 @@ time=2025-09-28T21:00:00.000Z level=INFO msg="AgentHub broker gRPC server with o
 Open another terminal:
 
 ```bash
-go run -tags observability agents/subscriber/main_observability.go
+go run agents/subscriber/main.go
 ```
 
 **Expected Output:**
@@ -112,7 +112,7 @@ time=2025-09-28T21:00:01.000Z level=INFO msg="Agent started with observability. 
 Open a third terminal:
 
 ```bash
-go run -tags observability agents/publisher/main_observability.go
+go run agents/publisher/main.go
 ```
 
 **Expected Output:**

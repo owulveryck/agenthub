@@ -68,14 +68,12 @@ package main
 
 ```
 agents/publisher/
-├── main.go                 # Basic version (no observability)
-├── main_observability.go   # Full observability version
+├── main.go                 # Unified abstraction with built-in observability
 ├── shared.go              # Common code (no build tags)
 └── config.go              # Configuration (no build tags)
 
 broker/
-├── main.go                 # Basic broker
-├── main_observability.go   # Observable broker
+├── main.go                 # Unified abstraction with built-in observability
 └── server.go              # Core server logic (shared)
 
 internal/
@@ -167,14 +165,14 @@ func processTask(ctx context.Context, task *pb.TaskMessage) error {
 go build -o bin/publisher agents/publisher/
 # Result: Small binary, no observability dependencies
 # Files included: main.go, shared.go, config.go
-# Files excluded: main_observability.go, observability/*
+# Files excluded: (none - unified abstraction includes observability)
 ```
 
 **Observable agent**:
 ```bash
 go build -tags observability -o bin/publisher-obs agents/publisher/
 # Result: Full-featured binary with observability
-# Files included: main_observability.go, shared.go, config.go, observability/*
+# Files included: main.go with unified abstraction, shared.go, config.go
 # Files excluded: main.go
 ```
 
@@ -321,7 +319,7 @@ Dependencies: OpenTelemetry SDK, Prometheus client
 ```bash
 # Files
 main.go                    # Basic version
-main_observability.go      # Observable version
+main.go                    # Unified version with built-in observability
 main_debug.go             # Debug version
 
 # Build tags

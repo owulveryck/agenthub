@@ -18,10 +18,10 @@ If you haven't completed the observability demo yet:
 cd agenthub/observability
 docker-compose up -d
 
-# Run observable agents (3 terminals)
-go run -tags observability broker/main_observability.go
-go run -tags observability agents/subscriber/main_observability.go
-go run -tags observability agents/publisher/main_observability.go
+# Run agents (3 terminals)
+go run broker/main.go
+go run agents/subscriber/main.go
+go run agents/publisher/main.go
 ```
 
 ## Dashboard Navigation
@@ -365,7 +365,7 @@ This opens Jaeger in a new tab. Let's explore:
 
 | **Issue** | **Solution** |
 |-----------|-------------|
-| Dashboard shows no data | Verify agents running with `-tags observability` |
+| Dashboard shows no data | Verify agents are running |
 | Grafana won't load | Check `docker-compose ps` in observability/ |
 | Metrics missing | Verify Prometheus targets at http://localhost:9090/targets |
 | Jaeger empty | Ensure trace context propagation is working |

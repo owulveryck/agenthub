@@ -9,14 +9,14 @@ The AgentHub Unified Abstraction Library (`internal/agenthub/`) is a comprehensi
 ### Before and After Comparison
 
 **Before (Legacy approach):**
-- `broker/main_observability.go`: 380+ lines of boilerplate
+- Previous implementation: 380+ lines of boilerplate
 - Manual OpenTelemetry setup in every component
 - Duplicate configuration handling across components
 - Manual correlation ID management
 - Separate observability and non-observability variants
 
 **After (Unified abstractions):**
-- `broker/main.go`: 29 lines using abstractions
+- `broker/main.go`: 29 lines using unified abstractions
 - Automatic OpenTelemetry integration
 - Environment-based configuration
 - Automatic correlation ID generation and propagation

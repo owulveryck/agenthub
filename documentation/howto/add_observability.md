@@ -419,7 +419,7 @@ Build tags are special comments that tell Go which files to include during compi
 
 package main
 
-// This file is ONLY compiled when using: go build -tags observability
+// This file is ONLY compiled when using: go build
 ```
 
 ### Creating Your Observable Version
@@ -462,7 +462,7 @@ func main() {
 | **Command** | **Result** | **Use Case** |
 |-------------|------------|--------------|
 | `go build` | Builds basic version (no observability) | Default development |
-| `go build -tags observability` | Builds observable version | Production monitoring |
+| `go build` | Builds observable version | Production monitoring |
 | `go build -tags "observability,debug"` | Multiple tags | Advanced configurations |
 
 ### File Organization Strategy
@@ -490,14 +490,14 @@ build-basic:
 	go build -o bin/agent ./your-agent/
 
 build-observable:
-	go build -tags observability -o bin/agent-obs ./your-agent/
+	go build -o bin/agent-obs ./your-agent/
 ```
 
 ## Step 8: Build and Test
 
 ```bash
 # Build your observable agent
-go build -tags observability -o bin/my-agent-obs your-agent-directory/
+go build -o bin/my-agent-obs your-agent-directory/
 
 # Test health endpoint
 curl http://localhost:8083/health
@@ -551,7 +551,7 @@ After implementing observability, verify:
 grep "trace_id" your-agent.log
 
 # Verify agent is using observability build tag
-go build -tags observability -v your-agent-directory/
+go build -v your-agent-directory/
 ```
 
 ### Issue: No metrics in Prometheus
