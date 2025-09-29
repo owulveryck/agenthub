@@ -37,26 +37,39 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentHubClient interface {
-	// Publish A2A messages through broker
+	// PublishMessage submits an A2A message for delivery through the broker.
+	// The message is wrapped in an AgentEvent and routed based on metadata.
+	// Supports point-to-point, broadcast, and topic-based delivery patterns.
 	PublishMessage(ctx context.Context, in *PublishMessageRequest, opts ...grpc.CallOption) (*PublishResponse, error)
-	// Publish task updates through broker
+	// PublishTaskUpdate notifies subscribers about A2A task state changes.
+	// Used to broadcast task lifecycle events (started, progress, completed).
 	PublishTaskUpdate(ctx context.Context, in *PublishTaskUpdateRequest, opts ...grpc.CallOption) (*PublishResponse, error)
+	// PublishTaskArtifact delivers A2A task output artifacts to subscribers.
+	// Supports both atomic delivery and streaming for large artifacts.
 	PublishTaskArtifact(ctx context.Context, in *PublishTaskArtifactRequest, opts ...grpc.CallOption) (*PublishResponse, error)
-	// Subscribe to A2A messages for specific agent
+	// SubscribeToMessages creates a stream of A2A message events for an agent.
+	// The agent receives all messages routed to it or matching its subscriptions.
 	SubscribeToMessages(ctx context.Context, in *SubscribeToMessagesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AgentEvent], error)
-	// Subscribe to A2A task events
+	// SubscribeToTasks creates a stream of A2A task events for an agent.
+	// Includes new tasks, status updates, and artifact notifications.
 	SubscribeToTasks(ctx context.Context, in *SubscribeToTasksRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AgentEvent], error)
-	// Subscribe to all events for an agent (combined stream)
+	// SubscribeToAgentEvents creates a unified stream of all events for an agent.
+	// Combines messages, tasks, status updates, and artifacts in one stream.
 	SubscribeToAgentEvents(ctx context.Context, in *SubscribeToAgentEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AgentEvent], error)
-	// Get task status (A2A compatible)
+	// GetTask retrieves the current state of an A2A task by ID.
+	// Returns the complete task with history, status, and artifacts.
 	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*Task, error)
-	// Cancel task (A2A compatible)
+	// CancelTask cancels an active A2A task and notifies subscribers.
+	// Only tasks in SUBMITTED or WORKING state can be cancelled.
 	CancelTask(ctx context.Context, in *CancelTaskRequest, opts ...grpc.CallOption) (*Task, error)
-	// List tasks for agent/context
+	// ListTasks returns A2A tasks matching the specified criteria.
+	// Supports filtering by agent, context, state, and pagination.
 	ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error)
-	// Get agent card for discovery
+	// GetAgentCard returns the broker's A2A agent card for discovery.
+	// Enables other agents to discover the broker's capabilities and endpoints.
 	GetAgentCard(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AgentCard, error)
-	// Register agent with broker
+	// RegisterAgent registers an agent with the broker for event routing.
+	// Enables the broker to route events to the agent and track its capabilities.
 	RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error)
 }
 
@@ -209,26 +222,39 @@ func (c *agentHubClient) RegisterAgent(ctx context.Context, in *RegisterAgentReq
 // All implementations must embed UnimplementedAgentHubServer
 // for forward compatibility.
 type AgentHubServer interface {
-	// Publish A2A messages through broker
+	// PublishMessage submits an A2A message for delivery through the broker.
+	// The message is wrapped in an AgentEvent and routed based on metadata.
+	// Supports point-to-point, broadcast, and topic-based delivery patterns.
 	PublishMessage(context.Context, *PublishMessageRequest) (*PublishResponse, error)
-	// Publish task updates through broker
+	// PublishTaskUpdate notifies subscribers about A2A task state changes.
+	// Used to broadcast task lifecycle events (started, progress, completed).
 	PublishTaskUpdate(context.Context, *PublishTaskUpdateRequest) (*PublishResponse, error)
+	// PublishTaskArtifact delivers A2A task output artifacts to subscribers.
+	// Supports both atomic delivery and streaming for large artifacts.
 	PublishTaskArtifact(context.Context, *PublishTaskArtifactRequest) (*PublishResponse, error)
-	// Subscribe to A2A messages for specific agent
+	// SubscribeToMessages creates a stream of A2A message events for an agent.
+	// The agent receives all messages routed to it or matching its subscriptions.
 	SubscribeToMessages(*SubscribeToMessagesRequest, grpc.ServerStreamingServer[AgentEvent]) error
-	// Subscribe to A2A task events
+	// SubscribeToTasks creates a stream of A2A task events for an agent.
+	// Includes new tasks, status updates, and artifact notifications.
 	SubscribeToTasks(*SubscribeToTasksRequest, grpc.ServerStreamingServer[AgentEvent]) error
-	// Subscribe to all events for an agent (combined stream)
+	// SubscribeToAgentEvents creates a unified stream of all events for an agent.
+	// Combines messages, tasks, status updates, and artifacts in one stream.
 	SubscribeToAgentEvents(*SubscribeToAgentEventsRequest, grpc.ServerStreamingServer[AgentEvent]) error
-	// Get task status (A2A compatible)
+	// GetTask retrieves the current state of an A2A task by ID.
+	// Returns the complete task with history, status, and artifacts.
 	GetTask(context.Context, *GetTaskRequest) (*Task, error)
-	// Cancel task (A2A compatible)
+	// CancelTask cancels an active A2A task and notifies subscribers.
+	// Only tasks in SUBMITTED or WORKING state can be cancelled.
 	CancelTask(context.Context, *CancelTaskRequest) (*Task, error)
-	// List tasks for agent/context
+	// ListTasks returns A2A tasks matching the specified criteria.
+	// Supports filtering by agent, context, state, and pagination.
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
-	// Get agent card for discovery
+	// GetAgentCard returns the broker's A2A agent card for discovery.
+	// Enables other agents to discover the broker's capabilities and endpoints.
 	GetAgentCard(context.Context, *emptypb.Empty) (*AgentCard, error)
-	// Register agent with broker
+	// RegisterAgent registers an agent with the broker for event routing.
+	// Enables the broker to route events to the agent and track its capabilities.
 	RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error)
 	mustEmbedUnimplementedAgentHubServer()
 }

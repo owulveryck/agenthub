@@ -24,15 +24,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Priority levels for events (maintained for EDA routing)
+// Priority levels for event processing and delivery ordering.
+// Higher priority events are processed before lower priority ones in queues.
 type Priority int32
 
 const (
-	Priority_PRIORITY_UNSPECIFIED Priority = 0
-	Priority_PRIORITY_LOW         Priority = 1
-	Priority_PRIORITY_MEDIUM      Priority = 2
-	Priority_PRIORITY_HIGH        Priority = 3
-	Priority_PRIORITY_CRITICAL    Priority = 4
+	Priority_PRIORITY_UNSPECIFIED Priority = 0 // Default priority (treated as MEDIUM)
+	Priority_PRIORITY_LOW         Priority = 1 // Background tasks, cleanup, telemetry
+	Priority_PRIORITY_MEDIUM      Priority = 2 // Normal agent-to-agent communication
+	Priority_PRIORITY_HIGH        Priority = 3 // Urgent tasks, real-time responses
+	Priority_PRIORITY_CRITICAL    Priority = 4 // System alerts, error conditions
 )
 
 // Enum value maps for Priority.
@@ -80,12 +81,14 @@ func (Priority) EnumDescriptor() ([]byte, []int) {
 	return file_proto_eventbus_proto_rawDescGZIP(), []int{0}
 }
 
-// AgentHub Event (wraps A2A messages for EDA transport)
+// AgentEvent wraps A2A messages for transport through the EDA broker.
+// This allows A2A messages to be routed, queued, and delivered using
+// event-driven patterns while maintaining A2A protocol compliance.
 type AgentEvent struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
-	EventId   string                 `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"` // Unique event ID
-	Timestamp *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`            // Event timestamp
-	// A2A-compliant payload (one of these)
+	EventId   string                 `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"` // Unique identifier for this event (for deduplication and tracking)
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`            // When this event was created (for ordering and TTL)
+	// A2A-compliant payload - exactly one of these must be set
 	//
 	// Types that are valid to be assigned to Payload:
 	//
@@ -94,11 +97,11 @@ type AgentEvent struct {
 	//	*AgentEvent_StatusUpdate
 	//	*AgentEvent_ArtifactUpdate
 	Payload isAgentEvent_Payload `protobuf_oneof:"payload"`
-	// EDA routing metadata
+	// EDA routing metadata for event distribution
 	Routing *AgentEventMetadata `protobuf:"bytes,20,opt,name=routing,proto3" json:"routing,omitempty"`
-	// Observability context
-	TraceId       string `protobuf:"bytes,30,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
-	SpanId        string `protobuf:"bytes,31,opt,name=span_id,json=spanId,proto3" json:"span_id,omitempty"`
+	// OpenTelemetry distributed tracing context
+	TraceId       string `protobuf:"bytes,30,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"` // Trace ID for request correlation
+	SpanId        string `protobuf:"bytes,31,opt,name=span_id,json=spanId,proto3" json:"span_id,omitempty"`    // Span ID for operation tracking
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -216,19 +219,19 @@ type isAgentEvent_Payload interface {
 }
 
 type AgentEvent_Message struct {
-	Message *Message `protobuf:"bytes,10,opt,name=message,proto3,oneof"` // A2A Message
+	Message *Message `protobuf:"bytes,10,opt,name=message,proto3,oneof"` // A2A Message for agent communication
 }
 
 type AgentEvent_Task struct {
-	Task *Task `protobuf:"bytes,11,opt,name=task,proto3,oneof"` // A2A Task
+	Task *Task `protobuf:"bytes,11,opt,name=task,proto3,oneof"` // A2A Task for work coordination
 }
 
 type AgentEvent_StatusUpdate struct {
-	StatusUpdate *TaskStatusUpdateEvent `protobuf:"bytes,12,opt,name=status_update,json=statusUpdate,proto3,oneof"` // Task status change
+	StatusUpdate *TaskStatusUpdateEvent `protobuf:"bytes,12,opt,name=status_update,json=statusUpdate,proto3,oneof"` // Task lifecycle state changes
 }
 
 type AgentEvent_ArtifactUpdate struct {
-	ArtifactUpdate *TaskArtifactUpdateEvent `protobuf:"bytes,13,opt,name=artifact_update,json=artifactUpdate,proto3,oneof"` // New/updated artifact
+	ArtifactUpdate *TaskArtifactUpdateEvent `protobuf:"bytes,13,opt,name=artifact_update,json=artifactUpdate,proto3,oneof"` // Task output artifacts
 }
 
 func (*AgentEvent_Message) isAgentEvent_Payload() {}
@@ -239,14 +242,16 @@ func (*AgentEvent_StatusUpdate) isAgentEvent_Payload() {}
 
 func (*AgentEvent_ArtifactUpdate) isAgentEvent_Payload() {}
 
-// EDA routing information
+// AgentEventMetadata provides routing and delivery information for events.
+// This enables sophisticated event routing patterns including point-to-point,
+// broadcast, topic-based, and priority-based delivery.
 type AgentEventMetadata struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FromAgentId   string                 `protobuf:"bytes,1,opt,name=from_agent_id,json=fromAgentId,proto3" json:"from_agent_id,omitempty"` // Source agent
-	ToAgentId     string                 `protobuf:"bytes,2,opt,name=to_agent_id,json=toAgentId,proto3" json:"to_agent_id,omitempty"`       // Target agent (empty = broadcast)
-	EventType     string                 `protobuf:"bytes,3,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`         // "message", "task", "status_update", etc.
-	Subscriptions []string               `protobuf:"bytes,4,rep,name=subscriptions,proto3" json:"subscriptions,omitempty"`                  // Topic-based routing
-	Priority      Priority               `protobuf:"varint,5,opt,name=priority,proto3,enum=agenthub.Priority" json:"priority,omitempty"`    // Event priority
+	FromAgentId   string                 `protobuf:"bytes,1,opt,name=from_agent_id,json=fromAgentId,proto3" json:"from_agent_id,omitempty"` // Source agent identifier (for reply routing)
+	ToAgentId     string                 `protobuf:"bytes,2,opt,name=to_agent_id,json=toAgentId,proto3" json:"to_agent_id,omitempty"`       // Target agent ID (empty string means broadcast to all)
+	EventType     string                 `protobuf:"bytes,3,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`         // Event classification ("message", "task", "status_update", "artifact")
+	Subscriptions []string               `protobuf:"bytes,4,rep,name=subscriptions,proto3" json:"subscriptions,omitempty"`                  // Topic-based routing tags for content-based filtering
+	Priority      Priority               `protobuf:"varint,5,opt,name=priority,proto3,enum=agenthub.Priority" json:"priority,omitempty"`    // Delivery priority for event queue ordering
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -316,14 +321,16 @@ func (x *AgentEventMetadata) GetPriority() Priority {
 	return Priority_PRIORITY_UNSPECIFIED
 }
 
-// Task status update event (A2A compatible)
+// TaskStatusUpdateEvent notifies subscribers about A2A task lifecycle changes.
+// This event is published whenever a task transitions between states
+// (SUBMITTED → WORKING → COMPLETED/FAILED/CANCELLED).
 type TaskStatusUpdateEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	ContextId     string                 `protobuf:"bytes,2,opt,name=context_id,json=contextId,proto3" json:"context_id,omitempty"`
-	Status        *TaskStatus            `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Final         bool                   `protobuf:"varint,4,opt,name=final,proto3" json:"final,omitempty"` // Last update for this task
-	Metadata      *structpb.Struct       `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`          // A2A task identifier
+	ContextId     string                 `protobuf:"bytes,2,opt,name=context_id,json=contextId,proto3" json:"context_id,omitempty"` // A2A conversation context
+	Status        *TaskStatus            `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`                        // New A2A task status with state and update message
+	Final         bool                   `protobuf:"varint,4,opt,name=final,proto3" json:"final,omitempty"`                         // True if this is the terminal state for the task
+	Metadata      *structpb.Struct       `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`                    // Additional event metadata (timing, agent info, etc.)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -393,15 +400,16 @@ func (x *TaskStatusUpdateEvent) GetMetadata() *structpb.Struct {
 	return nil
 }
 
-// Task artifact update event (A2A compatible)
+// TaskArtifactUpdateEvent delivers A2A task output artifacts to subscribers.
+// Supports both atomic artifact delivery and streaming for large outputs.
 type TaskArtifactUpdateEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	ContextId     string                 `protobuf:"bytes,2,opt,name=context_id,json=contextId,proto3" json:"context_id,omitempty"`
-	Artifact      *Artifact              `protobuf:"bytes,3,opt,name=artifact,proto3" json:"artifact,omitempty"`
-	Append        bool                   `protobuf:"varint,4,opt,name=append,proto3" json:"append,omitempty"`                        // Append to existing artifact
-	LastChunk     bool                   `protobuf:"varint,5,opt,name=last_chunk,json=lastChunk,proto3" json:"last_chunk,omitempty"` // Final chunk of artifact
-	Metadata      *structpb.Struct       `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`           // A2A task that produced this artifact
+	ContextId     string                 `protobuf:"bytes,2,opt,name=context_id,json=contextId,proto3" json:"context_id,omitempty"`  // A2A conversation context
+	Artifact      *Artifact              `protobuf:"bytes,3,opt,name=artifact,proto3" json:"artifact,omitempty"`                     // The A2A artifact containing structured output
+	Append        bool                   `protobuf:"varint,4,opt,name=append,proto3" json:"append,omitempty"`                        // True to append to existing artifact, false to replace
+	LastChunk     bool                   `protobuf:"varint,5,opt,name=last_chunk,json=lastChunk,proto3" json:"last_chunk,omitempty"` // True if this completes a streaming artifact
+	Metadata      *structpb.Struct       `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`                     // Delivery metadata (chunk info, compression, etc.)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
