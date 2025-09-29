@@ -78,6 +78,23 @@ func (s *AgentHubService) PublishMessage(ctx context.Context, req *pb.PublishMes
 		return nil, err
 	}
 
+	// Add comprehensive A2A message attributes to span
+	taskType := ""
+	if message.Metadata != nil && message.Metadata.Fields != nil {
+		if taskTypeValue, exists := message.Metadata.Fields["task_type"]; exists {
+			taskType = taskTypeValue.GetStringValue()
+		}
+	}
+	s.Server.TraceManager.AddA2AMessageAttributes(
+		span,
+		message.GetMessageId(),
+		message.GetContextId(),
+		message.GetRole().String(),
+		taskType,
+		len(message.GetContent()),
+		message.GetMetadata() != nil,
+	)
+
 	// Generate event ID
 	eventID := fmt.Sprintf("evt_%s_%d", message.GetMessageId(), time.Now().Unix())
 
@@ -127,13 +144,35 @@ func (s *AgentHubService) PublishMessage(ctx context.Context, req *pb.PublishMes
 		SpanId:    span.SpanContext().SpanID().String(),
 	}
 
-	// Route message event to subscribers
-	err := s.routeEvent(ctx, messageEvent)
+	// Route message event to subscribers with enhanced tracing
+	routeCtx, routeSpan := s.Server.TraceManager.StartA2AEventRouteSpan(
+		ctx,
+		eventID,
+		"message",
+		s.getSubscriberCount("message", messageEvent.GetRouting()),
+	)
+	defer routeSpan.End()
+
+	// Add routing metadata to route span
+	if routing := messageEvent.GetRouting(); routing != nil {
+		s.Server.TraceManager.AddA2AEventAttributes(
+			routeSpan,
+			eventID,
+			routing.GetEventType(),
+			routing.GetFromAgentId(),
+			routing.GetToAgentId(),
+			s.getSubscriberCount("message", routing),
+		)
+	}
+
+	err := s.routeEvent(routeCtx, messageEvent)
 	if err != nil {
 		s.Server.TraceManager.RecordError(span, err)
+		s.Server.TraceManager.RecordError(routeSpan, err)
 		s.Server.MetricsManager.IncrementEventErrors(ctx, "a2a_message", "broker", "routing_error")
 		return &pb.PublishResponse{Success: false, Error: err.Error()}, nil
 	}
+	s.Server.TraceManager.SetSpanSuccess(routeSpan)
 
 	// If this was a task message, also publish a task event
 	if task != nil {
@@ -686,6 +725,52 @@ func (s *AgentHubService) routeEvent(ctx context.Context, event *pb.AgentEvent) 
 	}
 
 	return nil
+}
+
+// getSubscriberCount returns the number of subscribers for a given event type and routing
+func (s *AgentHubService) getSubscriberCount(eventType string, routing *pb.AgentEventMetadata) int {
+	s.agentMu.RLock()
+	defer s.agentMu.RUnlock()
+
+	count := 0
+	targetAgent := ""
+	if routing != nil {
+		targetAgent = routing.GetToAgentId()
+	}
+
+	if targetAgent != "" {
+		// Count subscribers for specific agent
+		switch eventType {
+		case "message":
+			if subs, ok := s.messageSubscribers[targetAgent]; ok {
+				count += len(subs)
+			}
+		case "task":
+			if subs, ok := s.taskSubscribers[targetAgent]; ok {
+				count += len(subs)
+			}
+		}
+		if subs, ok := s.eventSubscribers[targetAgent]; ok {
+			count += len(subs)
+		}
+	} else {
+		// Count all subscribers for broadcast
+		switch eventType {
+		case "message":
+			for _, subs := range s.messageSubscribers {
+				count += len(subs)
+			}
+		case "task":
+			for _, subs := range s.taskSubscribers {
+				count += len(subs)
+			}
+		}
+		for _, subs := range s.eventSubscribers {
+			count += len(subs)
+		}
+	}
+
+	return count
 }
 
 // StartBroker creates and starts a broker with A2A compliance

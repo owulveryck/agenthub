@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	pb "github.com/owulveryck/agenthub/events/a2a"
@@ -163,8 +164,29 @@ func main() {
 				continue
 			}
 
+			// Start tracing for message publishing
+			pubCtx, pubSpan := client.TraceManager.StartA2AMessageSpan(
+				ctx,
+				"publish_chat_request",
+				message.GetMessageId(),
+				message.GetRole().String(),
+			)
+			defer pubSpan.End()
+
+			// Add comprehensive A2A attributes to publishing span
+			client.TraceManager.AddA2AMessageAttributes(
+				pubSpan,
+				message.GetMessageId(),
+				message.GetContextId(),
+				message.GetRole().String(),
+				"chat_request",
+				len(message.GetContent()),
+				message.GetMetadata() != nil,
+			)
+			client.TraceManager.AddComponentAttribute(pubSpan, "chat_repl")
+
 			// Publish A2A message with proper routing
-			resp, err := client.Client.PublishMessage(ctx, &pb.PublishMessageRequest{
+			resp, err := client.Client.PublishMessage(pubCtx, &pb.PublishMessageRequest{
 				Message: message,
 				Routing: &pb.AgentEventMetadata{
 					FromAgentId: replAgentID,
@@ -175,29 +197,75 @@ func main() {
 			})
 
 			if err != nil {
+				client.TraceManager.RecordError(pubSpan, err)
 				fmt.Printf("Error sending message: %v\n", err)
 				continue
 			}
+
+			client.TraceManager.SetSpanSuccess(pubSpan)
+			client.TraceManager.AddSpanEvent(pubSpan, "message_published",
+				attribute.String("event_id", resp.GetEventId()),
+			)
 
 			client.Logger.InfoContext(ctx, "Published A2A chat message",
 				"message_id", message.GetMessageId(),
 				"context_id", contextID,
 				"event_id", resp.GetEventId(),
+				"trace_id", pubSpan.SpanContext().TraceID().String(),
 			)
 
 			// Wait for response with timeout
 			fmt.Print("Waiting for response...")
 			select {
 			case response := <-responseChan:
+				// Start tracing for response processing
+				respCtx, respSpan := client.TraceManager.StartA2AMessageSpan(
+					ctx,
+					"process_chat_response",
+					response.GetMessageId(),
+					response.GetRole().String(),
+				)
+				defer respSpan.End()
+
+				// Add A2A attributes for response processing
+				client.TraceManager.AddA2AMessageAttributes(
+					respSpan,
+					response.GetMessageId(),
+					response.GetContextId(),
+					response.GetRole().String(),
+					"chat_response",
+					len(response.GetContent()),
+					response.GetMetadata() != nil,
+				)
+				client.TraceManager.AddComponentAttribute(respSpan, "chat_repl")
+
 				// Check if this response matches our context
 				if response.ContextId == contextID {
+					client.TraceManager.AddSpanEvent(respSpan, "context_matched",
+						attribute.String("expected_context", contextID),
+						attribute.String("received_context", response.ContextId),
+					)
 					fmt.Print("\r")
 					if len(response.Content) > 0 && response.Content[0].GetText() != "" {
 						fmt.Printf("< %s\n\n", response.Content[0].GetText())
+						client.TraceManager.AddSpanEvent(respSpan, "response_displayed",
+							attribute.String("response_text", response.Content[0].GetText()),
+						)
 					} else {
 						fmt.Printf("< [Empty response]\n\n")
+						client.TraceManager.AddSpanEvent(respSpan, "empty_response_received")
 					}
+					client.TraceManager.SetSpanSuccess(respSpan)
+					client.Logger.InfoContext(respCtx, "Processed chat response",
+						"response_message_id", response.GetMessageId(),
+						"context_id", response.GetContextId(),
+						"trace_id", respSpan.SpanContext().TraceID().String(),
+					)
 				} else {
+					client.TraceManager.AddSpanEvent(respSpan, "context_mismatch",
+						attribute.String("expected_context", contextID),
+						attribute.String("received_context", response.ContextId),
+					)
 					// Put it back if it doesn't match (though this shouldn't happen with proper filtering)
 					select {
 					case responseChan <- response:

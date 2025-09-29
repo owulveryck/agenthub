@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	pb "github.com/owulveryck/agenthub/events/a2a"
@@ -113,9 +114,31 @@ func main() {
 }
 
 func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, message *pb.Message) {
-	client.Logger.InfoContext(ctx, "Received A2A chat request",
+	// Start tracing for chat request processing
+	reqCtx, reqSpan := client.TraceManager.StartA2AMessageSpan(
+		ctx,
+		"handle_chat_request",
+		message.GetMessageId(),
+		message.GetRole().String(),
+	)
+	defer reqSpan.End()
+
+	// Add comprehensive A2A attributes for request processing
+	client.TraceManager.AddA2AMessageAttributes(
+		reqSpan,
+		message.GetMessageId(),
+		message.GetContextId(),
+		message.GetRole().String(),
+		"chat_request",
+		len(message.GetContent()),
+		message.GetMetadata() != nil,
+	)
+	client.TraceManager.AddComponentAttribute(reqSpan, "chat_responder")
+
+	client.Logger.InfoContext(reqCtx, "Received A2A chat request",
 		"message_id", message.GetMessageId(),
 		"context_id", message.GetContextId(),
+		"trace_id", reqSpan.SpanContext().TraceID().String(),
 	)
 
 	// Extract the user message from the message
@@ -124,7 +147,12 @@ func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 		userMessage = message.Content[0].GetText()
 	}
 
-	client.Logger.InfoContext(ctx, "Processing user message",
+	client.TraceManager.AddSpanEvent(reqSpan, "extracted_user_message",
+		attribute.String("user_message", userMessage),
+		attribute.Int("content_parts", len(message.GetContent())),
+	)
+
+	client.Logger.InfoContext(reqCtx, "Processing user message",
 		"message", userMessage,
 		"message_id", message.GetMessageId(),
 	)
@@ -157,8 +185,29 @@ func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 		return
 	}
 
+	// Start tracing for response publishing
+	pubCtx, pubSpan := client.TraceManager.StartA2AMessageSpan(
+		reqCtx,
+		"publish_chat_response",
+		responseMessage.GetMessageId(),
+		responseMessage.GetRole().String(),
+	)
+	defer pubSpan.End()
+
+	// Add A2A attributes for response publishing
+	client.TraceManager.AddA2AMessageAttributes(
+		pubSpan,
+		responseMessage.GetMessageId(),
+		responseMessage.GetContextId(),
+		responseMessage.GetRole().String(),
+		"chat_response",
+		len(responseMessage.GetContent()),
+		responseMessage.GetMetadata() != nil,
+	)
+	client.TraceManager.AddComponentAttribute(pubSpan, "chat_responder")
+
 	// Publish A2A response with proper routing
-	resp, err := client.Client.PublishMessage(ctx, &pb.PublishMessageRequest{
+	resp, err := client.Client.PublishMessage(pubCtx, &pb.PublishMessageRequest{
 		Message: responseMessage,
 		Routing: &pb.AgentEventMetadata{
 			FromAgentId: responderAgentID,
@@ -169,19 +218,30 @@ func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 	})
 
 	if err != nil {
-		client.Logger.ErrorContext(ctx, "Failed to publish A2A chat response",
+		client.TraceManager.RecordError(reqSpan, err)
+		client.TraceManager.RecordError(pubSpan, err)
+		client.Logger.ErrorContext(pubCtx, "Failed to publish A2A chat response",
 			"error", err,
 			"message_id", message.GetMessageId(),
+			"trace_id", pubSpan.SpanContext().TraceID().String(),
 		)
 		return
 	}
 
-	client.Logger.InfoContext(ctx, "Published A2A chat response",
+	client.TraceManager.SetSpanSuccess(reqSpan)
+	client.TraceManager.SetSpanSuccess(pubSpan)
+	client.TraceManager.AddSpanEvent(pubSpan, "response_published",
+		attribute.String("event_id", resp.GetEventId()),
+		attribute.String("response_content", "hello"),
+	)
+
+	client.Logger.InfoContext(pubCtx, "Published A2A chat response",
 		"message_id", message.GetMessageId(),
 		"response_message_id", responseMessage.GetMessageId(),
 		"context_id", message.GetContextId(),
 		"event_id", resp.GetEventId(),
 		"response", "hello",
+		"trace_id", pubSpan.SpanContext().TraceID().String(),
 	)
 }
 

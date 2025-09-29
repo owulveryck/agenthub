@@ -128,3 +128,69 @@ func (tm *TraceManager) AddSpanEvent(span trace.Span, eventName string, attribut
 func (tm *TraceManager) AddComponentAttribute(span trace.Span, component string) {
 	span.SetAttributes(attribute.String("agenthub.component", component))
 }
+
+// AddA2AMessageAttributes adds comprehensive A2A message information to a span
+func (tm *TraceManager) AddA2AMessageAttributes(span trace.Span, messageID, contextID, role, taskType string, contentLength int, hasMetadata bool) {
+	span.SetAttributes(
+		attribute.String("a2a.message.id", messageID),
+		attribute.String("a2a.message.role", role),
+		attribute.Int("a2a.message.content_parts", contentLength),
+		attribute.Bool("a2a.message.has_metadata", hasMetadata),
+	)
+
+	if contextID != "" {
+		span.SetAttributes(attribute.String("a2a.context.id", contextID))
+	}
+
+	if taskType != "" {
+		span.SetAttributes(attribute.String("a2a.task.type", taskType))
+	}
+}
+
+// AddA2AEventAttributes adds A2A event routing and processing information to a span
+func (tm *TraceManager) AddA2AEventAttributes(span trace.Span, eventID, eventType, fromAgent, toAgent string, subscriberCount int) {
+	span.SetAttributes(
+		attribute.String("a2a.event.id", eventID),
+		attribute.String("a2a.event.type", eventType),
+		attribute.Int("a2a.event.subscriber_count", subscriberCount),
+	)
+
+	if fromAgent != "" {
+		span.SetAttributes(attribute.String("a2a.routing.from_agent", fromAgent))
+	}
+
+	if toAgent != "" {
+		span.SetAttributes(attribute.String("a2a.routing.to_agent", toAgent))
+	}
+}
+
+// AddA2ATaskAttributes adds A2A task-specific information to a span
+func (tm *TraceManager) AddA2ATaskAttributes(span trace.Span, taskID, taskState, contextID string, historyCount, artifactCount int) {
+	span.SetAttributes(
+		attribute.String("a2a.task.id", taskID),
+		attribute.String("a2a.task.state", taskState),
+		attribute.String("a2a.task.context_id", contextID),
+		attribute.Int("a2a.task.history_count", historyCount),
+		attribute.Int("a2a.task.artifact_count", artifactCount),
+	)
+}
+
+// StartA2AMessageSpan starts a specialized span for A2A message processing
+func (tm *TraceManager) StartA2AMessageSpan(ctx context.Context, operationName, messageID, role string) (context.Context, trace.Span) {
+	return tm.tracer.Start(ctx, operationName, trace.WithAttributes(
+		attribute.String("a2a.message.id", messageID),
+		attribute.String("a2a.message.role", role),
+		attribute.String("messaging.system", "agenthub"),
+		attribute.String("messaging.protocol", "a2a"),
+	))
+}
+
+// StartA2AEventRouteSpan starts a span for A2A event routing
+func (tm *TraceManager) StartA2AEventRouteSpan(ctx context.Context, eventID, eventType string, subscriberCount int) (context.Context, trace.Span) {
+	return tm.tracer.Start(ctx, "a2a_route_event", trace.WithAttributes(
+		attribute.String("a2a.event.id", eventID),
+		attribute.String("a2a.event.type", eventType),
+		attribute.Int("a2a.event.subscriber_count", subscriberCount),
+		attribute.String("messaging.operation", "route"),
+	))
+}
