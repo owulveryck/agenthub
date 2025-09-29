@@ -21,6 +21,8 @@ OBSERVABILITY_OUT_DIR := internal/events/observability
 SERVER_BINARY := eventbus-server
 PUBLISHER_BINARY := publisher
 SUBSCRIBER_BINARY := subscriber
+CHAT_RESPONDER_BINARY := chat_responder
+CHAT_REPL_BINARY := chat_repl
 
 # Go compiler flags
 GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller binaries
@@ -29,7 +31,7 @@ GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller bi
 # Targets
 # ==============================================================================
 
-.PHONY: all proto build run-server run-publisher run-subscriber clean help
+.PHONY: all proto build run-server run-publisher run-subscriber run-chat-responder run-chat-repl clean help
 
 all: build
 
@@ -70,6 +72,12 @@ build: proto
 	@echo "Building A2A-compliant subscriber binary..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(SUBSCRIBER_BINARY) agents/subscriber/main.go
 
+	@echo "Building A2A-compliant chat responder binary..."
+	go build $(GO_BUILD_FLAGS) -o bin/$(CHAT_RESPONDER_BINARY) agents/chat_responder/main.go
+
+	@echo "Building A2A-compliant chat REPL binary..."
+	go build $(GO_BUILD_FLAGS) -o bin/$(CHAT_REPL_BINARY) agents/chat_repl/main.go
+
 	@echo "Build complete. A2A-compliant binaries are in the 'bin/' directory."
 
 # Target to run the event bus server
@@ -86,6 +94,16 @@ run-publisher:
 run-subscriber:
 	@echo "Starting Subscriber Client..."
 	go run agents/subscriber/main.go
+
+# Target to run the chat responder agent
+run-chat-responder:
+	@echo "Starting Chat Responder Agent..."
+	go run agents/chat_responder/main.go
+
+# Target to run the chat REPL agent
+run-chat-repl:
+	@echo "Starting Chat REPL Agent..."
+	go run agents/chat_repl/main.go
 
 # Target to clean up generated files and binaries
 clean:
@@ -104,15 +122,22 @@ help:
 	@echo "  make <target>"
 	@echo ""
 	@echo "Targets:"
-	@echo "  all              Builds all binaries (default)."
-	@echo "  proto            Generates Go code from .proto files."
-	@echo "  build            Builds the server, publisher, and subscriber binaries."
-	@echo "  run-server       Runs the event bus gRPC server."
-	@echo "  run-publisher    Runs the publisher client."
-	@echo "  run-subscriber   Runs the subscriber client."
-	@echo "  clean            Removes generated Go files and build artifacts."
-	@echo "  help             Displays this help message."
+	@echo "  all                  Builds all binaries (default)."
+	@echo "  proto                Generates Go code from .proto files."
+	@echo "  build                Builds all binaries (server, agents)."
+	@echo "  run-server           Runs the event bus gRPC server."
+	@echo "  run-publisher        Runs the publisher client."
+	@echo "  run-subscriber       Runs the subscriber client."
+	@echo "  run-chat-responder   Runs the chat responder agent (requires Vertex AI config)."
+	@echo "  run-chat-repl        Runs the chat REPL agent."
+	@echo "  clean                Removes generated Go files and build artifacts."
+	@echo "  help                 Displays this help message."
 	@echo ""
 	@echo "Configuration:"
 	@echo "  MODULE_PATH      Your Go module path (e.g., github.com/user/repo)."
 	@echo "                   Ensure this matches your go.mod file."
+	@echo ""
+	@echo "Environment Variables for Chat Responder:"
+	@echo "  GCP_PROJECT      Your Google Cloud Project ID"
+	@echo "  GCP_LOCATION     GCP region (default: us-central1)"
+	@echo "  VERTEX_AI_MODEL  Model name (default: gemini-2.0-flash)"

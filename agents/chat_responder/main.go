@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
+	"google.golang.org/genai"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	pb "github.com/owulveryck/agenthub/events/a2a"
@@ -19,6 +20,62 @@ import (
 const (
 	responderAgentID = "agent_chat_responder"
 )
+
+var (
+	// Environment variables for Vertex AI configuration
+	gcpProject  = getEnvOrDefault("GCP_PROJECT", "your-project")
+	gcpLocation = getEnvOrDefault("GCP_LOCATION", "us-central1")
+	modelName   = getEnvOrDefault("VERTEX_AI_MODEL", "gemini-2.0-flash")
+)
+
+// getEnvOrDefault returns environment variable value or default if not set
+func getEnvOrDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+// createVertexAIClient creates and returns a Vertex AI client
+func createVertexAIClient(ctx context.Context) (*genai.Client, error) {
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+		Project:  gcpProject,
+		Location: gcpLocation,
+		Backend:  genai.BackendVertexAI,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create Vertex AI client: %w", err)
+	}
+	return client, nil
+}
+
+// queryVertexAI sends a message to Vertex AI and returns the response
+func queryVertexAI(ctx context.Context, userMessage string) (string, error) {
+	client, err := createVertexAIClient(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	chat, err := client.Chats.Create(ctx, modelName, nil, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create chat: %w", err)
+	}
+
+	result, err := chat.SendMessage(ctx, genai.Part{Text: userMessage})
+	if err != nil {
+		return "", fmt.Errorf("failed to send message: %w", err)
+	}
+
+	// Extract the text response from the result
+	if len(result.Candidates) > 0 && len(result.Candidates[0].Content.Parts) > 0 {
+		part := result.Candidates[0].Content.Parts[0]
+		if part.Text != "" {
+			return part.Text, nil
+		}
+	}
+
+	return "I'm sorry, I couldn't generate a response.", nil
+}
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -157,6 +214,32 @@ func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 		"message_id", message.GetMessageId(),
 	)
 
+	// Query Vertex AI for response
+	client.TraceManager.AddSpanEvent(reqSpan, "querying_vertex_ai",
+		attribute.String("model", modelName),
+		attribute.String("project", gcpProject),
+		attribute.String("location", gcpLocation),
+	)
+
+	aiResponse, err := queryVertexAI(reqCtx, userMessage)
+	if err != nil {
+		client.TraceManager.RecordError(reqSpan, err)
+		client.Logger.ErrorContext(reqCtx, "Failed to query Vertex AI",
+			"error", err,
+			"message_id", message.GetMessageId(),
+		)
+		aiResponse = "I'm sorry, I'm having trouble processing your request at the moment."
+	}
+
+	client.TraceManager.AddSpanEvent(reqSpan, "vertex_ai_response_received",
+		attribute.String("response_length", fmt.Sprintf("%d", len(aiResponse))),
+	)
+
+	client.Logger.InfoContext(reqCtx, "Generated AI response",
+		"response_length", len(aiResponse),
+		"message_id", message.GetMessageId(),
+	)
+
 	// Create A2A-compliant response message
 	responseMessage := &pb.Message{
 		MessageId: fmt.Sprintf("msg_chat_response_%d", time.Now().Unix()),
@@ -165,7 +248,7 @@ func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 		Content: []*pb.Part{
 			{
 				Part: &pb.Part_Text{
-					Text: "hello",
+					Text: aiResponse,
 				},
 			},
 		},
@@ -232,7 +315,7 @@ func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 	client.TraceManager.SetSpanSuccess(pubSpan)
 	client.TraceManager.AddSpanEvent(pubSpan, "response_published",
 		attribute.String("event_id", resp.GetEventId()),
-		attribute.String("response_content", "hello"),
+		attribute.String("response_content", aiResponse),
 	)
 
 	client.Logger.InfoContext(pubCtx, "Published A2A chat response",
@@ -240,7 +323,7 @@ func handleChatRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 		"response_message_id", responseMessage.GetMessageId(),
 		"context_id", message.GetContextId(),
 		"event_id", resp.GetEventId(),
-		"response", "hello",
+		"response_length", len(aiResponse),
 		"trace_id", pubSpan.SpanContext().TraceID().String(),
 	)
 }
