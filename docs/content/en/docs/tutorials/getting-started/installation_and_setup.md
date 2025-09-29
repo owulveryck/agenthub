@@ -1,12 +1,12 @@
 ---
 title: "Installation and Setup Tutorial"
 weight: 20
-description: "Guide for installing AgentHub and setting up your development environment from scratch. Get a working AgentHub installation ready for building agent systems."
+description: "Guide for installing AgentHub and setting up your development environment from scratch. Get a working A2A-compliant AgentHub installation ready for building agent systems."
 ---
 
 # Installation and Setup Tutorial
 
-This tutorial will guide you through installing AgentHub and setting up your development environment from scratch. By the end, you'll have a working AgentHub installation ready for building agent systems.
+This tutorial will guide you through installing AgentHub and setting up your development environment from scratch. By the end, you'll have a working A2A-compliant AgentHub installation ready for building Agent2Agent protocol systems.
 
 ## Prerequisites Check
 
@@ -121,13 +121,14 @@ ls -la
 
 You should see:
 ```
-drwxr-xr-x agents/           # Sample agent implementations
-drwxr-xr-x broker/           # AgentHub broker server
-drwxr-xr-x documentation/    # Complete documentation
-drwxr-xr-x internal/         # Generated code
+drwxr-xr-x agents/           # Sample A2A agent implementations
+drwxr-xr-x broker/           # A2A-compliant AgentHub broker server
+drwxr-xr-x documentation/    # Complete A2A documentation
+drwxr-xr-x events/           # Generated A2A protocol code
+drwxr-xr-x internal/         # Internal packages and abstractions
 -rw-r--r-- go.mod            # Go module definition
 -rw-r--r-- Makefile         # Build automation
-drwxr-xr-x proto/           # Protocol definitions
+drwxr-xr-x proto/           # A2A protocol definitions
 -rw-r--r-- README.md        # Project overview
 ```
 
@@ -151,14 +152,36 @@ make proto
 
 You should see:
 ```
-Generating protobuf code for proto/eventbus.proto...
+Generating protobuf code for A2A protocol definitions...
+Generating proto/eventbus.proto...
+Generating proto/a2a.proto...
 Protobuf code generated successfully.
 ```
 
 Verify the generated files exist:
 
 ```bash
-ls internal/grpc/
+ls events/
+```
+
+You should see:
+```
+a2a/          # A2A protocol definitions
+eventbus/     # AgentHub broker definitions
+```
+
+```bash
+ls events/a2a/
+```
+
+You should see:
+```
+a2a.pb.go
+a2a_grpc.pb.go
+```
+
+```bash
+ls events/eventbus/
 ```
 
 You should see:
@@ -177,10 +200,10 @@ make build
 
 You should see:
 ```
-Building server binary...
-Building publisher binary...
-Building subscriber binary...
-Build complete. Binaries are in the 'bin/' directory.
+Building A2A-compliant server binary...
+Building A2A publisher binary...
+Building A2A subscriber binary...
+Build complete. A2A-compliant binaries are in the 'bin/' directory.
 ```
 
 Verify the binaries were created:
@@ -191,9 +214,9 @@ ls bin/
 
 You should see:
 ```
-eventbus-server
-publisher
-subscriber
+agenthub-server  # A2A-compliant AgentHub broker
+publisher        # A2A message publisher
+subscriber       # A2A message subscriber
 ```
 
 ## Verification Test
@@ -202,18 +225,19 @@ Let's verify everything works by running a quick test.
 
 ### Step 9: Test the Installation
 
-Start the broker server in the background:
+Start the A2A-compliant broker server in the background:
 
 ```bash
-./bin/eventbus-server &
+./bin/agenthub-server &
 ```
 
 You should see:
 ```
-2025/09/28 10:00:00 AgentHub broker gRPC server listening on [::]:50051
+2025/09/28 10:00:00 A2A-compliant AgentHub broker gRPC server listening on [::]:50051
+2025/09/28 10:00:00 AgentHub service ready for A2A protocol communication
 ```
 
-Start a subscriber agent:
+Start an A2A subscriber agent:
 
 ```bash
 ./bin/subscriber &
@@ -221,23 +245,23 @@ Start a subscriber agent:
 
 You should see:
 ```
-Agent started. Listening for events and tasks. Press Enter to stop.
-2025/09/28 10:00:05 Agent agent_demo_subscriber subscribing to tasks...
-2025/09/28 10:00:05 Successfully subscribed to tasks for agent agent_demo_subscriber. Waiting for tasks...
+A2A Agent started. Listening for A2A events and tasks. Press Enter to stop.
+2025/09/28 10:00:05 A2A Agent agent_demo_subscriber subscribing to A2A tasks...
+2025/09/28 10:00:05 Successfully subscribed to A2A tasks for agent agent_demo_subscriber. Waiting for A2A tasks...
 ```
 
-Run the publisher to send test tasks:
+Run the A2A publisher to send test tasks:
 
 ```bash
 ./bin/publisher
 ```
 
-You should see tasks being published and processed.
+You should see A2A tasks being published and processed with conversation context and structured artifacts.
 
 Clean up the test processes:
 
 ```bash
-pkill -f eventbus-server
+pkill -f agenthub-server
 pkill -f subscriber
 ```
 
@@ -263,15 +287,21 @@ AgentHub uses environment variables for configuration. Create a `.envrc` file fo
 
 ```bash
 cat > .envrc << EOF
-# Core AgentHub Configuration
+# Core A2A AgentHub Configuration
 export AGENTHUB_BROKER_ADDR="localhost"
 export AGENTHUB_BROKER_PORT="50051"
 export AGENTHUB_GRPC_PORT=":50051"
 
+# A2A Protocol Configuration
+export AGENTHUB_A2A_PROTOCOL_VERSION="1.0"
+export AGENTHUB_MESSAGE_BUFFER_SIZE="100"
+export AGENTHUB_CONTEXT_TIMEOUT="30s"
+export AGENTHUB_ARTIFACT_MAX_SIZE="10MB"
+
 # Health Check Ports
-export BROKER_HEALTH_PORT="8080"
-export PUBLISHER_HEALTH_PORT="8081"
-export SUBSCRIBER_HEALTH_PORT="8082"
+export AGENTHUB_HEALTH_PORT="8080"
+export A2A_PUBLISHER_HEALTH_PORT="8081"
+export A2A_SUBSCRIBER_HEALTH_PORT="8082"
 
 # Observability (optional for development)
 export JAEGER_ENDPOINT="http://localhost:14268/api/traces"

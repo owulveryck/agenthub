@@ -1,12 +1,12 @@
 ---
-title: "Running the AgentHub Broker Demo"
+title: "Running the A2A-Compliant AgentHub Demo"
 weight: 50
-description: "Walk through setting up and running the complete AgentHub broker system with Agent2Agent protocol task exchange capabilities. Learn how agents communicate and exchange structured tasks through the AgentHub broker."
+description: "Walk through setting up and running the complete A2A-compliant AgentHub EDA broker system. Learn how agents communicate using Agent2Agent protocol messages through the Event-Driven Architecture broker."
 ---
 
-# Running the AgentHub Broker Demo
+# Running the A2A-Compliant AgentHub Demo
 
-This tutorial will walk you through setting up and running the complete AgentHub broker system with Agent2Agent protocol task exchange capabilities. By the end of this tutorial, you'll have agents communicating and exchanging Agent2Agent-structured tasks through the AgentHub broker.
+This tutorial will walk you through setting up and running the complete Agent2Agent (A2A) protocol-compliant AgentHub Event-Driven Architecture (EDA) broker system. By the end of this tutorial, you'll have agents communicating using standardized A2A messages through the scalable EDA broker.
 
 ## Prerequisites
 
@@ -14,19 +14,26 @@ This tutorial will walk you through setting up and running the complete AgentHub
 - Protocol Buffers compiler (protoc) installed
 - Basic understanding of gRPC and message brokers
 
-## Step 1: Build the Components
+## Step 1: Build the A2A-Compliant Components
 
-First, let's build all the necessary components:
+First, let's build all the A2A-compliant components using the Makefile:
 
 ```bash
-# Build the broker
-go build -o bin/broker ./broker
+# Build all A2A-compliant binaries (generates protobuf files first)
+make build
+```
 
-# Build the subscriber (agent)
-go build -o bin/subscriber ./agents/subscriber
+This will:
+1. Generate A2A protocol files from `proto/a2a_core.proto` and `proto/eventbus.proto`
+2. Build the A2A-compliant broker, publisher, and subscriber binaries
+3. Place all binaries in the `bin/` directory
 
-# Build the publisher
-go build -o bin/publisher ./agents/publisher
+You should see output like:
+```
+Building A2A-compliant server binary...
+Building A2A-compliant publisher binary...
+Building A2A-compliant subscriber binary...
+Build complete. A2A-compliant binaries are in the 'bin/' directory.
 ```
 
 ## Step 2: Start the AgentHub Broker Server
@@ -68,39 +75,47 @@ This agent can process several types of tasks:
 - `random_number`: Random number generation
 - Any unknown task type will be rejected
 
-## Step 4: Send Agent2Agent Tasks
+## Step 4: Send A2A-Compliant Tasks
 
-Open a third terminal and run the publisher to send Agent2Agent protocol task messages:
+Open a third terminal and run the publisher to send A2A protocol-compliant task messages:
 
 ```bash
 ./bin/publisher
 ```
 
-You'll see the publisher send various Agent2Agent protocol task messages through the AgentHub broker:
+You'll see the publisher send various A2A-compliant task messages through the AgentHub EDA broker:
 
 ```
-time=2025-09-29T11:53:50.903+02:00 level=INFO msg="Starting publisher demo"
-time=2025-09-29T11:53:50.905+02:00 level=INFO msg="Testing Agent2Agent Task Publishing via AgentHub with observability"
-time=2025-09-29T11:53:50.905+02:00 level=INFO msg="Publishing task" task_id=task_greeting_1759139630 task_type=greeting responder_agent_id=agent_demo_subscriber
-time=2025-09-29T11:53:53.907+02:00 level=INFO msg="Task published successfully" task_id=task_greeting_1759139630
-time=2025-09-29T11:53:53.908+02:00 level=INFO msg="Publishing task" task_id=task_math_calculation_1759139633 task_type=math_calculation responder_agent_id=agent_demo_subscriber
-time=2025-09-29T11:53:56.912+02:00 level=INFO msg="Publishing task" task_id=task_random_number_1759139636 task_type=random_number responder_agent_id=agent_demo_subscriber
-time=2025-09-29T11:53:58.915+02:00 level=INFO msg="All tasks published! Check subscriber logs for results"
+time=2025-09-29T14:41:11.237+02:00 level=INFO msg="Starting publisher demo"
+time=2025-09-29T14:41:11.237+02:00 level=INFO msg="Testing Agent2Agent Task Publishing via AgentHub with observability"
+time=2025-09-29T14:41:11.237+02:00 level=INFO msg="Publishing A2A task" task_id=task_greeting_1759149671 task_type=greeting responder_agent_id=agent_demo_subscriber context_id=ctx_greeting_1759149671
+time=2025-09-29T14:41:11.242+02:00 level=INFO msg="A2A task published successfully" task_id=task_greeting_1759149671 task_type=greeting event_id=evt_msg_greeting_1759149671_1759149671
+time=2025-09-29T14:41:11.242+02:00 level=INFO msg="Published greeting task" task_id=task_greeting_1759149671
+time=2025-09-29T14:41:14.243+02:00 level=INFO msg="Publishing A2A task" task_id=task_math_calculation_1759149674 task_type=math_calculation responder_agent_id=agent_demo_subscriber context_id=ctx_math_calculation_1759149674
+time=2025-09-29T14:41:14.247+02:00 level=INFO msg="A2A task published successfully" task_id=task_math_calculation_1759149674 task_type=math_calculation event_id=evt_msg_math_calculation_1759149674_1759149674
+time=2025-09-29T14:41:16.248+02:00 level=INFO msg="Publishing A2A task" task_id=task_random_number_1759149676 task_type=random_number responder_agent_id=agent_demo_subscriber context_id=ctx_random_number_1759149676
+time=2025-09-29T14:41:16.249+02:00 level=INFO msg="Published random number task" task_id=task_random_number_1759149676
 ```
 
-## Step 5: Observe Task Processing
+Notice how the A2A implementation includes:
+- **Context IDs**: Each task is grouped in a conversation context (`ctx_greeting_...`)
+- **Event IDs**: EDA wrapper events have unique identifiers for tracing
+- **A2A Task Structure**: Tasks use A2A-compliant Message and Part formats
 
-Switch back to the subscriber terminal to see the agent processing tasks in real-time:
+## Step 5: Observe A2A Task Processing
+
+Switch back to the subscriber terminal to see the agent processing A2A tasks in real-time:
 
 ```
-time=2025-09-29T11:54:15.123+02:00 level=INFO msg="Processing task" task_id=task_greeting_1759139630 task_type=greeting requester_agent_id=agent_demo_publisher
-time=2025-09-29T11:54:15.125+02:00 level=INFO msg="Task completed successfully" task_id=task_greeting_1759139630 task_type=greeting status=TASK_STATUS_COMPLETED
-time=2025-09-29T11:54:18.135+02:00 level=INFO msg="Processing task" task_id=task_math_calculation_1759139633 task_type=math_calculation requester_agent_id=agent_demo_publisher
-time=2025-09-29T11:54:18.137+02:00 level=INFO msg="Task completed successfully" task_id=task_math_calculation_1759139633 task_type=math_calculation status=TASK_STATUS_COMPLETED
-time=2025-09-29T11:54:21.142+02:00 level=INFO msg="Processing task" task_id=task_random_number_1759139636 task_type=random_number requester_agent_id=agent_demo_publisher
+time=2025-09-29T14:41:11.243+02:00 level=INFO msg="Task processing completed" task_id=task_greeting_1759149671 status=TASK_STATE_COMPLETED has_artifact=true
+time=2025-09-29T14:41:14.253+02:00 level=INFO msg="Task processing completed" task_id=task_math_calculation_1759149674 status=TASK_STATE_COMPLETED has_artifact=true
+time=2025-09-29T14:41:16.249+02:00 level=INFO msg="Task processing completed" task_id=task_random_number_1759149676 status=TASK_STATE_COMPLETED has_artifact=true
 ```
 
-The agent will process each task and log the results with structured logging.
+Notice the A2A-compliant processing:
+- **Task States**: Using A2A standard states (`TASK_STATE_COMPLETED`)
+- **Artifacts**: Each completed task generates A2A artifacts (`has_artifact=true`)
+- **Structured Processing**: Tasks are processed using A2A Message and Part handlers
 
 ## Step 6: Check the Broker Logs
 
@@ -114,22 +129,29 @@ In the first terminal (broker server), you'll see logs showing message routing:
 
 ## Understanding What Happened
 
-1. **Agent2Agent Task Requests**: The publisher sent structured Agent2Agent protocol task requests with:
-   - Unique task IDs
-   - Task types and parameters
-   - Requester and responder agent IDs
-   - Priority levels
+1. **A2A Message Creation**: The publisher created A2A-compliant messages with:
+   - **Message Structure**: Using A2A Message format with Part content
+   - **Context Grouping**: Each task belongs to a conversation context
+   - **Task Association**: Messages are linked to specific A2A tasks
+   - **Role Definition**: Messages specify USER (requester) or AGENT (responder) roles
 
-2. **AgentHub Routing**: The AgentHub broker:
-   - Received Agent2Agent tasks from publishers
-   - Routed tasks to appropriate subscriber agents
-   - Forwarded task results and progress updates back to requesters
+2. **EDA Event Routing**: The AgentHub EDA broker:
+   - **Wrapped A2A Messages**: A2A messages wrapped in AgentEvent for EDA transport
+   - **Event-Driven Routing**: Used EDA patterns for scalable message delivery
+   - **Task Storage**: Stored A2A tasks with full message history and artifacts
+   - **Status Tracking**: Managed A2A task lifecycle (SUBMITTED → WORKING → COMPLETED)
 
-3. **Agent Task Processing**: The subscriber agent:
-   - Received Agent2Agent tasks assigned to its agent ID
-   - Processed them based on task type
-   - Sent progress updates during execution using Agent2Agent progress structures
-   - Published final results back through the AgentHub broker
+3. **A2A Task Processing**: The subscriber agent:
+   - **A2A Task Reception**: Received A2A tasks via EDA event streams
+   - **Message Processing**: Processed A2A Message content using Part handlers
+   - **Artifact Generation**: Generated structured A2A artifacts as task output
+   - **Status Updates**: Published A2A-compliant status updates through EDA events
+
+4. **Hybrid Architecture Benefits**:
+   - **A2A Compliance**: Full interoperability with other A2A-compliant systems
+   - **EDA Scalability**: Event-driven patterns for high-throughput scenarios
+   - **Standards-Based**: Using industry-standard Agent2Agent protocol
+   - **Observable**: Built-in tracing and metrics for production deployment
 
 ## Next Steps
 
@@ -149,10 +171,24 @@ lsof -ti:50051 | xargs kill -9
 
 **Agent Not Receiving Tasks**: Ensure the agent ID in the publisher matches the subscriber's agent ID (`agent_demo_subscriber`).
 
-**Build Errors**: Regenerate protocol buffer files and ensure all imports are correct:
+**Build Errors**: Regenerate A2A protocol buffer files and ensure all imports are correct:
 ```bash
-find . -name "*.pb.go" -delete
-protoc --go_out=. --go-grpc_out=. proto/eventbus.proto
+# Clean old protobuf files
+make clean
+
+# Regenerate A2A protobuf files
+make proto
+
+# Rebuild everything
+make build
 ```
 
-You now have a working AgentHub broker system implementing Agent2Agent protocol task exchange! The agents can exchange structured Agent2Agent tasks, track progress, and receive results - all through your AgentHub broker.
+**A2A Compliance Issues**: Verify A2A protocol structures are correctly generated:
+```bash
+# Check A2A core types
+ls events/a2a/
+
+# Should show: a2a_core.pb.go eventbus.pb.go eventbus_grpc.pb.go
+```
+
+You now have a working A2A-compliant AgentHub EDA broker system! The agents can exchange standardized A2A messages, maintain conversation contexts, generate structured artifacts, and track task lifecycles - all through your scalable Event-Driven Architecture broker with full Agent2Agent protocol compliance.

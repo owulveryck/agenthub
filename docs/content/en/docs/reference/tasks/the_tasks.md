@@ -1,30 +1,27 @@
 ---
-title: "Task Reference"
+title: "A2A Task Reference"
 weight: 50
 description: "Comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation."
 ---
 
-# Task Reference
+# A2A Task Reference
 
-This document provides a comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation.
+This document provides a comprehensive reference for all task-related message types and operations in the Agent2Agent (A2A) protocol implementation within AgentHub's hybrid Event-Driven Architecture.
 
-## Core Task Messages
+## Core A2A Task Types
 
-### TaskMessage
+### A2A Task
 
-The primary message type for requesting work from other agents.
+The primary message type for managing work requests between agents in the Agent2Agent protocol.
 
 ```protobuf
-message TaskMessage {
-  string task_id = 1;                                    // Unique identifier
-  string task_type = 2;                                  // Type of task
-  google.protobuf.Struct parameters = 3;                // Task parameters
-  string requester_agent_id = 4;                        // ID of requesting agent
-  string responder_agent_id = 5;                        // ID of target agent (optional)
-  google.protobuf.Timestamp deadline = 6;               // Optional deadline
-  Priority priority = 7;                                // Task priority
-  google.protobuf.Struct metadata = 8;                  // Optional metadata
-  google.protobuf.Timestamp created_at = 9;             // Creation timestamp
+message Task {
+  string id = 1;                    // Required: Task identifier
+  string context_id = 2;            // Optional: Conversation context
+  TaskStatus status = 3;            // Required: Current task status
+  repeated Message history = 4;     // Message history for this task
+  repeated Artifact artifacts = 5;  // Task output artifacts
+  google.protobuf.Struct metadata = 6; // Task metadata
 }
 ```
 
@@ -32,15 +29,12 @@ message TaskMessage {
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `task_id` | string | Yes | Globally unique identifier for the task |
-| `task_type` | string | Yes | Semantic classification of the work to be done |
-| `parameters` | Struct | No | Task-specific input parameters |
-| `requester_agent_id` | string | Yes | Agent ID that initiated the task |
-| `responder_agent_id` | string | No | Specific agent to handle task (blank = broadcast) |
-| `deadline` | Timestamp | No | Latest acceptable completion time |
-| `priority` | Priority | No | Urgency level (default: PRIORITY_MEDIUM) |
+| `id` | string | Yes | Globally unique identifier for the task |
+| `context_id` | string | No | Groups related tasks in a workflow or conversation |
+| `status` | TaskStatus | Yes | Current execution state and last update |
+| `history` | Message[] | No | Complete message history for this task |
+| `artifacts` | Artifact[] | No | Output artifacts produced by the task |
 | `metadata` | Struct | No | Additional context information |
-| `created_at` | Timestamp | Yes | When the task was created |
 
 #### Task ID Format
 
@@ -53,35 +47,15 @@ taskID := fmt.Sprintf("task_%s_%s", taskType, uuid.New().String())
 taskID := fmt.Sprintf("%s_%s_%d", requesterID, taskType, sequence)
 ```
 
-#### Task Type Conventions
+### A2A TaskStatus
 
-Use hierarchical naming for task types:
-
-```
-domain.operation[.variant]
-
-Examples:
-- data.analysis
-- data.analysis.trend
-- image.generation
-- image.generation.portrait
-- notification.email
-- notification.email.marketing
-```
-
-### TaskResult
-
-Response message containing task execution results.
+Represents the current state and latest update for a task.
 
 ```protobuf
-message TaskResult {
-  string task_id = 1;                                    // Reference to original task
-  TaskStatus status = 2;                                 // Final status
-  google.protobuf.Struct result = 3;                    // Task results
-  string error_message = 4;                             // Error details if failed
-  string executor_agent_id = 5;                         // ID of executing agent
-  google.protobuf.Timestamp completed_at = 6;           // Completion timestamp
-  google.protobuf.Struct execution_metadata = 7;        // Optional execution details
+message TaskStatus {
+  TaskState state = 1;              // Current task state
+  Message update = 2;               // Status update message
+  google.protobuf.Timestamp timestamp = 3; // Status timestamp
 }
 ```
 
@@ -89,60 +63,64 @@ message TaskResult {
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `task_id` | string | Yes | Must match original TaskMessage.task_id |
-| `status` | TaskStatus | Yes | Final execution status |
-| `result` | Struct | No | Structured result data (null if failed) |
-| `error_message` | string | No | Human-readable error description |
-| `executor_agent_id` | string | Yes | Agent that executed the task |
-| `completed_at` | Timestamp | Yes | When execution finished |
-| `execution_metadata` | Struct | No | Additional execution context |
+| `state` | TaskState | Yes | Current execution state |
+| `update` | Message | No | Latest status message from the executing agent |
+| `timestamp` | Timestamp | Yes | When this status was last updated |
 
-#### Result Data Patterns
+### A2A Message
 
-Structure result data for easy consumption:
-
-```go
-// Simple scalar result
-result, _ := structpb.NewStruct(map[string]interface{}{
-    "value": 42.0,
-    "unit": "seconds",
-})
-
-// Complex structured result
-result, _ := structpb.NewStruct(map[string]interface{}{
-    "analysis": map[string]interface{}{
-        "total_records": 1500,
-        "mean_value": 42.7,
-        "trends": []string{"increasing", "seasonal"},
-    },
-    "metadata": map[string]interface{}{
-        "processing_time": "2.3s",
-        "data_quality": "high",
-    },
-})
-
-// File-based result
-result, _ := structpb.NewStruct(map[string]interface{}{
-    "output_file": "/tmp/results/analysis_20240115.json",
-    "file_size": 2048576,
-    "format": "json",
-    "checksum": "sha256:abc123...",
-})
-```
-
-### TaskProgress
-
-Intermediate progress updates during task execution.
+Agent-to-agent communication within task context.
 
 ```protobuf
-message TaskProgress {
-  string task_id = 1;                                    // Reference to original task
-  TaskStatus status = 2;                                 // Current status
-  string progress_message = 3;                           // Human-readable description
-  int32 progress_percentage = 4;                         // Progress as percentage (0-100)
-  google.protobuf.Struct progress_data = 5;             // Optional structured progress
-  string executor_agent_id = 6;                         // ID of executing agent
-  google.protobuf.Timestamp updated_at = 7;             // When this progress was reported
+message Message {
+  string message_id = 1;       // Required: Unique message identifier
+  string context_id = 2;       // Optional: Conversation context
+  string task_id = 3;          // Optional: Associated task
+  Role role = 4;               // Required: USER or AGENT
+  repeated Part content = 5;   // Required: Message content parts
+  google.protobuf.Struct metadata = 6; // Optional: Additional metadata
+  repeated string extensions = 7;       // Optional: Protocol extensions
+}
+```
+
+#### Message Content Parts
+
+Messages contain structured content using A2A Part definitions:
+
+```protobuf
+message Part {
+  oneof part {
+    string text = 1;           // Text content
+    DataPart data = 2;         // Structured data
+    FilePart file = 3;         // File reference
+  }
+}
+
+message DataPart {
+  google.protobuf.Struct data = 1;    // Structured data content
+  string description = 2;             // Optional data description
+}
+
+message FilePart {
+  string file_id = 1;                 // File identifier or URI
+  string filename = 2;                // Original filename
+  string mime_type = 3;               // MIME type
+  int64 size_bytes = 4;               // File size in bytes
+  google.protobuf.Struct metadata = 5; // Additional file metadata
+}
+```
+
+### A2A Artifact
+
+Structured output produced by completed tasks.
+
+```protobuf
+message Artifact {
+  string artifact_id = 1;           // Required: Artifact identifier
+  string name = 2;                  // Human-readable name
+  string description = 3;           // Artifact description
+  repeated Part parts = 4;          // Artifact content parts
+  google.protobuf.Struct metadata = 5; // Artifact metadata
 }
 ```
 
@@ -150,48 +128,54 @@ message TaskProgress {
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `task_id` | string | Yes | Must match original TaskMessage.task_id |
-| `status` | TaskStatus | Yes | Current execution status (typically IN_PROGRESS) |
-| `progress_message` | string | No | Human-readable progress description |
-| `progress_percentage` | int32 | No | Completion percentage (0-100) |
-| `progress_data` | Struct | No | Structured progress information |
-| `executor_agent_id` | string | Yes | Agent reporting the progress |
-| `updated_at` | Timestamp | Yes | When this update was generated |
-
-#### Progress Reporting Patterns
-
-```go
-// Simple percentage progress
-progress := &pb.TaskProgress{
-    TaskId:             taskID,
-    Status:             pb.TaskStatus_TASK_STATUS_IN_PROGRESS,
-    ProgressMessage:    "Processing data",
-    ProgressPercentage: 45,
-    ExecutorAgentId:    agentID,
-    UpdatedAt:          timestamppb.Now(),
-}
-
-// Detailed progress with structured data
-progressData, _ := structpb.NewStruct(map[string]interface{}{
-    "phase": "data_analysis",
-    "records_processed": 750,
-    "total_records": 1500,
-    "current_operation": "correlation_analysis",
-    "estimated_remaining": "2m30s",
-})
-
-progress := &pb.TaskProgress{
-    TaskId:           taskID,
-    Status:           pb.TaskStatus_TASK_STATUS_IN_PROGRESS,
-    ProgressMessage:  "Analyzing correlations",
-    ProgressPercentage: 50,
-    ProgressData:     progressData,
-    ExecutorAgentId:  agentID,
-    UpdatedAt:        timestamppb.Now(),
-}
-```
+| `artifact_id` | string | Yes | Unique identifier for this artifact |
+| `name` | string | No | Human-readable artifact name |
+| `description` | string | No | Description of the artifact contents |
+| `parts` | Part[] | Yes | Structured content using A2A Part format |
+| `metadata` | Struct | No | Additional artifact information |
 
 ## Enumerations
+
+### TaskState
+
+Current state of A2A task execution.
+
+```protobuf
+enum TaskState {
+  TASK_STATE_SUBMITTED = 0;    // Task created and submitted
+  TASK_STATE_WORKING = 1;      // Task in progress
+  TASK_STATE_COMPLETED = 2;    // Task completed successfully
+  TASK_STATE_FAILED = 3;       // Task failed with error
+  TASK_STATE_CANCELLED = 4;    // Task cancelled
+}
+```
+
+#### State Transition Rules
+
+Valid state transitions:
+
+```
+TASK_STATE_SUBMITTED → TASK_STATE_WORKING → TASK_STATE_COMPLETED
+TASK_STATE_SUBMITTED → TASK_STATE_WORKING → TASK_STATE_FAILED
+TASK_STATE_SUBMITTED → TASK_STATE_WORKING → TASK_STATE_CANCELLED
+TASK_STATE_SUBMITTED → TASK_STATE_CANCELLED (before execution starts)
+```
+
+Invalid transitions:
+- Any state → TASK_STATE_SUBMITTED
+- TASK_STATE_COMPLETED → any other state
+- TASK_STATE_FAILED → any other state (except for retry scenarios)
+
+### Role
+
+Identifies the role of the message sender in A2A communication.
+
+```protobuf
+enum Role {
+  USER = 0;    // Message from requesting agent
+  AGENT = 1;   // Message from responding agent
+}
+```
 
 ### Priority
 
@@ -216,77 +200,44 @@ enum Priority {
 | `HIGH` | User-visible operations, time-sensitive tasks | Seconds to minutes |
 | `CRITICAL` | Emergency operations, system health tasks | Immediate |
 
-### TaskStatus
+## AgentHub EDA Request/Response Messages
 
-Current state of task execution.
+### Task Publishing
+
+#### PublishTaskUpdateRequest
+
+Request to publish a task status update through the EDA broker.
 
 ```protobuf
-enum TaskStatus {
-  TASK_STATUS_UNSPECIFIED = 0;  // Invalid/unknown status
-  TASK_STATUS_PENDING = 1;      // Waiting to be processed
-  TASK_STATUS_IN_PROGRESS = 2;  // Currently being executed
-  TASK_STATUS_COMPLETED = 3;    // Successfully completed
-  TASK_STATUS_FAILED = 4;       // Failed during execution
-  TASK_STATUS_CANCELLED = 5;    // Cancelled before/during execution
+message PublishTaskUpdateRequest {
+  a2a.Task task = 1;                      // Updated A2A task
+  AgentEventMetadata routing = 2;         // EDA routing metadata
 }
 ```
 
-#### Status Transition Rules
+#### PublishTaskArtifactRequest
 
-Valid status transitions:
-
-```
-PENDING → IN_PROGRESS → COMPLETED
-PENDING → IN_PROGRESS → FAILED
-PENDING → IN_PROGRESS → CANCELLED
-PENDING → CANCELLED (before execution starts)
-```
-
-Invalid transitions:
-- Any status → PENDING
-- COMPLETED → any other status
-- FAILED → any other status (except for retry scenarios)
-
-## Request/Response Messages
-
-### PublishTaskRequest
-
-Request to publish a task to the broker.
+Request to publish a task artifact through the EDA broker.
 
 ```protobuf
-message PublishTaskRequest {
-  TaskMessage task = 1;
+message PublishTaskArtifactRequest {
+  string task_id = 1;                     // Associated task ID
+  a2a.Artifact artifact = 2;              // A2A artifact
+  AgentEventMetadata routing = 3;         // EDA routing metadata
 }
 ```
 
-### PublishTaskResultRequest
+### Task Subscription
 
-Request to publish a task result.
+#### SubscribeToTasksRequest
 
-```protobuf
-message PublishTaskResultRequest {
-  TaskResult result = 1;
-}
-```
-
-### PublishTaskProgressRequest
-
-Request to publish task progress.
-
-```protobuf
-message PublishTaskProgressRequest {
-  TaskProgress progress = 1;
-}
-```
-
-### SubscribeToTasksRequest
-
-Request to subscribe to tasks for a specific agent.
+Request to subscribe to A2A task events through the EDA broker.
 
 ```protobuf
 message SubscribeToTasksRequest {
-  string agent_id = 1;                   // Agent ID to receive tasks for
-  repeated string task_types = 2;        // Optional: filter by task types
+  string agent_id = 1;                    // Agent ID for subscription
+  repeated string task_types = 2;         // Optional task type filter
+  repeated a2a.TaskState states = 3;      // Optional state filter
 }
 ```
 
@@ -298,288 +249,355 @@ req := &pb.SubscribeToTasksRequest{
     AgentId: "data_processor_01",
 }
 
-// Subscribe only to specific task types
+// Subscribe only to working and completed tasks
 req := &pb.SubscribeToTasksRequest{
-    AgentId:   "image_processor",
-    TaskTypes: []string{"image.generation", "image.enhancement"},
+    AgentId: "workflow_orchestrator",
+    States: []a2a.TaskState{
+        a2a.TaskState_TASK_STATE_WORKING,
+        a2a.TaskState_TASK_STATE_COMPLETED,
+    },
 }
 ```
 
-### SubscribeToTaskResultsRequest
+### Task Management
 
-Request to subscribe to task results.
+#### GetTaskRequest
+
+Request to retrieve the current state of an A2A task.
 
 ```protobuf
-message SubscribeToTaskResultsRequest {
-  string requester_agent_id = 1;         // Agent ID that requested tasks
-  repeated string task_ids = 2;          // Optional: filter by specific task IDs
+message GetTaskRequest {
+  string task_id = 1;                     // Task identifier
+  int32 history_length = 2;               // History limit (optional)
 }
 ```
 
-#### Usage Examples
+#### CancelTaskRequest
 
-```go
-// Subscribe to all results for tasks this agent requested
-req := &pb.SubscribeToTaskResultsRequest{
-    RequesterAgentId: "workflow_orchestrator",
-}
+Request to cancel an active A2A task.
 
-// Subscribe only to specific task results
-req := &pb.SubscribeToTaskResultsRequest{
-    RequesterAgentId: "workflow_orchestrator",
-    TaskIds: []string{"task_analysis_123", "task_report_456"},
+```protobuf
+message CancelTaskRequest {
+  string task_id = 1;                     // Task to cancel
+  string reason = 2;                      // Cancellation reason
 }
 ```
 
-## RPC Service Methods
+#### ListTasksRequest
+
+Request to list A2A tasks matching criteria.
+
+```protobuf
+message ListTasksRequest {
+  string agent_id = 1;                    // Filter by agent
+  repeated a2a.TaskState states = 2;      // Filter by states
+  google.protobuf.Timestamp since = 3;    // Filter by timestamp
+  int32 limit = 4;                        // Results limit
+}
+```
+
+## gRPC Service Methods
 
 ### Task Publishing Methods
 
-#### PublishTask
+#### PublishTaskUpdate
 
-Publishes a task request to the broker.
+Publishes a task status update to the EDA broker.
 
 ```go
-rpc PublishTask (PublishTaskRequest) returns (PublishResponse);
+rpc PublishTaskUpdate (PublishTaskUpdateRequest) returns (PublishResponse);
 ```
-
-**Parameters:**
-- `PublishTaskRequest` containing the `TaskMessage`
-
-**Returns:**
-- `PublishResponse` with success status and optional error message
 
 **Example:**
 ```go
-task := &pb.TaskMessage{
-    TaskId:           "task_analysis_123",
-    TaskType:         "data.analysis",
-    RequesterAgentId: "orchestrator",
-    // ... other fields
+// Create updated task status
+status := &a2a.TaskStatus{
+    State: a2a.TaskState_TASK_STATE_WORKING,
+    Update: &a2a.Message{
+        MessageId: "msg_" + uuid.New().String(),
+        TaskId:    taskID,
+        Role:      a2a.Role_AGENT,
+        Content: []*a2a.Part{
+            {
+                Part: &a2a.Part_Text{
+                    Text: "Processing data analysis...",
+                },
+            },
+        },
+    },
+    Timestamp: timestamppb.Now(),
 }
 
-req := &pb.PublishTaskRequest{Task: task}
-res, err := client.PublishTask(ctx, req)
+task := &a2a.Task{
+    Id:     taskID,
+    Status: status,
+}
+
+req := &pb.PublishTaskUpdateRequest{
+    Task: task,
+    Routing: &pb.AgentEventMetadata{
+        FromAgentId: "processor_01",
+        EventType:   "task.status_update",
+    },
+}
+res, err := client.PublishTaskUpdate(ctx, req)
 ```
 
-#### PublishTaskResult
+#### PublishTaskArtifact
 
-Publishes a task completion result.
+Publishes a task artifact to the EDA broker.
 
 ```go
-rpc PublishTaskResult (PublishTaskResultRequest) returns (PublishResponse);
+rpc PublishTaskArtifact (PublishTaskArtifactRequest) returns (PublishResponse);
 ```
 
-#### PublishTaskProgress
-
-Publishes a task progress update.
-
+**Example:**
 ```go
-rpc PublishTaskProgress (PublishTaskProgressRequest) returns (PublishResponse);
+// Create artifact with results
+artifact := &a2a.Artifact{
+    ArtifactId:  "artifact_" + uuid.New().String(),
+    Name:        "Analysis Results",
+    Description: "Statistical analysis of sales data",
+    Parts: []*a2a.Part{
+        {
+            Part: &a2a.Part_Data{
+                Data: &a2a.DataPart{
+                    Data: structData, // Contains analysis results
+                    Description: "Sales analysis summary statistics",
+                },
+            },
+        },
+        {
+            Part: &a2a.Part_File{
+                File: &a2a.FilePart{
+                    FileId:   "file_123",
+                    Filename: "analysis_report.pdf",
+                    MimeType: "application/pdf",
+                    SizeBytes: 1024576,
+                },
+            },
+        },
+    },
+}
+
+req := &pb.PublishTaskArtifactRequest{
+    TaskId:   taskID,
+    Artifact: artifact,
+    Routing: &pb.AgentEventMetadata{
+        FromAgentId: "processor_01",
+        EventType:   "task.artifact",
+    },
+}
+res, err := client.PublishTaskArtifact(ctx, req)
 ```
 
 ### Task Subscription Methods
 
 #### SubscribeToTasks
 
-Subscribes to receive tasks assigned to a specific agent.
+Subscribes to receive A2A task events through the EDA broker.
 
 ```go
-rpc SubscribeToTasks (SubscribeToTasksRequest) returns (stream TaskMessage);
+rpc SubscribeToTasks (SubscribeToTasksRequest) returns (stream AgentEvent);
 ```
 
-**Returns:** Stream of `TaskMessage` objects
+**Returns:** Stream of `AgentEvent` objects containing A2A task updates
 
 **Example:**
 ```go
-req := &pb.SubscribeToTasksRequest{AgentId: "processor_01"}
+req := &pb.SubscribeToTasksRequest{
+    AgentId: "processor_01",
+    States: []a2a.TaskState{a2a.TaskState_TASK_STATE_SUBMITTED},
+}
 stream, err := client.SubscribeToTasks(ctx, req)
 
 for {
-    task, err := stream.Recv()
+    event, err := stream.Recv()
     if err != nil {
         break
     }
-    go processTask(task)
+
+    // Extract A2A task from event
+    if task := event.GetTask(); task != nil {
+        go processA2ATask(task)
+    }
 }
 ```
 
-#### SubscribeToTaskResults
+### Task Management Methods
 
-Subscribes to receive results for tasks requested by an agent.
+#### GetTask
+
+Retrieves the current state of an A2A task by ID.
 
 ```go
-rpc SubscribeToTaskResults (SubscribeToTaskResultsRequest) returns (stream TaskResult);
+rpc GetTask (GetTaskRequest) returns (a2a.Task);
 ```
 
-#### SubscribeToTaskProgress
+#### CancelTask
 
-Subscribes to receive progress updates for tasks requested by an agent.
+Cancels an active A2A task and notifies subscribers.
 
 ```go
-rpc SubscribeToTaskProgress (SubscribeToTaskResultsRequest) returns (stream TaskProgress);
+rpc CancelTask (CancelTaskRequest) returns (a2a.Task);
 ```
 
-## Common Task Types Reference
+#### ListTasks
 
-### Data Processing Tasks
+Returns A2A tasks matching the specified criteria.
 
-#### data.analysis
-Analyzes datasets and produces statistical results.
-
-**Parameters:**
-```json
-{
-  "dataset_path": "/data/sales_2024.csv",
-  "analysis_type": "summary_statistics|trend_analysis|correlation",
-  "time_period": "daily|weekly|monthly|quarterly",
-  "output_format": "json|csv|html"
-}
+```go
+rpc ListTasks (ListTasksRequest) returns (ListTasksResponse);
 ```
 
-**Result:**
-```json
-{
-  "analysis_type": "summary_statistics",
-  "total_records": 1500,
-  "metrics": {
-    "mean": 42.7,
-    "median": 41.2,
-    "std_dev": 8.3
-  },
-  "charts": ["/tmp/chart1.png", "/tmp/chart2.png"]
+## A2A Task Workflow Patterns
+
+### Simple Request-Response
+
+```go
+// 1. Agent A creates and publishes task request
+task := &a2a.Task{
+    Id:        "task_analysis_123",
+    ContextId: "workflow_456",
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_SUBMITTED,
+        Update: &a2a.Message{
+            MessageId: "msg_" + uuid.New().String(),
+            TaskId:    "task_analysis_123",
+            Role:      a2a.Role_USER,
+            Content: []*a2a.Part{
+                {
+                    Part: &a2a.Part_Text{
+                        Text: "Please analyze the Q4 sales data",
+                    },
+                },
+                {
+                    Part: &a2a.Part_Data{
+                        Data: &a2a.DataPart{
+                            Data: dataStruct, // Contains parameters
+                        },
+                    },
+                },
+            },
+        },
+        Timestamp: timestamppb.Now(),
+    },
 }
+
+// 2. Agent B receives task and updates status to WORKING
+// 3. Agent B publishes progress updates during execution
+// 4. Agent B publishes final artifacts and COMPLETED status
 ```
 
-#### data.transformation
-Transforms data between formats or structures.
+### Multi-Step Workflow
 
-**Parameters:**
-```json
-{
-  "input_path": "/data/input.csv",
-  "output_path": "/data/output.json",
-  "transformation_rules": {
-    "format": "csv_to_json",
-    "schema_mapping": {...}
-  }
+```go
+// 1. Orchestrator creates main task
+mainTask := &a2a.Task{
+    Id:        "workflow_main_789",
+    ContextId: "workflow_context_789",
+    // ... initial message
 }
-```
 
-### Image Processing Tasks
-
-#### image.generation
-Generates images based on text prompts or parameters.
-
-**Parameters:**
-```json
-{
-  "prompt": "A futuristic cityscape at sunset",
-  "style": "photorealistic|artistic|cartoon",
-  "resolution": "1920x1080",
-  "quality": "low|medium|high"
+// 2. Create subtasks with same context_id
+subtask1 := &a2a.Task{
+    Id:        "subtask_data_prep_790",
+    ContextId: "workflow_context_789", // Same context
+    // ... data preparation request
 }
-```
 
-**Result:**
-```json
-{
-  "image_path": "/tmp/generated_image.png",
-  "resolution": "1920x1080",
-  "file_size": 2048576,
-  "generation_time": "15.2s"
+subtask2 := &a2a.Task{
+    Id:        "subtask_analysis_791",
+    ContextId: "workflow_context_789", // Same context
+    // ... analysis request (depends on subtask1)
 }
-```
 
-### Mathematical Tasks
-
-#### math.calculation
-Performs mathematical operations.
-
-**Parameters:**
-```json
-{
-  "operation": "add|subtract|multiply|divide|power",
-  "operands": [42.0, 58.0],
-  "precision": 2
-}
-```
-
-**Result:**
-```json
-{
-  "operation": "add",
-  "operands": [42.0, 58.0],
-  "result": 100.0
-}
-```
-
-### Communication Tasks
-
-#### notification.email
-Sends email notifications.
-
-**Parameters:**
-```json
-{
-  "to": ["user@example.com"],
-  "subject": "Task Completed",
-  "body": "Your analysis task has completed successfully.",
-  "template": "task_completion",
-  "attachments": ["/tmp/report.pdf"]
-}
+// 3. Tasks linked by context_id for workflow tracking
 ```
 
 ## Error Handling Reference
 
-### Common Error Codes
-
-Task execution may fail with these common error patterns:
+### A2A Task Error Patterns
 
 #### Parameter Validation Errors
-```json
-{
-  "error_code": "INVALID_PARAMETERS",
-  "error_message": "Required parameter 'dataset_path' is missing",
-  "details": {
-    "missing_parameters": ["dataset_path"],
-    "invalid_parameters": {"timeout": "must be positive integer"}
-  }
+```go
+// Task fails with validation error
+failedTask := &a2a.Task{
+    Id: taskID,
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_FAILED,
+        Update: &a2a.Message{
+            Role: a2a.Role_AGENT,
+            Content: []*a2a.Part{
+                {
+                    Part: &a2a.Part_Text{
+                        Text: "Task failed: Required parameter 'dataset_path' is missing",
+                    },
+                },
+                {
+                    Part: &a2a.Part_Data{
+                        Data: &a2a.DataPart{
+                            Data: errorDetails, // Structured error info
+                            Description: "Validation error details",
+                        },
+                    },
+                },
+            },
+        },
+        Timestamp: timestamppb.Now(),
+    },
 }
 ```
 
 #### Resource Errors
-```json
-{
-  "error_code": "RESOURCE_UNAVAILABLE",
-  "error_message": "Cannot access dataset file",
-  "details": {
-    "resource_type": "file",
-    "resource_path": "/data/sales_2024.csv",
-    "error_details": "File not found"
-  }
-}
-```
-
-#### Timeout Errors
-```json
-{
-  "error_code": "DEADLINE_EXCEEDED",
-  "error_message": "Task deadline exceeded during processing",
-  "details": {
-    "deadline": "2024-01-15T11:00:00Z",
-    "actual_completion": "2024-01-15T11:05:00Z",
-    "phase": "data_analysis"
-  }
+```go
+// Task fails due to resource unavailability
+failedTask := &a2a.Task{
+    Id: taskID,
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_FAILED,
+        Update: &a2a.Message{
+            Role: a2a.Role_AGENT,
+            Content: []*a2a.Part{
+                {
+                    Part: &a2a.Part_Text{
+                        Text: "Cannot access dataset file: /data/sales_2024.csv",
+                    },
+                },
+            },
+        },
+        Timestamp: timestamppb.Now(),
+    },
 }
 ```
 
 ### Error Handling Best Practices
 
-1. **Provide specific error codes** for programmatic handling
-2. **Include actionable error messages** for human operators
-3. **Add structured details** for debugging and retry logic
-4. **Log errors appropriately** based on severity
-5. **Consider partial results** for partially successful operations
+1. **Use structured error messages** in A2A format for programmatic handling
+2. **Include actionable error descriptions** in text parts for human operators
+3. **Add detailed error data** in data parts for debugging and retry logic
+4. **Maintain task history** to preserve error context
+5. **Consider partial results** using artifacts for partially successful operations
 
-This reference provides the complete specification for task-related messages and operations in the Agent2Agent protocol, enabling robust distributed task coordination and execution.
+## Migration from Legacy EventBus
+
+### Message Type Mappings
+
+| Legacy EventBus | A2A Equivalent | Notes |
+|-----------------|----------------|-------|
+| `TaskMessage` | `a2a.Task` with initial `Message` | Task creation with request message |
+| `TaskResult` | `a2a.Task` with final `Artifact` | Task completion with result artifacts |
+| `TaskProgress` | `a2a.Task` with status `Message` | Progress updates via status messages |
+| `TaskStatus` enum | `a2a.TaskState` enum | State names updated (e.g., `IN_PROGRESS` → `TASK_STATE_WORKING`) |
+
+### API Method Mappings
+
+| Legacy EventBus | A2A Equivalent | Notes |
+|-----------------|----------------|-------|
+| `PublishTask` | `PublishTaskUpdate` | Now publishes A2A task objects |
+| `PublishTaskResult` | `PublishTaskArtifact` | Results published as artifacts |
+| `PublishTaskProgress` | `PublishTaskUpdate` | Progress via task status updates |
+| `SubscribeToTasks` | `SubscribeToTasks` | Now returns A2A task events |
+| `SubscribeToTaskResults` | `SubscribeToTasks` (filtered) | Filter by COMPLETED state |
+
+This reference provides the complete specification for A2A task-related messages and operations in the AgentHub Event-Driven Architecture, enabling robust distributed task coordination with full Agent2Agent protocol compliance.

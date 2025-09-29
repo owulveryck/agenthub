@@ -10,16 +10,16 @@ This advanced tutorial teaches you to create complex workflows involving multipl
 
 ## What You'll Build
 
-By the end of this tutorial, you'll have a multi-agent system that:
+By the end of this tutorial, you'll have an A2A-compliant multi-agent system that:
 
-1. **Ingests documents** through a Document Intake Agent
-2. **Validates content** using a Validation Agent
-3. **Extracts metadata** with a Metadata Extraction Agent
-4. **Processes text** through a Text Processing Agent
-5. **Generates summaries** using a Summary Agent
-6. **Orchestrates the workflow** with a Workflow Coordinator Agent
+1. **Ingests documents** through an A2A Document Intake Agent
+2. **Validates content** using an A2A Validation Agent
+3. **Extracts metadata** with an A2A Metadata Extraction Agent
+4. **Processes text** through an A2A Text Processing Agent
+5. **Generates summaries** using an A2A Summary Agent
+6. **Orchestrates the workflow** with an A2A Workflow Coordinator Agent
 
-This demonstrates real-world agent collaboration patterns used in production systems.
+This demonstrates real-world A2A agent collaboration patterns with conversation context, structured message content, and artifact-based results used in production systems.
 
 ## Prerequisites
 
@@ -32,15 +32,15 @@ This demonstrates real-world agent collaboration patterns used in production sys
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Workflow      │    │   AgentHub      │    │   Specialized   │
-│  Coordinator    │    │    Broker       │    │    Agents       │
+│  A2A Workflow   │    │   AgentHub      │    │  A2A Specialized│
+│  Coordinator    │    │  A2A Broker     │    │    Agents       │
 │                 │    │                 │    │                 │
-│ • Orchestrates  │◄──►│ • Routes tasks  │◄──►│ • Document      │
-│   pipeline      │    │ • Tracks        │    │   Intake        │
-│ • Manages       │    │   progress      │    │ • Validation    │
-│   dependencies │    │ • Handles       │    │ • Metadata      │
-│ • Handles       │    │   failures      │    │ • Text Proc     │
-│   failures      │    │                 │    │ • Summary       │
+│ • A2A context   │◄──►│ • Routes A2A    │◄──►│ • Document      │
+│   management    │    │   messages      │    │   Intake        │
+│ • Conversation  │    │ • Tracks A2A    │    │ • Validation    │
+│   threading     │    │   conversations │    │ • Metadata      │
+│ • Artifact      │    │ • Manages A2A   │    │ • Text Proc     │
+│   aggregation   │    │   state         │    │ • Summary       │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -65,26 +65,30 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/owulveryck/agenthub/events/a2a"
+	a2a "github.com/owulveryck/agenthub/events/a2a"
+	pb "github.com/owulveryck/agenthub/events/eventbus"
 )
 
 const (
 	agentHubAddr = "localhost:50051"
-	agentID      = "workflow_coordinator"
+	agentID      = "a2a_workflow_coordinator"
 )
 
-type DocumentWorkflow struct {
+type A2ADocumentWorkflow struct {
 	DocumentID    string
+	ContextID     string                 // A2A conversation context
 	Status        string
 	CurrentStage  string
-	Results       map[string]interface{}
+	TaskHistory   []*a2a.Task           // Complete A2A task history
+	Artifacts     []*a2a.Artifact       // Collected artifacts from stages
 	StartTime     time.Time
-	client        pb.EventBusClient
+	client        pb.AgentHubClient      // A2A-compliant client
 }
 
 func main() {
@@ -94,100 +98,142 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := pb.NewEventBusClient(conn)
-	coordinator := &WorkflowCoordinator{
+	client := pb.NewAgentHubClient(conn)
+	coordinator := &A2AWorkflowCoordinator{
 		client:        client,
-		workflows:     make(map[string]*DocumentWorkflow),
+		workflows:     make(map[string]*A2ADocumentWorkflow),
 	}
 
 	ctx := context.Background()
 
-	// Start listening for task results
-	go coordinator.subscribeToResults(ctx)
+	// Start listening for A2A task events
+	go coordinator.subscribeToA2AEvents(ctx)
 
-	// Start processing documents
-	coordinator.startDocumentProcessing(ctx)
+	// Start processing documents with A2A workflow
+	coordinator.startA2ADocumentProcessing(ctx)
 
 	// Keep running
 	select {}
 }
 
-type WorkflowCoordinator struct {
-	client    pb.EventBusClient
-	workflows map[string]*DocumentWorkflow
+type A2AWorkflowCoordinator struct {
+	client    pb.AgentHubClient
+	workflows map[string]*A2ADocumentWorkflow
 }
 
-func (wc *WorkflowCoordinator) startDocumentProcessing(ctx context.Context) {
-	// Simulate document arrival
+func (wc *A2AWorkflowCoordinator) startA2ADocumentProcessing(ctx context.Context) {
+	// Simulate document arrival with A2A structured content
 	documents := []map[string]interface{}{
 		{
 			"document_id": "doc_001",
 			"content":     "This is a sample business document about quarterly results.",
 			"filename":    "q3_results.txt",
 			"source":      "email_attachment",
+			"doc_type":    "business_report",
 		},
 		{
 			"document_id": "doc_002",
 			"content":     "Technical specification for the new API endpoints and authentication mechanisms.",
 			"filename":    "api_spec.txt",
 			"source":      "file_upload",
+			"doc_type":    "technical_spec",
 		},
 	}
 
 	for _, doc := range documents {
-		wc.processDocument(ctx, doc)
+		wc.processA2ADocument(ctx, doc)
 		time.Sleep(5 * time.Second)
 	}
 }
 
-func (wc *WorkflowCoordinator) processDocument(ctx context.Context, document map[string]interface{}) {
+func (wc *A2AWorkflowCoordinator) processA2ADocument(ctx context.Context, document map[string]interface{}) {
 	documentID := document["document_id"].(string)
+	contextID := fmt.Sprintf("doc_workflow_%s_%s", documentID, uuid.New().String())
 
-	workflow := &DocumentWorkflow{
+	workflow := &A2ADocumentWorkflow{
 		DocumentID:   documentID,
+		ContextID:    contextID,
 		Status:       "started",
 		CurrentStage: "intake",
-		Results:      make(map[string]interface{}),
+		TaskHistory:  make([]*a2a.Task, 0),
+		Artifacts:    make([]*a2a.Artifact, 0),
 		StartTime:    time.Now(),
+		client:       wc.client,
 	}
 
 	wc.workflows[documentID] = workflow
 
-	log.Printf("Starting document processing workflow for %s", documentID)
+	log.Printf("Starting A2A document processing workflow for %s with context %s", documentID, contextID)
 
-	// Stage 1: Document Intake
-	wc.publishTask(ctx, "document_intake", document, "document_intake_agent", documentID)
+	// Stage 1: A2A Document Intake
+	wc.publishA2ATask(ctx, "document_intake", document, "a2a_document_intake_agent", workflow)
 }
 
-func (wc *WorkflowCoordinator) publishTask(ctx context.Context, taskType string, params map[string]interface{}, targetAgent, workflowID string) {
-	taskID := fmt.Sprintf("%s_%s_%d", taskType, workflowID, time.Now().Unix())
+func (wc *A2AWorkflowCoordinator) publishA2ATask(ctx context.Context, taskDescription string, params map[string]interface{}, targetAgent string, workflow *A2ADocumentWorkflow) {
+	taskID := fmt.Sprintf("task_%s_%s", taskDescription, uuid.New().String())
+	messageID := fmt.Sprintf("msg_%d_%s", time.Now().Unix(), uuid.New().String())
 
-	// Add workflow metadata
-	params["workflow_id"] = workflowID
-	params["stage"] = taskType
-
-	parametersStruct, err := structpb.NewStruct(params)
+	// Create A2A structured content
+	paramsData, err := structpb.NewStruct(params)
 	if err != nil {
 		log.Printf("Error creating parameters: %v", err)
 		return
 	}
 
-	task := &pb.TaskMessage{
-		TaskId:           taskID,
-		TaskType:         taskType,
-		Parameters:       parametersStruct,
-		RequesterAgentId: agentID,
-		ResponderAgentId: targetAgent,
-		Priority:         pb.Priority_PRIORITY_MEDIUM,
-		CreatedAt:        timestamppb.Now(),
+	// Create A2A message with structured parts
+	requestMessage := &a2a.Message{
+		MessageId: messageID,
+		ContextId: workflow.ContextID,
+		TaskId:    taskID,
+		Role:      a2a.Role_USER,
+		Content: []*a2a.Part{
+			{
+				Part: &a2a.Part_Text{
+					Text: fmt.Sprintf("Please process %s for document %s", taskDescription, workflow.DocumentID),
+				},
+			},
+			{
+				Part: &a2a.Part_Data{
+					Data: &a2a.DataPart{
+						Data:        paramsData,
+						Description: fmt.Sprintf("%s parameters", taskDescription),
+					},
+				},
+			},
+		},
 	}
 
-	req := &pb.PublishTaskRequest{Task: task}
+	// Create A2A task
+	task := &a2a.Task{
+		Id:        taskID,
+		ContextId: workflow.ContextID,
+		Status: &a2a.TaskStatus{
+			State:     a2a.TaskState_TASK_STATE_SUBMITTED,
+			Update:    requestMessage,
+			Timestamp: timestamppb.Now(),
+		},
+		History: []*a2a.Message{requestMessage},
+		Metadata: paramsData,
+	}
 
-	log.Printf("Publishing %s task for workflow %s", taskType, workflowID)
-	_, err = wc.client.PublishTask(ctx, req)
+	// Store in workflow history
+	workflow.TaskHistory = append(workflow.TaskHistory, task)
+
+	// Publish A2A task update
+	req := &pb.PublishTaskUpdateRequest{
+		Task: task,
+		Routing: &pb.AgentEventMetadata{
+			FromAgentId: agentID,
+			ToAgentId:   targetAgent,
+			EventType:   "task.submitted",
+			Priority:    pb.Priority_PRIORITY_MEDIUM,
+		},
+	}
+
+	log.Printf("Publishing A2A %s task for workflow %s in context %s", taskDescription, workflow.DocumentID, workflow.ContextID)
+	_, err = wc.client.PublishTaskUpdate(ctx, req)
 	if err != nil {
-		log.Printf("Error publishing task: %v", err)
+		log.Printf("Error publishing A2A task: %v", err)
 	}
 }
 

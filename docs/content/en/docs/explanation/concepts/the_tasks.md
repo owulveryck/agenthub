@@ -15,72 +15,130 @@ Tasks are the fundamental unit of work exchange in the Agent2Agent protocol. Thi
 
 Every task in the Agent2Agent system consists of several key components that define its identity, purpose, and execution context:
 
-#### Task Identity
+#### A2A Task Identity
 ```protobuf
-string task_id = 1;                    // Unique identifier
-string task_type = 2;                  // Semantic classification
+string id = 1;                         // Unique task identifier
+string context_id = 2;                 // Optional conversation context
 ```
 
-The **task_id** serves as a unique identifier that allows all participants to track the task throughout its lifecycle. It should be globally unique and meaningful for debugging purposes.
+The **id** serves as a unique identifier that allows all participants to track the task throughout its lifecycle. It should be globally unique and meaningful for debugging purposes.
 
-The **task_type** provides semantic classification that allows agents to understand what kind of work is being requested. Examples include:
-- `data_analysis` - Request for data processing and analysis
-- `image_generation` - Request for creating or manipulating images
-- `file_conversion` - Request for converting files between formats
-- `notification_delivery` - Request for sending notifications to users
+The **context_id** groups related tasks in a conversation or workflow context, enabling sophisticated multi-task coordination patterns.
 
-#### Task Payload
+Task classification in A2A is handled through the initial **Message** content rather than a separate task_type field, providing more flexibility for complex task descriptions.
+
+#### A2A Task Status and History
 ```protobuf
-google.protobuf.Struct parameters = 3; // Task-specific data
-google.protobuf.Struct metadata = 8;   // Additional context
+TaskStatus status = 3;                 // Current task status
+repeated Message history = 4;          // Message history for this task
+repeated Artifact artifacts = 5;       // Task output artifacts
+google.protobuf.Struct metadata = 6;   // Task metadata
 ```
 
-**Parameters** contain the specific data required to execute the task. The structure is flexible and task-type dependent:
+In A2A, task data is contained within **Message** content using the structured **Part** format:
 
-```json
-// Example: data_analysis task parameters
-{
-  "dataset_path": "/data/sales_2024.csv",
-  "analysis_type": "trend_analysis",
-  "time_period": "quarterly",
-  "output_format": "json"
+```protobuf
+// A2A task request message
+message Message {
+  string message_id = 1;
+  string context_id = 2;
+  string task_id = 3;
+  Role role = 4;                    // USER (requester) or AGENT (responder)
+  repeated Part content = 5;        // Structured task content
 }
 
-// Example: image_generation task parameters
-{
-  "prompt": "A futuristic cityscape at sunset",
-  "style": "photorealistic",
-  "resolution": "1920x1080",
-  "quality": "high"
-}
-```
-
-**Metadata** provides additional context that may be useful for execution, auditing, or debugging but isn't directly required for task completion:
-
-```json
-{
-  "workflow_id": "workflow_abc123",
-  "user_id": "user_456",
-  "request_source": "web_ui",
-  "correlation_id": "trace_789"
+message Part {
+  oneof part {
+    string text = 1;               // Text description
+    DataPart data = 2;             // Structured data
+    FilePart file = 3;             // File references
+  }
 }
 ```
 
-#### Agent Coordination
-```protobuf
-string requester_agent_id = 4;        // Who initiated the task
-string responder_agent_id = 5;        // Who should execute (optional)
+```go
+// Example: A2A data analysis task
+taskMessage := &a2a.Message{
+    MessageId: "msg_" + uuid.New().String(),
+    ContextId: "analysis_workflow_123",
+    TaskId:    "task_analysis_456",
+    Role:      a2a.Role_USER,
+    Content: []*a2a.Part{
+        {
+            Part: &a2a.Part_Text{
+                Text: "Please perform trend analysis on Q4 sales data",
+            },
+        },
+        {
+            Part: &a2a.Part_Data{
+                Data: &a2a.DataPart{
+                    Data: analysisParams, // Structured parameters
+                    Description: "Analysis configuration",
+                },
+            },
+        },
+    },
+}
 ```
 
-These fields establish the communication relationship:
-- **requester_agent_id** identifies which agent requested the task, enabling result delivery
-- **responder_agent_id** can specify a particular agent for execution, or be omitted for broadcast/routing
+**Metadata** in A2A tasks provides additional context for execution, auditing, or debugging:
 
-#### Execution Context
+```go
+// A2A task metadata
+taskMetadata, _ := structpb.NewStruct(map[string]interface{}{
+    "workflow_id":     "workflow_abc123",
+    "user_id":         "user_456",
+    "request_source":  "web_ui",
+    "correlation_id":  "trace_789",
+    "priority":        "high",
+    "expected_duration": "5m",
+})
+
+task := &a2a.Task{
+    Id:        "task_analysis_456",
+    ContextId: "analysis_workflow_123",
+    Metadata:  taskMetadata,
+}
+```
+
+#### A2A Agent Coordination
+
+In A2A, agent coordination is handled through the EDA routing metadata:
+
 ```protobuf
-google.protobuf.Timestamp deadline = 6;   // When task must complete
-Priority priority = 7;                    // Urgency level
-google.protobuf.Timestamp created_at = 9; // Creation timestamp
+message AgentEventMetadata {
+  string from_agent_id = 1;           // Source agent identifier
+  string to_agent_id = 2;             // Target agent ID (empty = broadcast)
+  string event_type = 3;              // Event classification
+  repeated string subscriptions = 4;   // Topic-based routing tags
+  Priority priority = 5;              // Delivery priority
+}
+```
+
+This enables flexible routing patterns:
+- **from_agent_id** identifies the requesting agent
+- **to_agent_id** can specify a target agent or be empty for broadcast
+- **subscriptions** enable topic-based routing for specialized agents
+- **priority** ensures urgent tasks get precedence
+
+#### A2A Execution Context
+
+A2A handles execution context through the TaskStatus structure:
+
+```protobuf
+message TaskStatus {
+  TaskState state = 1;                   // SUBMITTED, WORKING, COMPLETED, FAILED, CANCELLED
+  Message update = 2;                    // Latest status message
+  google.protobuf.Timestamp timestamp = 3; // Status timestamp
+}
+
+enum TaskState {
+  TASK_STATE_SUBMITTED = 0;
+  TASK_STATE_WORKING = 1;
+  TASK_STATE_COMPLETED = 2;
+  TASK_STATE_FAILED = 3;
+  TASK_STATE_CANCELLED = 4;
+}
 ```
 
 This context helps agents make intelligent scheduling decisions:
@@ -90,36 +148,71 @@ This context helps agents make intelligent scheduling decisions:
 
 ## Task Lifecycle
 
-### 1. Task Creation and Publishing
+### 1. A2A Task Creation and Publishing
 
-Tasks begin their lifecycle when a requesting agent identifies work that needs to be done:
+A2A tasks begin their lifecycle when a requesting agent creates a task with an initial message:
 
 ```go
-// Agent identifies need for data analysis
-task := &pb.TaskMessage{
-    TaskId:           generateUniqueID(),
-    TaskType:         "data_analysis",
-    Parameters:       analysisParams,
-    RequesterAgentId: "data_orchestrator",
-    ResponderAgentId: "data_processor_01", // Optional: specific agent
-    Priority:         pb.Priority_PRIORITY_HIGH,
-    Deadline:         timestamppb.New(time.Now().Add(30 * time.Minute)),
-    CreatedAt:        timestamppb.Now(),
+// Create A2A task with initial request message
+task := &a2a.Task{
+    Id:        "task_analysis_" + uuid.New().String(),
+    ContextId: "workflow_orchestration_123",
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_SUBMITTED,
+        Update: &a2a.Message{
+            MessageId: "msg_" + uuid.New().String(),
+            TaskId:    "task_analysis_" + uuid.New().String(),
+            Role:      a2a.Role_USER,
+            Content: []*a2a.Part{
+                {
+                    Part: &a2a.Part_Text{
+                        Text: "Please analyze the quarterly sales data for trends",
+                    },
+                },
+                {
+                    Part: &a2a.Part_Data{
+                        Data: &a2a.DataPart{
+                            Data: analysisParams,
+                            Description: "Analysis configuration",
+                        },
+                    },
+                },
+            },
+        },
+        Timestamp: timestamppb.Now(),
+    },
 }
 
-// Publish to the broker
-client.PublishTask(ctx, &pb.PublishTaskRequest{Task: task})
+// Publish to AgentHub broker
+client.PublishTaskUpdate(ctx, &pb.PublishTaskUpdateRequest{
+    Task: task,
+    Routing: &pb.AgentEventMetadata{
+        FromAgentId: "data_orchestrator",
+        ToAgentId:   "data_processor_01", // Optional: specific agent
+        EventType:   "task.submitted",
+        Priority:    pb.Priority_PRIORITY_HIGH,
+    },
+})
 ```
 
-### 2. Task Discovery and Acceptance
+### 2. A2A Task Discovery and Acceptance
 
-Agents subscribe to tasks and evaluate whether to accept them:
+Agents subscribe to A2A task events and evaluate whether to accept them:
 
 ```go
-// Agent receives task notification
-func (a *Agent) evaluateTask(task *pb.TaskMessage) bool {
+// Agent receives A2A task event
+func (a *Agent) evaluateA2ATask(event *pb.AgentEvent) bool {
+    task := event.GetTask()
+    if task == nil || task.Status.State != a2a.TaskState_TASK_STATE_SUBMITTED {
+        return false
+    }
+
+    // Analyze task content to understand requirements
+    requestMessage := task.Status.Update
+    taskDescription := a.extractTaskDescription(requestMessage)
+
     // Check if agent can handle this task type
-    if !a.canHandle(task.GetTaskType()) {
+    if !a.canHandleTaskType(taskDescription) {
         return false
     }
 
@@ -128,69 +221,177 @@ func (a *Agent) evaluateTask(task *pb.TaskMessage) bool {
         return false
     }
 
-    // Check deadline feasibility
-    estimatedDuration := a.estimateTaskDuration(task)
-    if time.Now().Add(estimatedDuration).After(task.GetDeadline().AsTime()) {
+    // Estimate duration from task content and metadata
+    estimatedDuration := a.estimateA2ATaskDuration(task)
+    if estimatedDuration > a.maxTaskDuration {
         return false
     }
 
     return true
 }
+
+func (a *Agent) extractTaskDescription(msg *a2a.Message) string {
+    for _, part := range msg.Content {
+        if textPart := part.GetText(); textPart != "" {
+            return textPart
+        }
+    }
+    return ""
+}
 ```
 
-### 3. Task Execution with Progress Reporting
+### 3. A2A Task Execution with Progress Reporting
 
-Accepted tasks enter the execution phase with regular progress updates:
+Accepted A2A tasks enter the execution phase with regular status updates:
 
 ```go
-func (a *Agent) executeTask(task *pb.TaskMessage) {
-    // Initial progress
-    a.reportProgress(task, 0, "Task started")
+func (a *Agent) executeA2ATask(task *a2a.Task) {
+    // Update task to WORKING state
+    a.updateTaskStatus(task, a2a.TaskState_TASK_STATE_WORKING, "Task started")
 
     // Phase 1: Preparation
-    a.reportProgress(task, 25, "Preparing data")
-    prepareResult := a.prepareExecution(task)
+    a.updateTaskStatus(task, a2a.TaskState_TASK_STATE_WORKING, "Preparing data analysis")
+    prepareResult := a.prepareA2AExecution(task)
 
     // Phase 2: Main processing
-    a.reportProgress(task, 50, "Processing data")
-    processResult := a.processData(prepareResult)
+    a.updateTaskStatus(task, a2a.TaskState_TASK_STATE_WORKING, "Processing data - 50% complete")
+    processResult := a.processA2AData(prepareResult)
 
     // Phase 3: Finalization
-    a.reportProgress(task, 75, "Finalizing results")
-    finalResult := a.finalizeResults(processResult)
+    a.updateTaskStatus(task, a2a.TaskState_TASK_STATE_WORKING, "Finalizing results - 75% complete")
+    finalResult := a.finalizeA2AResults(processResult)
 
-    // Completion
-    a.reportProgress(task, 100, "Task completed")
-    a.publishResult(task, finalResult, pb.TaskStatus_TASK_STATUS_COMPLETED)
+    // Completion with artifacts
+    a.completeTaskWithArtifacts(task, finalResult)
+}
+
+func (a *Agent) updateTaskStatus(task *a2a.Task, state a2a.TaskState, message string) {
+    statusUpdate := &a2a.Message{
+        MessageId: "msg_" + uuid.New().String(),
+        TaskId:    task.Id,
+        Role:      a2a.Role_AGENT,
+        Content: []*a2a.Part{
+            {
+                Part: &a2a.Part_Text{
+                    Text: message,
+                },
+            },
+        },
+    }
+
+    task.Status = &a2a.TaskStatus{
+        State:     state,
+        Update:    statusUpdate,
+        Timestamp: timestamppb.Now(),
+    }
+
+    // Publish task update
+    a.client.PublishTaskUpdate(context.Background(), &pb.PublishTaskUpdateRequest{
+        Task: task,
+        Routing: &pb.AgentEventMetadata{
+            FromAgentId: a.agentId,
+            EventType:   "task.status_update",
+        },
+    })
 }
 ```
 
-### 4. Result Delivery
+### 4. A2A Result Delivery
 
-Task completion triggers result publication back to the requesting agent:
+A2A task completion delivers results through structured artifacts:
 
 ```go
-result := &pb.TaskResult{
-    TaskId:            task.GetTaskId(),
-    Status:            pb.TaskStatus_TASK_STATUS_COMPLETED,
-    Result:            resultData,
-    ExecutorAgentId:   a.agentId,
-    CompletedAt:       timestamppb.Now(),
-    ExecutionMetadata: executionContext,
+func (a *Agent) completeTaskWithArtifacts(task *a2a.Task, resultData interface{}) {
+    // Create completion message
+    completionMessage := &a2a.Message{
+        MessageId: "msg_" + uuid.New().String(),
+        TaskId:    task.Id,
+        Role:      a2a.Role_AGENT,
+        Content: []*a2a.Part{
+            {
+                Part: &a2a.Part_Text{
+                    Text: "Analysis completed successfully",
+                },
+            },
+        },
+    }
+
+    // Create result artifact
+    resultArtifact := &a2a.Artifact{
+        ArtifactId:  "artifact_" + uuid.New().String(),
+        Name:        "Analysis Results",
+        Description: "Quarterly sales trend analysis",
+        Parts: []*a2a.Part{
+            {
+                Part: &a2a.Part_Data{
+                    Data: &a2a.DataPart{
+                        Data:        resultData.(structpb.Struct),
+                        Description: "Analysis results and metrics",
+                    },
+                },
+            },
+        },
+    }
+
+    // Update task to completed
+    task.Status = &a2a.TaskStatus{
+        State:     a2a.TaskState_TASK_STATE_COMPLETED,
+        Update:    completionMessage,
+        Timestamp: timestamppb.Now(),
+    }
+    task.Artifacts = append(task.Artifacts, resultArtifact)
+
+    // Publish final task update
+    a.client.PublishTaskUpdate(context.Background(), &pb.PublishTaskUpdateRequest{
+        Task: task,
+        Routing: &pb.AgentEventMetadata{
+            FromAgentId: a.agentId,
+            EventType:   "task.completed",
+        },
+    })
+
+    // Publish artifact separately
+    a.client.PublishTaskArtifact(context.Background(), &pb.PublishTaskArtifactRequest{
+        TaskId:   task.Id,
+        Artifact: resultArtifact,
+        Routing: &pb.AgentEventMetadata{
+            FromAgentId: a.agentId,
+            EventType:   "task.artifact",
+        },
+    })
+}
+```
+
+## A2A Task Design Patterns
+
+### 1. Simple A2A Request-Response
+
+The most basic pattern where one agent requests work from another using A2A messages:
+
+```
+Agent A ──[A2A Task]──> AgentHub ──[TaskEvent]──> Agent B
+Agent A <─[Artifact]─── AgentHub <─[TaskUpdate]── Agent B
+```
+
+**A2A Implementation:**
+```go
+// Agent A creates task
+task := &a2a.Task{
+    Id: "simple_task_123",
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_SUBMITTED,
+        Update: &a2a.Message{
+            Role: a2a.Role_USER,
+            Content: []*a2a.Part{{Part: &a2a.Part_Text{Text: "Convert CSV to JSON"}}},
+        },
+    },
 }
 
-client.PublishTaskResult(ctx, &pb.PublishTaskResultRequest{Result: result})
-```
-
-## Task Design Patterns
-
-### 1. Simple Request-Response
-
-The most basic pattern where one agent requests work from another:
-
-```
-Agent A ──[Task]──> Broker ──[Task]──> Agent B
-Agent A <─[Result]─ Broker <─[Result]─ Agent B
+// Agent B responds with artifact
+artifact := &a2a.Artifact{
+    Name: "Converted Data",
+    Parts: []*a2a.Part{{Part: &a2a.Part_File{File: &a2a.FilePart{FileId: "converted.json"}}}},
+}
 ```
 
 **Use cases:**
@@ -199,14 +400,43 @@ Agent A <─[Result]─ Broker <─[Result]─ Agent B
 - Data validation
 - Content generation
 
-### 2. Broadcast Processing
+### 2. A2A Broadcast Processing
 
-One agent broadcasts a task to multiple potential processors:
+One agent broadcasts a task to multiple potential processors using A2A context-aware routing:
 
 ```
-Agent A ──[Task]──> Broker ──[Task]──> Agent B₁
-                           ├─[Task]──> Agent B₂
-                           └─[Task]──> Agent B₃
+Agent A ──[A2A Task]──> AgentHub ──[TaskEvent]──> Agent B₁
+                                ├─[TaskEvent]──> Agent B₂
+                                └─[TaskEvent]──> Agent B₃
+```
+
+**A2A Implementation:**
+```go
+// Broadcast task with shared context
+task := &a2a.Task{
+    Id:        "broadcast_task_456",
+    ContextId: "parallel_processing_context",
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_SUBMITTED,
+        Update: &a2a.Message{
+            Role: a2a.Role_USER,
+            Content: []*a2a.Part{
+                {Part: &a2a.Part_Text{Text: "Process data chunk"}},
+                {Part: &a2a.Part_Data{Data: &a2a.DataPart{Data: chunkData}}},
+            },
+        },
+    },
+}
+
+// Publish without specific target (broadcast)
+client.PublishTaskUpdate(ctx, &pb.PublishTaskUpdateRequest{
+    Task: task,
+    Routing: &pb.AgentEventMetadata{
+        FromAgentId: "orchestrator",
+        // No ToAgentId = broadcast
+        EventType: "task.broadcast",
+    },
+})
 ```
 
 **Use cases:**
@@ -215,13 +445,47 @@ Agent A ──[Task]──> Broker ──[Task]──> Agent B₁
 - Content distribution
 - Parallel processing
 
-### 3. Pipeline Processing
+### 3. A2A Pipeline Processing
 
-Tasks flow through a series of specialized agents:
+Tasks flow through a series of specialized agents using shared A2A context:
 
 ```
-Agent A ──[Task₁]──> Agent B ──[Task₂]──> Agent C ──[Task₃]──> Agent D
-       <──[Result]─────────────────────────────────────────────┘
+Agent A ──[A2A Task₁]──> Agent B ──[A2A Task₂]──> Agent C ──[A2A Task₃]──> Agent D
+       <──[Final Artifact]───────────────────────────────────────────────────┘
+```
+
+**A2A Implementation:**
+```go
+// Shared context for pipeline
+pipelineContext := "data_pipeline_" + uuid.New().String()
+
+// Stage 1: Data extraction
+task1 := &a2a.Task{
+    Id:        "extract_" + uuid.New().String(),
+    ContextId: pipelineContext,
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_SUBMITTED,
+        Update: &a2a.Message{
+            Role: a2a.Role_USER,
+            Content: []*a2a.Part{{Part: &a2a.Part_Text{Text: "Extract data from source"}}},
+        },
+    },
+}
+
+// Stage 2: Data transformation (triggered by Stage 1 completion)
+task2 := &a2a.Task{
+    Id:        "transform_" + uuid.New().String(),
+    ContextId: pipelineContext, // Same context
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_SUBMITTED,
+        Update: &a2a.Message{
+            Role: a2a.Role_USER,
+            Content: []*a2a.Part{{Part: &a2a.Part_Text{Text: "Transform extracted data"}}},
+        },
+    },
+}
+
+// Context linking enables pipeline coordination
 ```
 
 **Use cases:**
@@ -230,15 +494,52 @@ Agent A ──[Task₁]──> Agent B ──[Task₂]──> Agent C ──[Tas
 - Document processing chains
 - ETL operations
 
-### 4. Hierarchical Decomposition
+### 4. A2A Hierarchical Decomposition
 
-Complex tasks are broken down into subtasks by coordinator agents:
+Complex tasks are broken down into subtasks using A2A context hierarchy:
 
 ```
-Agent A ──[ComplexTask]──> Coordinator
-                              ├──[SubTask₁]──> Specialist₁
-                              ├──[SubTask₂]──> Specialist₂
-                              └──[SubTask₃]──> Specialist₃
+Agent A ──[A2A ComplexTask]──> Coordinator
+                                  ├──[A2A SubTask₁]──> Specialist₁
+                                  ├──[A2A SubTask₂]──> Specialist₂
+                                  └──[A2A SubTask₃]──> Specialist₃
+```
+
+**A2A Implementation:**
+```go
+// Parent task
+parentTask := &a2a.Task{
+    Id:        "complex_analysis_789",
+    ContextId: "business_workflow_123",
+    Status: &a2a.TaskStatus{
+        State: a2a.TaskState_TASK_STATE_SUBMITTED,
+        Update: &a2a.Message{
+            Role: a2a.Role_USER,
+            Content: []*a2a.Part{{Part: &a2a.Part_Text{Text: "Perform comprehensive business analysis"}}},
+        },
+    },
+}
+
+// Coordinator creates subtasks with hierarchical context
+subtask1 := &a2a.Task{
+    Id:        "financial_analysis_790",
+    ContextId: "business_workflow_123", // Same parent context
+    Metadata: map[string]interface{}{
+        "parent_task_id": "complex_analysis_789",
+        "subtask_type":   "financial",
+    },
+}
+
+subtask2 := &a2a.Task{
+    Id:        "market_analysis_791",
+    ContextId: "business_workflow_123", // Same parent context
+    Metadata: map[string]interface{}{
+        "parent_task_id": "complex_analysis_789",
+        "subtask_type":   "market",
+    },
+}
+
+// Context enables coordination and result aggregation
 ```
 
 **Use cases:**
@@ -263,28 +564,37 @@ Agent A ──[Task]──> Broker ──[Task]──> Agent B₁ (accepts)
 - Fault tolerance
 - Performance optimization
 
-## Task Types and Semantics
+## A2A Task Content and Semantics
 
-### Classification Strategies
+### A2A Message-Based Classification
 
-Task types should follow consistent naming conventions that enable agents to understand capabilities:
+In A2A, task classification is handled through message content rather than rigid type fields, providing more flexibility:
 
-#### Domain-Based Classification
-```
-data.*          - Data processing tasks
-  data.analysis
-  data.transformation
-  data.validation
+#### Content-Based Classification
+```go
+// Data processing task
+message := &a2a.Message{
+    Content: []*a2a.Part{
+        {Part: &a2a.Part_Text{Text: "Analyze quarterly sales data for trends"}},
+        {Part: &a2a.Part_Data{Data: &a2a.DataPart{Description: "Analysis parameters"}}},
+    },
+}
 
-image.*         - Image processing tasks
-  image.generation
-  image.enhancement
-  image.conversion
+// Image processing task
+message := &a2a.Message{
+    Content: []*a2a.Part{
+        {Part: &a2a.Part_Text{Text: "Generate product image with specifications"}},
+        {Part: &a2a.Part_Data{Data: &a2a.DataPart{Description: "Image requirements"}}},
+    },
+}
 
-notification.*  - Communication tasks
-  notification.email
-  notification.sms
-  notification.push
+// Notification task
+message := &a2a.Message{
+    Content: []*a2a.Part{
+        {Part: &a2a.Part_Text{Text: "Send completion notification to user"}},
+        {Part: &a2a.Part_Data{Data: &a2a.DataPart{Description: "Notification details"}}},
+    },
+}
 ```
 
 #### Operation-Based Classification
@@ -304,23 +614,49 @@ complex.*       - Resource-intensive tasks
 background.*    - Long-running batch tasks
 ```
 
-### Parameter Design Guidelines
+### A2A Content Design Guidelines
 
-**Be Explicit**: Include all information needed for execution
-```json
-// Good: Explicit parameters
-{
-  "source_format": "csv",
-  "target_format": "json",
-  "include_headers": true,
-  "delimiter": ",",
-  "encoding": "utf-8"
+**Be Explicit**: Include all information needed for execution in structured Parts
+```go
+// Good: Explicit A2A content
+content := []*a2a.Part{
+    {
+        Part: &a2a.Part_Text{
+            Text: "Convert CSV file to JSON format with specific options",
+        },
+    },
+    {
+        Part: &a2a.Part_Data{
+            Data: &a2a.DataPart{
+                Data: structpb.NewStruct(map[string]interface{}{
+                    "source_format":   "csv",
+                    "target_format":   "json",
+                    "include_headers": true,
+                    "delimiter":       ",",
+                    "encoding":        "utf-8",
+                }),
+                Description: "Conversion parameters",
+            },
+        },
+    },
+    {
+        Part: &a2a.Part_File{
+            File: &a2a.FilePart{
+                FileId:   "source_data.csv",
+                Filename: "data.csv",
+                MimeType: "text/csv",
+            },
+        },
+    },
 }
 
-// Poor: Ambiguous parameters
-{
-  "file": "data.csv",
-  "convert": "json"
+// Poor: Ambiguous A2A content
+content := []*a2a.Part{
+    {
+        Part: &a2a.Part_Text{
+            Text: "Convert file", // Too vague
+        },
+    },
 }
 ```
 
@@ -344,23 +680,48 @@ background.*    - Long-running batch tasks
 }
 ```
 
-## Error Handling and Edge Cases
+## A2A Error Handling and Edge Cases
 
-### Task Rejection
+### A2A Task Rejection
 
-Agents should provide meaningful rejection reasons:
+Agents should provide meaningful rejection reasons using A2A message format:
 
 ```go
-func (a *Agent) rejectTask(task *pb.TaskMessage, reason string) {
-    result := &pb.TaskResult{
-        TaskId:       task.GetTaskId(),
-        Status:       pb.TaskStatus_TASK_STATUS_FAILED,
-        ErrorMessage: reason,
-        ExecutorAgentId: a.agentId,
-        CompletedAt:  timestamppb.Now(),
+func (a *Agent) rejectA2ATask(task *a2a.Task, reason string) {
+    // Create rejection message
+    rejectionMessage := &a2a.Message{
+        MessageId: "msg_" + uuid.New().String(),
+        TaskId:    task.Id,
+        Role:      a2a.Role_AGENT,
+        Content: []*a2a.Part{
+            {
+                Part: &a2a.Part_Text{
+                    Text: "Task rejected: " + reason,
+                },
+            },
+            {
+                Part: &a2a.Part_Data{
+                    Data: &a2a.DataPart{
+                        Data: structpb.NewStruct(map[string]interface{}{
+                            "rejection_reason": reason,
+                            "agent_id":         a.agentId,
+                            "timestamp":        time.Now().Unix(),
+                        }),
+                        Description: "Rejection details",
+                    },
+                },
+            },
+        },
     }
 
-    a.publishResult(result)
+    // Update task status to failed
+    task.Status = &a2a.TaskStatus{
+        State:     a2a.TaskState_TASK_STATE_FAILED,
+        Update:    rejectionMessage,
+        Timestamp: timestamppb.Now(),
+    }
+
+    a.publishTaskUpdate(task)
 }
 ```
 
@@ -439,4 +800,4 @@ type PartialResult struct {
 4. **Log task execution** for audit trails
 5. **Encrypt sensitive parameters** when necessary
 
-Tasks form the foundation of Agent2Agent communication, enabling sophisticated distributed processing patterns while maintaining clear semantics and strong observability. Proper task design is crucial for building robust, scalable agent networks.
+A2A tasks form the foundation of Agent2Agent communication, enabling sophisticated distributed processing patterns through structured messages, artifacts, and context-aware coordination. The A2A protocol's flexible message format and EDA integration provide robust, scalable agent networks with clear semantics and strong observability. Proper A2A task design leverages the protocol's strengths for building maintainable, interoperable agent systems.

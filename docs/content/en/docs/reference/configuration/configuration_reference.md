@@ -50,6 +50,17 @@ AgentHub uses environment variables for all configuration with the unified abstr
 | `SERVICE_VERSION` | `1.0.0` | Service version for telemetry and observability |
 | `ENVIRONMENT` | `development` | Deployment environment (development, staging, production) |
 
+#### A2A Protocol Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AGENTHUB_MESSAGE_BUFFER_SIZE` | `100` | Buffer size for A2A message processing |
+| `AGENTHUB_TASK_UPDATE_INTERVAL` | `1s` | Interval for publishing task status updates |
+| `AGENTHUB_ARTIFACT_MAX_SIZE` | `10MB` | Maximum size for task artifacts |
+| `AGENTHUB_CONTEXT_TIMEOUT` | `30s` | Timeout for A2A message context |
+| `AGENTHUB_A2A_PROTOCOL_VERSION` | `1.0` | A2A protocol version for compatibility |
+| `AGENTHUB_MESSAGE_HISTORY_LIMIT` | `50` | Maximum message history per task |
+
 ## Unified Abstraction Usage
 
 ### Using Configuration with the Unified Abstraction
@@ -136,8 +147,8 @@ server := grpc.NewServer()
 // Automatic configuration from environment
 config := agenthub.NewGRPCConfig("broker")
 server, err := agenthub.NewAgentHubServer(config)
-service := agenthub.NewEventBusService(server)
-pb.RegisterEventBusServer(server.Server, service)
+service := agenthub.NewAgentHubService(server)
+pb.RegisterAgentHubServer(server.Server, service)
 server.Start(ctx)
 ```
 
@@ -148,7 +159,7 @@ server.Start(ctx)
 The unified abstraction provides simplified command execution:
 
 ```bash
-eventbus-server [OPTIONS]
+agenthub-server [OPTIONS]
 
 Options:
   -port int
@@ -208,7 +219,7 @@ security:
 
 **Loading Configuration:**
 ```bash
-eventbus-server -config /path/to/agenthub.yaml
+agenthub-server -config /path/to/agenthub.yaml
 ```
 
 ## Agent Configuration
@@ -430,7 +441,7 @@ security:
 ```go
 // Agent authentication
 type AuthenticatedAgent struct {
-    client   pb.EventBusClient
+    client   pb.AgentHubClient
     token    string
     agentID  string
 }
@@ -440,8 +451,8 @@ func (a *AuthenticatedAgent) authenticate() error {
     ctx := metadata.AppendToOutgoingContext(context.Background(),
         "authorization", "Bearer "+a.token)
 
-    // Use authenticated context for requests
-    _, err := a.client.PublishTask(ctx, request)
+    // Use authenticated context for A2A requests
+    _, err := a.client.PublishMessage(ctx, request)
     return err
 }
 ```

@@ -13,16 +13,16 @@ This document explores the core principles of Google's Agent2Agent protocol and 
 
 ### Agent2Agent Protocol (Google)
 The Agent2Agent protocol defines:
-- **Task Message Structures**: `TaskMessage`, `TaskResult`, `TaskProgress` with their fields and semantics
-- **Task Status and Priority Enums**: Standardized task lifecycle and priority levels
-- **Communication Patterns**: Asynchronous task delegation and result reporting concepts
+- **A2A Message Structures**: `Message`, `Task`, `Artifact` with structured content parts
+- **Task State Management**: `TaskState` enums (SUBMITTED, WORKING, COMPLETED, FAILED, CANCELLED)
+- **Communication Patterns**: Asynchronous task delegation with context-aware message handling
 
 ### AgentHub Implementation (This Project)
 AgentHub provides:
-- **Event Bus Broker**: Centralized gRPC service that routes tasks between agents
-- **Pub/Sub Architecture**: Publisher-subscriber pattern for task distribution
-- **Subscription Mechanisms**: `SubscribeToTasks`, `SubscribeToTaskResults`, `SubscribeToTaskProgress` methods
-- **Agent Implementations**: Sample publisher and subscriber agents demonstrating the protocol
+- **Hybrid EDA+A2A Broker**: Centralized gRPC service implementing A2A protocol within Event-Driven Architecture
+- **A2A-Compliant Pub/Sub**: Publisher-subscriber pattern using native A2A message structures
+- **A2A Subscription Mechanisms**: `SubscribeToTasks`, `SubscribeToMessages`, `SubscribeToAgentEvents` methods
+- **A2A Agent Implementations**: Sample agents using `A2ATaskPublisher` and `A2ATaskSubscriber` abstractions
 
 ## Philosophy and Core Concepts
 
@@ -69,59 +69,103 @@ This asynchronicity enables:
 - **Improved scalability** as systems can handle more concurrent operations
 - **Enhanced resilience** as temporary agent unavailability doesn't block the entire system
 
-### 2. Rich Task Semantics (Agent2Agent Protocol)
+### 2. Rich A2A Task Semantics
 
-The Agent2Agent protocol defines rich task message structures that AgentHub implements:
+The Agent2Agent protocol defines rich task structures with flexible message content that AgentHub implements:
 
 ```protobuf
-message TaskMessage {
-  string task_id = 1;                    // Unique identifier for tracking
-  string task_type = 2;                  // Semantic type (e.g., "data_analysis")
-  google.protobuf.Struct parameters = 3; // Flexible parameters
-  string requester_agent_id = 4;         // Who requested the work
-  string responder_agent_id = 5;         // Who should do the work (optional)
-  google.protobuf.Timestamp deadline = 6; // When it needs to be done
-  Priority priority = 7;                 // How urgent it is
-  google.protobuf.Struct metadata = 8;   // Additional context
+message Task {
+  string id = 1;                         // Unique task identifier
+  string context_id = 2;                 // Conversation/workflow context
+  TaskStatus status = 3;                 // Current status with latest message
+  repeated Message history = 4;          // Complete message history
+  repeated Artifact artifacts = 5;       // Task output artifacts
+  google.protobuf.Struct metadata = 6;   // Additional context
+}
+
+message Message {
+  string message_id = 1;                 // Unique message identifier
+  string context_id = 2;                 // Conversation context
+  string task_id = 3;                    // Associated task
+  Role role = 4;                         // USER or AGENT
+  repeated Part content = 5;             // Structured content parts
+  google.protobuf.Struct metadata = 6;   // Message metadata
+}
+
+message TaskStatus {
+  TaskState state = 1;                   // SUBMITTED, WORKING, COMPLETED, etc.
+  Message update = 2;                    // Latest status message
+  google.protobuf.Timestamp timestamp = 3; // Status timestamp
 }
 ```
 
-This rich structure enables:
-- **Intelligent routing** based on task type and agent capabilities
-- **Priority-based scheduling** to ensure urgent tasks are handled first
-- **Deadline awareness** for time-sensitive operations
-- **Context preservation** for better decision-making
+This rich A2A structure enables:
+- **Context-aware routing** based on conversation context and message content
+- **Flexible content handling** through structured Part types (text, data, files)
+- **Workflow coordination** via shared context IDs across related tasks
+- **Complete communication history** for debugging and audit trails
+- **Structured artifact delivery** for rich result types
 
-### 3. Explicit Progress Tracking
+### 3. A2A Status Updates and Progress Tracking
 
-Long-running tasks benefit from explicit progress reporting:
+Long-running tasks benefit from A2A status updates through the message history:
 
 ```protobuf
-message TaskProgress {
-  string task_id = 1;                    // Which task this refers to
-  TaskStatus status = 2;                 // Current status
-  string progress_message = 3;           // Human-readable description
-  int32 progress_percentage = 4;         // Quantitative progress (0-100)
-  google.protobuf.Struct progress_data = 5; // Structured progress information
+// Progress updates are A2A messages within the task
+message TaskStatus {
+  TaskState state = 1;                   // Current execution state
+  Message update = 2;                    // Latest status message from agent
+  google.protobuf.Timestamp timestamp = 3; // When this status was set
+}
+
+// Progress information is conveyed through message content
+message Message {
+  // ... other fields
+  repeated Part content = 5;             // Can include progress details
+}
+
+// Example progress message content
+Part progressPart = {
+  part: {
+    data: {
+      data: {
+        "progress_percentage": 65,
+        "phase": "data_analysis",
+        "estimated_remaining": "2m30s"
+      },
+      description: "Processing progress update"
+    }
+  }
 }
 ```
 
-This enables:
-- **Visibility** into system operations for monitoring and debugging
-- **User experience improvements** with real-time progress indicators
-- **Resource planning** by understanding how long operations typically take
-- **Early failure detection** when progress stalls unexpectedly
+This A2A approach enables:
+- **Rich progress communication** through structured message content
+- **Complete audit trails** via message history preservation
+- **Context-aware status updates** linking progress to specific workflows
+- **Flexible progress formats** supporting text, data, and file-based updates
+- **Multi-agent coordination** through shared context and message threading
 
-### 4. Flexible Agent Addressing
+### 4. A2A EDA Routing Flexibility
 
-The protocol supports multiple addressing patterns:
+AgentHub's A2A implementation supports multiple routing patterns through EDA metadata:
 
-- **Direct addressing**: Tasks sent to specific agents by ID
-- **Broadcast addressing**: Tasks sent to all capable agents
-- **Capability-based routing**: Tasks routed based on agent capabilities
-- **Load-balanced routing**: Tasks distributed among agents with similar capabilities
+```protobuf
+message AgentEventMetadata {
+  string from_agent_id = 1;              // Source agent
+  string to_agent_id = 2;                // Target agent (empty = broadcast)
+  string event_type = 3;                 // Event classification
+  repeated string subscriptions = 4;      // Topic-based routing
+  Priority priority = 5;                 // Delivery priority
+}
+```
 
-This flexibility enables different architectural patterns within the same system.
+- **Direct A2A addressing**: Tasks sent to specific agents via `to_agent_id`
+- **Broadcast A2A addressing**: Tasks sent to all subscribed agents (empty `to_agent_id`)
+- **Topic-based A2A routing**: Tasks routed via subscription filters and event types
+- **Context-aware routing**: Tasks routed based on A2A context and conversation state
+
+This hybrid EDA+A2A approach enables sophisticated routing patterns while maintaining A2A protocol compliance.
 
 ## Architectural Patterns
 
@@ -134,14 +178,34 @@ In a microservices architecture, Agent2Agent can enhance service communication b
 - **Enabling service composition** through task chaining
 - **Improving resilience** through task retry and timeout mechanisms
 
-### Event-Driven Architecture Integration
+### Event-Driven Architecture with A2A Protocol
 
-Agent2Agent complements event-driven architectures by:
+AgentHub integrates A2A protocol within Event-Driven Architecture by:
 
-- **Adding structure** to event processing with explicit task semantics
-- **Enabling bidirectional communication** where events can trigger tasks that produce responses
-- **Providing progress tracking** for complex event processing workflows
-- **Supporting task-based coordination** alongside pure event broadcasting
+- **Wrapping A2A messages** in EDA event envelopes for routing and delivery
+- **Preserving A2A semantics** while leveraging EDA scalability and reliability
+- **Enabling A2A conversation contexts** within event-driven message flows
+- **Supporting A2A task coordination** alongside traditional event broadcasting
+- **Providing A2A-compliant APIs** that internally use EDA for transport
+
+```go
+// A2A message wrapped in EDA event
+type AgentEvent struct {
+    EventId   string
+    Timestamp timestamppb.Timestamp
+
+    // A2A-compliant payload
+    Payload oneof {
+        a2a.Message message = 10
+        a2a.Task task = 11
+        TaskStatusUpdateEvent status_update = 12
+        TaskArtifactUpdateEvent artifact_update = 13
+    }
+
+    // EDA routing metadata
+    Routing AgentEventMetadata
+}
+```
 
 ### Workflow Orchestration
 
@@ -205,43 +269,56 @@ When connecting heterogeneous systems that need to coordinate:
 - Third-party service coordination
 - Cross-platform workflows
 
-## Comparison with Other Patterns
+## A2A Protocol Comparison with Other Patterns
 
 ### vs. Message Queues
 Traditional message queues provide asynchronous communication but lack:
-- Rich task semantics
-- Progress tracking
-- Bidirectional result delivery
-- Priority and deadline awareness
+- A2A structured message parts (text, data, files)
+- A2A conversation context and task threading
+- A2A bidirectional artifact delivery
+- A2A complete message history preservation
+- A2A flexible content types and metadata
 
 ### vs. RPC/HTTP APIs
 RPC and HTTP APIs provide structured communication but are typically:
-- Synchronous (blocking)
-- Lacking progress visibility
-- Point-to-point rather than flexible routing
-- Without built-in retry and timeout semantics
+- Synchronous (blocking) vs A2A asynchronous task delegation
+- Lacking A2A-style progress tracking through message history
+- Point-to-point rather than A2A context-aware routing
+- Without A2A structured content parts and artifact handling
+- Missing A2A conversation threading and workflow coordination
 
 ### vs. Event Sourcing
 Event sourcing provides audit trails and state reconstruction but:
-- Focuses on state changes rather than work coordination
-- Lacks explicit progress tracking
-- Doesn't provide direct task completion feedback
-- Requires more complex query patterns for current state
+- Focuses on state changes rather than A2A work coordination
+- Lacks A2A structured task status and message threading
+- Doesn't provide A2A artifact-based result delivery
+- Requires more complex patterns vs A2A's built-in conversation context
+- Missing A2A's multi-modal content handling (text, data, files)
 
-## Future Evolution
+## A2A Protocol Future Evolution
 
-The Agent2Agent principle opens possibilities for:
+The A2A protocol and AgentHub implementation opens possibilities for:
 
-### Intelligent Agent Networks
-Agents that learn about each other's capabilities and performance characteristics to make better delegation decisions.
+### Intelligent A2A Agent Networks
+Agents that learn from A2A conversation contexts and message patterns to make better delegation decisions based on historical performance and capability matching.
 
-### Self-Organizing Systems
-Agent networks that automatically reconfigure based on workload patterns and agent availability.
+### Self-Organizing A2A Systems
+Agent networks that automatically reconfigure based on A2A workflow patterns, context relationships, and agent availability, using A2A metadata for intelligent routing decisions.
 
-### Cross-Organization Collaboration
-Extending Agent2Agent protocols across organizational boundaries for B2B workflow automation.
+### Cross-Organization A2A Collaboration
+Extending A2A protocols across organizational boundaries for B2B workflow automation, leveraging A2A's structured content parts and artifact handling for secure inter-org communication.
 
-### AI Agent Integration
-Natural integration points for AI agents that can understand task semantics and make autonomous decisions about task acceptance and delegation.
+### AI Agent A2A Integration
+Natural integration points for AI agents that can:
+- Parse A2A message content parts for semantic understanding
+- Generate appropriate A2A responses with structured artifacts
+- Maintain A2A conversation context across complex multi-turn interactions
+- Make autonomous decisions about A2A task acceptance based on content analysis
 
-The Agent2Agent principle represents a foundational shift toward more intelligent, autonomous, and collaborative software systems that can handle the complexity of modern distributed applications while providing the visibility and control that operators need.
+### Enhanced A2A Features
+- **A2A Protocol Extensions**: Custom Part types for domain-specific content
+- **Advanced A2A Routing**: ML-based routing decisions using conversation context
+- **A2A Federation**: Cross-cluster A2A communication with context preservation
+- **A2A Analytics**: Deep insights from conversation patterns and artifact flows
+
+The A2A protocol represents a foundational shift toward more intelligent, context-aware, and collaborative software systems that can handle complex distributed workflows while maintaining strong semantics, complete audit trails, and rich inter-agent communication patterns.
