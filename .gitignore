@@ -13,6 +13,11 @@
 !*.yml
 !test-demo.sh
 # etc...
+# Grafana dashboards
+observability/grafana/dashboards/agenthub-broker-dashboard.json
+observability/grafana/dashboards/eda-system-dashboard.json
+observability/grafana/dashboards/agenthub-working-dashboard.json
+observability/grafana/dashboards/agenthub-fixed-dashboard.json
 
 # ...even if they are in subdirectories
 !*/

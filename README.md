@@ -1,11 +1,11 @@
-# AgentHub - Event-Driven Architecture with Complete Observability
+# AgentHub - Event-Driven Architecture with Unified Abstractions
 
 [![Go Version](https://img.shields.io/badge/Go-1.24%2B-blue.svg)](https://golang.org/doc/install)
 [![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-1.37.0-orange.svg)](https://opentelemetry.io/)
 [![gRPC](https://img.shields.io/badge/gRPC-1.75%2B-blue.svg)](https://grpc.io/)
 [![Observability](https://img.shields.io/badge/Observability-Complete-green.svg)](observability/)
 
-AgentHub is a high-performance, gRPC-based communication broker that enables autonomous agents to collaborate through structured task exchange. **Now featuring comprehensive observability** with distributed tracing, metrics collection, and real-time monitoring dashboards.
+AgentHub is a high-performance, gRPC-based communication broker that enables autonomous agents to collaborate through structured task exchange. **Now featuring a unified abstraction library** that simplifies development with built-in observability, environment-based configuration, and automatic correlation tracking.
 
 ## 🚀 Quick Demo - See AgentHub in Action!
 
@@ -25,15 +25,15 @@ cd observability
 docker-compose up -d
 cd ..
 
-# 4. Run the observable demo (3 terminals)
-# Terminal 1 - Broker with full observability
-go run -tags observability broker/main_observability.go
+# 4. Run the unified abstraction demo (3 terminals)
+# Terminal 1 - Broker with built-in observability
+go run broker/main.go
 
 # Terminal 2 - Subscriber agent
-go run -tags observability agents/subscriber/main_observability.go
+go run agents/subscriber/main.go
 
 # Terminal 3 - Publisher agent (sends demo tasks)
-go run -tags observability agents/publisher/main_observability.go
+go run agents/publisher/main.go
 ```
 
 **🎯 Instant Results:**
@@ -44,10 +44,16 @@ go run -tags observability agents/publisher/main_observability.go
 
 ## ✨ What Makes AgentHub Special
 
-### 🔍 **Complete Observability**
-- **Distributed Tracing**: See every event's complete journey across agents
-- **Real-time Metrics**: 47+ metrics covering events, performance, and system health
-- **Intelligent Alerting**: Proactive monitoring with Prometheus alerts
+### 🏗️ **Unified Abstraction Library**
+- **Zero Boilerplate**: Built-in gRPC setup with automatic observability
+- **Environment-Based Configuration**: Automatic configuration from environment variables
+- **Correlation Tracking**: Automatic correlation ID generation and propagation
+- **Pluggable Architecture**: Register custom task handlers with ease
+
+### 🔍 **Built-in Observability**
+- **Distributed Tracing**: Automatic OpenTelemetry instrumentation
+- **Real-time Metrics**: Complete metrics collection with zero configuration
+- **Health Monitoring**: Automatic health check endpoints
 - **Visual Dashboards**: Beautiful Grafana dashboards for system insights
 
 ### ⚡ **High Performance**
@@ -56,10 +62,10 @@ go run -tags observability agents/publisher/main_observability.go
 - **< 5% CPU overhead** for full observability
 - **< 50MB memory** overhead per agent
 
-### 🎯 **Agent-First Design**
-- **Asynchronous Task Delegation** with progress tracking
-- **Flexible Routing** (direct, broadcast, capability-based)
-- **Rich Task Semantics** with priorities and deadlines
+### 🎯 **Developer Experience**
+- **Simplified APIs**: Main files reduced from 380+ lines to 29 lines
+- **Automatic Setup**: One-line broker and client creation
+- **Rich Task Semantics**: Built-in support for priorities and deadlines
 - **Built-in Resilience** with timeout handling and recovery
 
 ## 📊 Live System Visualization
@@ -199,10 +205,10 @@ make proto
 # Build standard binaries
 make build
 
-# Build observable binaries
-go build -tags observability -o bin/broker-obs broker/main_observability.go
-go build -tags observability -o bin/publisher-obs agents/publisher/main_observability.go
-go build -tags observability -o bin/subscriber-obs agents/subscriber/main_observability.go
+# Build binaries with unified abstractions
+go build -o bin/broker broker/main.go
+go build -o bin/publisher agents/publisher/main.go
+go build -o bin/subscriber agents/subscriber/main.go
 
 # Clean generated files
 make clean
@@ -219,22 +225,25 @@ agenthub/
 │   └── README.md              # Observability documentation
 ├── 🔧 internal/
 │   ├── grpc/                  # Generated Protocol Buffer code
-│   └── observability/         # Observability package
-│       ├── config.go          # OpenTelemetry configuration
-│       ├── handler.go         # Custom slog handler with tracing
+│   ├── observability/         # Observability package
+│   │   ├── config.go          # OpenTelemetry configuration
+│   │   ├── handler.go         # Custom slog handler with tracing
+│   │   ├── metrics.go         # Metrics management
+│   │   ├── tracing.go         # Distributed tracing
+│   │   └── healthcheck.go     # Health monitoring
+│   └── agenthub/              # Unified abstraction library
+│       ├── grpc.go            # AgentHub client/server abstractions
+│       ├── metadata.go        # Task publishing/processing abstractions
 │       ├── metrics.go         # Metrics management
-│       ├── tracing.go         # Distributed tracing
-│       └── healthcheck.go     # Health monitoring
+│       ├── broker.go          # Broker service abstraction
+│       └── subscriber.go      # Subscriber service abstraction
 ├── 🤖 agents/                 # Sample agent implementations
 │   ├── publisher/             # Task publishing agents
-│   │   ├── main.go            # Basic publisher
-│   │   └── main_observability.go # Observable publisher
+│   │   └── main.go            # Publisher with unified abstractions
 │   └── subscriber/            # Task processing agents
-│       ├── main.go            # Basic subscriber
-│       └── main_observability.go # Observable subscriber
+│       └── main.go            # Subscriber with unified abstractions
 ├── 🏢 broker/                 # AgentHub broker server
-│   ├── main.go                # Basic broker
-│   └── main_observability.go  # Observable broker
+│   └── main.go                # Broker with unified abstractions
 ├── 📚 documentation/          # Complete documentation suite
 ├── 🔌 proto/                  # Protocol Buffer definitions
 └── 📄 eventflow.md           # Observability specification
@@ -267,17 +276,17 @@ Each service exposes:
 
 ## 🎯 Quick Start Options
 
-### Option 1: Full Observability Experience (Recommended)
-Perfect for understanding the complete system:
+### Option 1: Full Experience with Unified Abstractions (Recommended)
+Perfect for understanding the complete system with simplified code:
 ```bash
 cd observability && docker-compose up -d
-go run -tags observability broker/main_observability.go
-go run -tags observability agents/subscriber/main_observability.go
-go run -tags observability agents/publisher/main_observability.go
+go run broker/main.go
+go run agents/subscriber/main.go
+go run agents/publisher/main.go
 ```
 
-### Option 2: Basic Functionality
-For simple task exchange without observability:
+### Option 2: Basic Functionality (Makefile)
+For simple task exchange using the old Makefile commands:
 ```bash
 make run-server     # Terminal 1
 make run-subscriber # Terminal 2

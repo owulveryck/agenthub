@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	pb "github.com/owulveryck/agenthub/internal/grpc"
 	"github.com/owulveryck/agenthub/internal/agenthub"
+	pb "github.com/owulveryck/agenthub/internal/grpc"
 )
 
 const (

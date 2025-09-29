@@ -123,3 +123,8 @@ func (tm *TraceManager) AddTaskResult(span trace.Span, status string, result map
 func (tm *TraceManager) AddSpanEvent(span trace.Span, eventName string, attributes ...attribute.KeyValue) {
 	span.AddEvent(eventName, trace.WithAttributes(attributes...))
 }
+
+// AddComponentAttribute adds a component identifier to a span
+func (tm *TraceManager) AddComponentAttribute(span trace.Span, component string) {
+	span.SetAttributes(attribute.String("agenthub.component", component))
+}
