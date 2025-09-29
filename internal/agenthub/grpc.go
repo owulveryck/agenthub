@@ -34,10 +34,15 @@ type GRPCConfig struct {
 
 // NewGRPCConfig creates a new gRPC configuration from environment variables
 func NewGRPCConfig(componentName string) *GRPCConfig {
+	// Build broker address from separate host and port variables
+	brokerHost := getEnvWithDefault("AGENTHUB_BROKER_ADDR", "localhost")
+	brokerPort := getEnvWithDefault("AGENTHUB_BROKER_PORT", "50051")
+	brokerAddr := brokerHost + ":" + brokerPort
+
 	config := &GRPCConfig{
 		ComponentName: componentName,
 		ServerAddr:    getEnvWithDefault("AGENTHUB_GRPC_PORT", DefaultGRPCPort),
-		BrokerAddr:    getEnvWithDefault("AGENTHUB_BROKER_ADDR", "localhost:50051"),
+		BrokerAddr:    brokerAddr,
 		HealthPort:    getEnvWithDefault("BROKER_HEALTH_PORT", DefaultHealthPort),
 	}
 

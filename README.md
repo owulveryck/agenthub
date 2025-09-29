@@ -133,6 +133,7 @@ Our documentation follows the [Diátaxis framework](https://diataxis.fr/) for di
 - **[📋 Understanding Tasks](documentation/explanation/the_tasks.md)** - Task semantics and lifecycle
 
 ### 📖 [Reference](documentation/reference/) - *Technical Specifications*
+- **[🏗️ Unified Abstraction API](documentation/reference/unified_abstraction_api.md)** - Complete API reference for the unified abstraction library
 - **[📊 Observability Metrics](documentation/reference/observability_metrics.md)** - Complete metrics catalog and usage
 - **[🔍 Tracing API](documentation/reference/tracing_api.md)** - OpenTelemetry integration reference
 - **[🏥 Health Endpoints](documentation/reference/health_endpoints.md)** - Health check and monitoring APIs
@@ -231,12 +232,13 @@ agenthub/
 │   │   ├── metrics.go         # Metrics management
 │   │   ├── tracing.go         # Distributed tracing
 │   │   └── healthcheck.go     # Health monitoring
-│   └── agenthub/              # Unified abstraction library
-│       ├── grpc.go            # AgentHub client/server abstractions
-│       ├── metadata.go        # Task publishing/processing abstractions
-│       ├── metrics.go         # Metrics management
-│       ├── broker.go          # Broker service abstraction
-│       └── subscriber.go      # Subscriber service abstraction
+│   └── agenthub/              # 🏗️ Unified abstraction library
+│       ├── grpc.go            # AgentHub client/server with environment-based config
+│       ├── metadata.go        # Task publishing/processing with correlation tracking
+│       ├── metrics.go         # Automatic metrics collection
+│       ├── broker.go          # High-level broker service abstraction
+│       ├── subscriber.go      # Pluggable subscriber service abstraction
+│       └── agenthub_test.go   # Comprehensive test suite
 ├── 🤖 agents/                 # Sample agent implementations
 │   ├── publisher/             # Task publishing agents
 │   │   └── main.go            # Publisher with unified abstractions

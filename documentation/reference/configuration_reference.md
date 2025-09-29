@@ -1,50 +1,145 @@
 # Configuration Reference
 
-This document provides comprehensive reference for configuring AgentHub broker and agents, including environment variables, command-line options, and configuration files.
+This document provides comprehensive reference for configuring AgentHub components using the unified abstraction library with environment-based configuration.
 
-## Broker Configuration
+## Unified Abstraction Configuration
 
-### Environment Variables
+AgentHub uses environment variables for all configuration with the unified abstraction library providing automatic configuration setup.
 
-The AgentHub broker can be configured using the following environment variables:
+### Core Environment Variables
 
-#### Server Configuration
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `AGENTHUB_PORT` | `50051` | Port number for the gRPC server |
-| `AGENTHUB_HOST` | `0.0.0.0` | Host address to bind to |
-| `AGENTHUB_MAX_CONNECTIONS` | `1000` | Maximum concurrent connections |
-| `AGENTHUB_TIMEOUT` | `30s` | Default timeout for operations |
-
-#### Logging Configuration
+#### gRPC Connection Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AGENTHUB_LOG_LEVEL` | `info` | Logging level: `debug`, `info`, `warn`, `error` |
-| `AGENTHUB_LOG_FORMAT` | `text` | Log format: `text`, `json` |
-| `AGENTHUB_LOG_FILE` | `""` | Log file path (empty for stdout) |
+| `AGENTHUB_BROKER_ADDR` | `localhost` | Broker server hostname or IP address |
+| `AGENTHUB_BROKER_PORT` | `50051` | Broker gRPC port number |
+| `AGENTHUB_GRPC_PORT` | `:50051` | Server listen address (for broker) |
 
-#### Performance Configuration
+**Note:** The unified abstraction automatically combines `AGENTHUB_BROKER_ADDR` and `AGENTHUB_BROKER_PORT` into a complete broker address (e.g., `localhost:50051`).
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `AGENTHUB_CHANNEL_BUFFER_SIZE` | `10` | Default channel buffer size |
-| `AGENTHUB_MAX_MESSAGE_SIZE` | `4MB` | Maximum gRPC message size |
-| `AGENTHUB_KEEPALIVE_TIME` | `30s` | gRPC keepalive time |
-| `AGENTHUB_KEEPALIVE_TIMEOUT` | `5s` | gRPC keepalive timeout |
-
-#### Resource Limits
+#### Health Monitoring Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AGENTHUB_MAX_AGENTS` | `10000` | Maximum number of registered agents |
-| `AGENTHUB_MAX_TASKS_PER_AGENT` | `100` | Maximum pending tasks per agent |
-| `AGENTHUB_MEMORY_LIMIT` | `1GB` | Memory usage limit (soft limit) |
+| `BROKER_HEALTH_PORT` | `8080` | Broker health check endpoint port |
+| `PUBLISHER_HEALTH_PORT` | `8081` | Publisher health check endpoint port |
+| `SUBSCRIBER_HEALTH_PORT` | `8082` | Subscriber health check endpoint port |
 
-### Command-Line Options
+#### Observability Configuration
 
-The broker supports the following command-line options:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `JAEGER_ENDPOINT` | `127.0.0.1:4317` | Jaeger OTLP endpoint for distributed tracing |
+| `PROMETHEUS_PORT` | `9090` | Prometheus metrics collection port |
+| `GRAFANA_PORT` | `3333` | Grafana dashboard web interface port |
+| `ALERTMANAGER_PORT` | `9093` | AlertManager web interface port |
+| `OTLP_GRPC_PORT` | `4320` | OpenTelemetry Collector gRPC port |
+| `OTLP_HTTP_PORT` | `4321` | OpenTelemetry Collector HTTP port |
+
+#### Service Metadata
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SERVICE_VERSION` | `1.0.0` | Service version for telemetry and observability |
+| `ENVIRONMENT` | `development` | Deployment environment (development, staging, production) |
+
+## Unified Abstraction Usage
+
+### Using Configuration with the Unified Abstraction
+
+The unified abstraction library automatically loads configuration from environment variables:
+
+```go
+// Create configuration from environment variables
+config := agenthub.NewGRPCConfig("my-component")
+
+// Configuration is automatically populated:
+// - config.BrokerAddr: "localhost:50051" (combined from AGENTHUB_BROKER_ADDR + AGENTHUB_BROKER_PORT)
+// - config.ServerAddr: ":50051" (from AGENTHUB_GRPC_PORT)
+// - config.HealthPort: "8080" (from BROKER_HEALTH_PORT)
+// - config.ComponentName: "my-component" (from parameter)
+```
+
+### Environment Variable Loading
+
+The recommended way to load environment variables:
+
+**Option 1: Using direnv (recommended)**
+```bash
+# Place variables in .envrc file
+direnv allow
+```
+
+**Option 2: Source manually**
+```bash
+source .envrc
+```
+
+**Option 3: Set individual variables**
+```bash
+export AGENTHUB_BROKER_ADDR=localhost
+export AGENTHUB_BROKER_PORT=50051
+export JAEGER_ENDPOINT=127.0.0.1:4317
+```
+
+### Configuration Override Examples
+
+You can override defaults by setting environment variables before running:
+
+```bash
+# Use different broker address
+export AGENTHUB_BROKER_ADDR=remote-broker.example.com
+export AGENTHUB_BROKER_PORT=9090
+go run broker/main.go
+
+# Use different health ports to avoid conflicts
+export BROKER_HEALTH_PORT=8083
+export PUBLISHER_HEALTH_PORT=8084
+export SUBSCRIBER_HEALTH_PORT=8085
+go run agents/publisher/main.go
+
+# Use custom observability endpoints
+export JAEGER_ENDPOINT=jaeger.example.com:4317
+export PROMETHEUS_PORT=9091
+go run -tags observability broker/main_observability.go
+```
+
+### Configuration Best Practices
+
+1. **Use .envrc for Development**: Keep all environment variables in `.envrc` for consistent development experience
+2. **Override Selectively**: Only override specific variables when needed, use defaults otherwise
+3. **Environment-Specific Configs**: Use different variable values for development, staging, and production
+4. **Health Port Management**: Use different health ports for each component to avoid conflicts
+5. **Observability Integration**: Always configure observability endpoints for production deployments
+
+### Legacy Configuration Migration
+
+If migrating from previous versions of AgentHub:
+
+**Old Configuration Pattern:**
+```go
+// Manual server setup (deprecated)
+lis, err := net.Listen("tcp", ":50051")
+server := grpc.NewServer()
+// ... extensive setup code
+```
+
+**New Unified Abstraction Pattern:**
+```go
+// Automatic configuration from environment
+config := agenthub.NewGRPCConfig("broker")
+server, err := agenthub.NewAgentHubServer(config)
+service := agenthub.NewEventBusService(server)
+pb.RegisterEventBusServer(server.Server, service)
+server.Start(ctx)
+```
+
+## Command-Line Usage
+
+### Basic Commands
+
+The unified abstraction provides simplified command execution:
 
 ```bash
 eventbus-server [OPTIONS]
