@@ -18,6 +18,30 @@ docs/node_modules
 !docs/
 !docs/package.json
 !docs/package-lock.json
+!docs/.cspell.yml
+!docs/.hugo_build.lock
+!docs/.nvmrc
+!docs/assets/
+!docs/assets/**
+!docs/config.yaml
+!docs/content/
+!docs/content/**
+!docs/docsy.work
+!docs/docsy.work.sum
+!docs/go.mod
+!docs/go.sum
+!docs/hugo-disabled.toml
+!docs/hugo.yaml
+!docs/layouts/
+!docs/layouts/**
+!docs/LICENSE
+!docs/README.md
+!docs/resources/
+!docs/resources/**
+# Exclude docs/public, docs/node_modules, and generated resources
+docs/public/
+docs/node_modules/
+docs/resources/_gen/
 # etc...
 # Grafana dashboards
 observability/grafana/dashboards/agenthub-broker-dashboard.json
