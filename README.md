@@ -360,3 +360,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **For Production:** **[📈 Add Observability to Your Agent](documentation/howto/add_observability.md)** - Integrate observability into your existing agents.
 
 **Need Help?** **[🧠 Distributed Tracing Explained](documentation/explanation/distributed_tracing.md)** - Understand the concepts behind modern observability.
+
