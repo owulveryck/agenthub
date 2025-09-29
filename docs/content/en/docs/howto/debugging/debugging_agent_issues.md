@@ -22,7 +22,7 @@ Failed to connect: connection refused
 1. **Check if broker is running:**
    ```bash
    # Check if broker process is running
-   ps aux | grep eventbus-server
+   ps aux | grep broker
 
    # Check if port 50051 is listening
    netstat -tlnp | grep 50051
@@ -30,10 +30,16 @@ Failed to connect: connection refused
    lsof -i :50051
    ```
 
-2. **Verify broker address:**
+2. **Verify broker address and configuration:**
    ```go
-   const agentHubAddr = "localhost:50051"  // Correct for local development
-   // const agentHubAddr = "broker.example.com:50051"  // For remote broker
+   // Using unified abstraction - configuration via environment or code
+   config := agenthub.NewGRPCConfig("subscriber")
+   config.BrokerAddr = "localhost"  // Default
+   config.BrokerPort = "50051"      // Default
+
+   // Or set via environment variables:
+   // export AGENTHUB_BROKER_ADDR="localhost"
+   // export AGENTHUB_BROKER_PORT="50051"
    ```
 
 3. **Check firewall settings:**
@@ -53,9 +59,14 @@ transport: authentication handshake failed
 ```
 
 **Solution:**
-Ensure you're using insecure credentials for development:
+The unified abstraction handles TLS configuration automatically:
 ```go
-conn, err := grpc.Dial(agentHubAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+// TLS and connection management handled automatically
+config := agenthub.NewGRPCConfig("subscriber")
+client, err := agenthub.NewAgentHubClient(config)
+if err != nil {
+    panic(err)
+}
 ```
 
 ## Task Processing Issues

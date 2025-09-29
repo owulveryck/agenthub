@@ -19,8 +19,8 @@ This tutorial will walk you through setting up and running the complete AgentHub
 First, let's build all the necessary components:
 
 ```bash
-# Build the event bus server
-go build -o bin/eventbus-server ./broker
+# Build the broker
+go build -o bin/broker ./broker
 
 # Build the subscriber (agent)
 go build -o bin/subscriber ./agents/subscriber
@@ -29,23 +29,18 @@ go build -o bin/subscriber ./agents/subscriber
 go build -o bin/publisher ./agents/publisher
 ```
 
-If you encounter any build errors, ensure the protocol buffer files are generated:
-
-```bash
-protoc --go_out=. --go-grpc_out=. proto/eventbus.proto
-```
-
 ## Step 2: Start the AgentHub Broker Server
 
 Open a terminal and start the AgentHub broker server:
 
 ```bash
-./bin/eventbus-server
+./bin/broker
 ```
 
 You should see output like:
 ```
-2025/09/27 16:34:00 AgentHub gRPC server listening on [::]:50051
+time=2025-09-29T11:51:26.612+02:00 level=INFO msg="Starting health server" port=8080
+time=2025-09-29T11:51:26.611+02:00 level=INFO msg="AgentHub gRPC server with observability listening" address=[::]:50051 health_endpoint=http://localhost:8080/health metrics_endpoint=http://localhost:8080/metrics component=broker
 ```
 
 Keep this terminal open - the AgentHub broker needs to run continuously.
@@ -60,10 +55,11 @@ Open a second terminal and start an agent that can receive and process tasks:
 
 You should see output indicating the agent has started:
 ```
-Agent started. Listening for events and tasks. Press Enter to stop.
-2025/09/27 16:34:18 Agent agent_demo_subscriber subscribing to task results...
-2025/09/27 16:34:18 Successfully subscribed to tasks for agent agent_demo_subscriber. Waiting for tasks...
-2025/09/27 16:34:18 Successfully subscribed to task results for agent agent_demo_subscriber.
+time=2025-09-29T11:52:04.727+02:00 level=INFO msg="AgentHub client started with observability" broker_addr=localhost:50051 component=subscriber
+time=2025-09-29T11:52:04.727+02:00 level=INFO msg="Starting health server" port=8082
+time=2025-09-29T11:52:04.728+02:00 level=INFO msg="Agent started with observability. Listening for events and tasks."
+time=2025-09-29T11:52:04.728+02:00 level=INFO msg="Subscribing to task results" agent_id=agent_demo_subscriber
+time=2025-09-29T11:52:04.728+02:00 level=INFO msg="Subscribing to tasks" agent_id=agent_demo_subscriber
 ```
 
 This agent can process several types of tasks:
@@ -83,15 +79,13 @@ Open a third terminal and run the publisher to send Agent2Agent protocol task me
 You'll see the publisher send various Agent2Agent protocol task messages through the AgentHub broker:
 
 ```
-=== Testing Agent2Agent Task Publishing via AgentHub ===
-Publishing task: task_greeting_1758983673 (type: greeting) to agent: agent_demo_subscriber
-Task task_greeting_1758983673 published successfully.
-Publishing task: task_math_calculation_1758983676 (type: math_calculation) to agent: agent_demo_subscriber
-Task task_math_calculation_1758983676 published successfully.
-Publishing task: task_random_number_1758983678 (type: random_number) to agent: agent_demo_subscriber
-Task task_random_number_1758983678 published successfully.
-Publishing task: task_unknown_task_1758983680 (type: unknown_task) to agent: agent_demo_subscriber
-Task task_unknown_task_1758983680 published successfully.
+time=2025-09-29T11:53:50.903+02:00 level=INFO msg="Starting publisher demo"
+time=2025-09-29T11:53:50.905+02:00 level=INFO msg="Testing Agent2Agent Task Publishing via AgentHub with observability"
+time=2025-09-29T11:53:50.905+02:00 level=INFO msg="Publishing task" task_id=task_greeting_1759139630 task_type=greeting responder_agent_id=agent_demo_subscriber
+time=2025-09-29T11:53:53.907+02:00 level=INFO msg="Task published successfully" task_id=task_greeting_1759139630
+time=2025-09-29T11:53:53.908+02:00 level=INFO msg="Publishing task" task_id=task_math_calculation_1759139633 task_type=math_calculation responder_agent_id=agent_demo_subscriber
+time=2025-09-29T11:53:56.912+02:00 level=INFO msg="Publishing task" task_id=task_random_number_1759139636 task_type=random_number responder_agent_id=agent_demo_subscriber
+time=2025-09-29T11:53:58.915+02:00 level=INFO msg="All tasks published! Check subscriber logs for results"
 ```
 
 ## Step 5: Observe Task Processing
@@ -99,15 +93,14 @@ Task task_unknown_task_1758983680 published successfully.
 Switch back to the subscriber terminal to see the agent processing tasks in real-time:
 
 ```
-2025/09/27 16:34:33 Received task: task_greeting_1758983673 (type: greeting) from agent: agent_demo_publisher
-2025/09/27 16:34:33 Processing task task_greeting_1758983673 of type 'greeting'
-2025/09/27 16:34:33 Published progress for task task_greeting_1758983673: 25% - Starting task processing
-2025/09/27 16:34:35 Published progress for task task_greeting_1758983673: 75% - Generating greeting
-2025/09/27 16:34:35 Published progress for task task_greeting_1758983673: 100% - Task completed
-2025/09/27 16:34:35 Published result for task task_greeting_1758983673 with status TASK_STATUS_COMPLETED
+time=2025-09-29T11:54:15.123+02:00 level=INFO msg="Processing task" task_id=task_greeting_1759139630 task_type=greeting requester_agent_id=agent_demo_publisher
+time=2025-09-29T11:54:15.125+02:00 level=INFO msg="Task completed successfully" task_id=task_greeting_1759139630 task_type=greeting status=TASK_STATUS_COMPLETED
+time=2025-09-29T11:54:18.135+02:00 level=INFO msg="Processing task" task_id=task_math_calculation_1759139633 task_type=math_calculation requester_agent_id=agent_demo_publisher
+time=2025-09-29T11:54:18.137+02:00 level=INFO msg="Task completed successfully" task_id=task_math_calculation_1759139633 task_type=math_calculation status=TASK_STATUS_COMPLETED
+time=2025-09-29T11:54:21.142+02:00 level=INFO msg="Processing task" task_id=task_random_number_1759139636 task_type=random_number requester_agent_id=agent_demo_publisher
 ```
 
-The agent will also display macOS notifications (if on macOS) for each completed task.
+The agent will process each task and log the results with structured logging.
 
 ## Step 6: Check the Broker Logs
 

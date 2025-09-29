@@ -10,39 +10,61 @@ This guide shows you how to create an agent that publishes Agent2Agent protocol 
 
 ## Basic Setup
 
-First, establish a connection to the AgentHub broker and create a client:
+Using AgentHub's unified abstractions, creating a publisher is straightforward:
 
 ```go
 package main
 
 import (
     "context"
-    "log"
+    "fmt"
     "time"
 
-    "google.golang.org/grpc"
-    "google.golang.org/grpc/credentials/insecure"
-    "google.golang.org/protobuf/types/known/structpb"
-    "google.golang.org/protobuf/types/known/timestamppb"
-
+    "github.com/owulveryck/agenthub/internal/agenthub"
     pb "github.com/owulveryck/agenthub/internal/grpc"
 )
 
 const (
-    agentHubAddr = "localhost:50051"
-    myAgentID    = "my_publisher_agent"
+    myAgentID = "my_publisher_agent"
 )
 
 func main() {
-    // Connect to the AgentHub broker
-    conn, err := grpc.Dial(agentHubAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-    if err != nil {
-        log.Fatalf("Failed to connect: %v", err)
-    }
-    defer conn.Close()
+    ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+    defer cancel()
 
-    client := pb.NewEventBusClient(conn)
-    ctx := context.Background()
+    // Create configuration with automatic observability
+    config := agenthub.NewGRPCConfig("publisher")
+    config.HealthPort = "8081" // Unique port for this publisher
+
+    // Create AgentHub client with built-in observability
+    client, err := agenthub.NewAgentHubClient(config)
+    if err != nil {
+        panic("Failed to create AgentHub client: " + err.Error())
+    }
+
+    // Automatic graceful shutdown
+    defer func() {
+        shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer shutdownCancel()
+        if err := client.Shutdown(shutdownCtx); err != nil {
+            client.Logger.ErrorContext(shutdownCtx, "Error during shutdown", "error", err)
+        }
+    }()
+
+    // Start the client (enables observability)
+    if err := client.Start(ctx); err != nil {
+        client.Logger.ErrorContext(ctx, "Failed to start client", "error", err)
+        panic(err)
+    }
+
+    // Create task publisher with automatic tracing and metrics
+    taskPublisher := &agenthub.TaskPublisher{
+        Client:         client.Client,
+        TraceManager:   client.TraceManager,
+        MetricsManager: client.MetricsManager,
+        Logger:         client.Logger,
+        ComponentName:  "publisher",
+    }
 
     // Your task publishing code goes here
 }
@@ -50,50 +72,25 @@ func main() {
 
 ## Publishing a Simple Task
 
-Here's how to publish a basic task:
+Here's how to publish a basic task using the TaskPublisher abstraction:
 
 ```go
-func publishSimpleTask(ctx context.Context, client pb.EventBusClient) {
-    // Create task parameters
-    params, err := structpb.NewStruct(map[string]interface{}{
-        "message": "Hello from publisher!",
-        "priority": "high",
+func publishSimpleTask(ctx context.Context, taskPublisher *agenthub.TaskPublisher) {
+    // Publish task using the unified abstraction
+    err := taskPublisher.PublishTask(ctx, &agenthub.PublishTaskRequest{
+        TaskType: "greeting",
+        Parameters: map[string]interface{}{
+            "message": "Hello from publisher!",
+            "name":    "Claude",
+        },
+        RequesterAgentID: myAgentID,
+        ResponderAgentID: "target_agent_id", // Optional: specify target agent
+        Priority:         pb.Priority_PRIORITY_HIGH,
     })
     if err != nil {
-        log.Printf("Error creating parameters: %v", err)
-        return
+        // Logging is handled automatically by TaskPublisher
+        panic(fmt.Sprintf("Failed to publish greeting task: %v", err))
     }
-
-    // Create the task message
-    task := &pb.TaskMessage{
-        TaskId:           generateTaskID("greeting"),
-        TaskType:         "greeting",
-        Parameters:       params,
-        RequesterAgentId: myAgentID,
-        ResponderAgentId: "target_agent_id", // Optional: specify target agent
-        Priority:         pb.Priority_PRIORITY_HIGH,
-        CreatedAt:        timestamppb.Now(),
-    }
-
-    // Publish the task
-    req := &pb.PublishTaskRequest{Task: task}
-
-    res, err := client.PublishTask(ctx, req)
-    if err != nil {
-        log.Printf("Error publishing task: %v", err)
-        return
-    }
-
-    if !res.GetSuccess() {
-        log.Printf("Failed to publish task: %s", res.GetError())
-        return
-    }
-
-    log.Printf("Task %s published successfully", task.GetTaskId())
-}
-
-func generateTaskID(taskType string) string {
-    return fmt.Sprintf("task_%s_%d", taskType, time.Now().Unix())
 }
 ```
 
@@ -102,131 +99,122 @@ func generateTaskID(taskType string) string {
 ### Math Calculation Task
 
 ```go
-func publishMathTask(ctx context.Context, client pb.EventBusClient) {
-    params, _ := structpb.NewStruct(map[string]interface{}{
-        "operation": "multiply",
-        "a":         15.0,
-        "b":         7.0,
-    })
-
-    task := &pb.TaskMessage{
-        TaskId:           generateTaskID("math_calculation"),
-        TaskType:         "math_calculation",
-        Parameters:       params,
-        RequesterAgentId: myAgentID,
-        ResponderAgentId: "math_agent",
+func publishMathTask(ctx context.Context, taskPublisher *agenthub.TaskPublisher) {
+    err := taskPublisher.PublishTask(ctx, &agenthub.PublishTaskRequest{
+        TaskType: "math_calculation",
+        Parameters: map[string]interface{}{
+            "operation": "multiply",
+            "a":         15.0,
+            "b":         7.0,
+        },
+        RequesterAgentID: myAgentID,
+        ResponderAgentID: "math_agent",
         Priority:         pb.Priority_PRIORITY_MEDIUM,
-        CreatedAt:        timestamppb.Now(),
+    })
+    if err != nil {
+        panic(fmt.Sprintf("Failed to publish math task: %v", err))
     }
-
-    publishTask(ctx, client, task)
 }
 ```
 
 ### Data Processing Task
 
 ```go
-func publishDataProcessingTask(ctx context.Context, client pb.EventBusClient) {
-    params, _ := structpb.NewStruct(map[string]interface{}{
-        "dataset_path": "/data/customer_data.csv",
-        "analysis_type": "summary_statistics",
-        "output_format": "json",
-        "filters": map[string]interface{}{
-            "date_range": "last_30_days",
-            "status": "active",
-        },
-    })
-
-    task := &pb.TaskMessage{
-        TaskId:           generateTaskID("data_processing"),
-        TaskType:         "data_processing",
-        Parameters:       params,
-        RequesterAgentId: myAgentID,
-        ResponderAgentId: "data_agent",
-        Priority:         pb.Priority_PRIORITY_HIGH,
-        Deadline:         timestamppb.New(time.Now().Add(30 * time.Minute)),
-        CreatedAt:        timestamppb.Now(),
-        Metadata: createMetadata(map[string]interface{}{
+func publishDataProcessingTask(ctx context.Context, taskPublisher *agenthub.TaskPublisher) {
+    err := taskPublisher.PublishTask(ctx, &agenthub.PublishTaskRequest{
+        TaskType: "data_processing",
+        Parameters: map[string]interface{}{
+            "dataset_path":   "/data/customer_data.csv",
+            "analysis_type":  "summary_statistics",
+            "output_format":  "json",
+            "filters": map[string]interface{}{
+                "date_range": "last_30_days",
+                "status":     "active",
+            },
+            // Metadata is handled automatically by TaskPublisher
             "workflow_id": "workflow_123",
-            "user_id": "user_456",
-        }),
+            "user_id":     "user_456",
+        },
+        RequesterAgentID: myAgentID,
+        ResponderAgentID: "data_agent",
+        Priority:         pb.Priority_PRIORITY_HIGH,
+    })
+    if err != nil {
+        panic(fmt.Sprintf("Failed to publish data processing task: %v", err))
     }
-
-    publishTask(ctx, client, task)
-}
-
-func createMetadata(data map[string]interface{}) *structpb.Struct {
-    metadata, _ := structpb.NewStruct(data)
-    return metadata
 }
 ```
 
 ## Broadcasting Tasks (No Specific Responder)
 
-To broadcast a task to all available agents, omit the `ResponderAgentId`:
+To broadcast a task to all available agents, omit the `ResponderAgentID`:
 
 ```go
-func broadcastTask(ctx context.Context, client pb.EventBusClient) {
-    params, _ := structpb.NewStruct(map[string]interface{}{
-        "announcement": "Server maintenance in 30 minutes",
-        "action_required": false,
-    })
-
-    task := &pb.TaskMessage{
-        TaskId:           generateTaskID("announcement"),
-        TaskType:         "announcement",
-        Parameters:       params,
-        RequesterAgentId: myAgentID,
-        // ResponderAgentId omitted - will broadcast to all agents
+func broadcastTask(ctx context.Context, taskPublisher *agenthub.TaskPublisher) {
+    err := taskPublisher.PublishTask(ctx, &agenthub.PublishTaskRequest{
+        TaskType: "announcement",
+        Parameters: map[string]interface{}{
+            "announcement":    "Server maintenance in 30 minutes",
+            "action_required": false,
+        },
+        RequesterAgentID: myAgentID,
+        // ResponderAgentID omitted - will broadcast to all agents
+        ResponderAgentID: "",
         Priority:         pb.Priority_PRIORITY_LOW,
-        CreatedAt:        timestamppb.Now(),
+    })
+    if err != nil {
+        panic(fmt.Sprintf("Failed to publish announcement: %v", err))
     }
-
-    publishTask(ctx, client, task)
 }
 ```
 
 ## Subscribing to Task Results
 
-As a publisher, you'll want to receive results from tasks you've requested:
+As a publisher, you'll want to receive results from tasks you've requested. You can use the AgentHub client directly:
 
 ```go
-func subscribeToResults(ctx context.Context, client pb.EventBusClient) {
+func subscribeToResults(ctx context.Context, client *agenthub.AgentHubClient) {
     req := &pb.SubscribeToTaskResultsRequest{
         RequesterAgentId: myAgentID,
         // TaskIds: []string{"specific_task_id"}, // Optional: filter specific tasks
     }
 
-    stream, err := client.SubscribeToTaskResults(ctx, req)
+    stream, err := client.Client.SubscribeToTaskResults(ctx, req)
     if err != nil {
-        log.Printf("Error subscribing to results: %v", err)
+        client.Logger.ErrorContext(ctx, "Error subscribing to results", "error", err)
         return
     }
 
-    log.Printf("Subscribed to task results for agent %s", myAgentID)
+    client.Logger.InfoContext(ctx, "Subscribed to task results", "agent_id", myAgentID)
 
     for {
         result, err := stream.Recv()
         if err != nil {
-            log.Printf("Error receiving result: %v", err)
+            client.Logger.ErrorContext(ctx, "Error receiving result", "error", err)
             return
         }
 
-        handleTaskResult(result)
+        handleTaskResult(ctx, client, result)
     }
 }
 
-func handleTaskResult(result *pb.TaskResult) {
-    log.Printf("Received result for task %s: status=%s",
-        result.GetTaskId(), result.GetStatus().String())
+func handleTaskResult(ctx context.Context, client *agenthub.AgentHubClient, result *pb.TaskResult) {
+    client.Logger.InfoContext(ctx, "Received task result",
+        "task_id", result.GetTaskId(),
+        "status", result.GetStatus().String())
 
     switch result.GetStatus() {
     case pb.TaskStatus_TASK_STATUS_COMPLETED:
-        log.Printf("Task completed successfully: %+v", result.GetResult().AsMap())
+        client.Logger.InfoContext(ctx, "Task completed successfully",
+            "task_id", result.GetTaskId(),
+            "result", result.GetResult().AsMap())
     case pb.TaskStatus_TASK_STATUS_FAILED:
-        log.Printf("Task failed: %s", result.GetErrorMessage())
+        client.Logger.ErrorContext(ctx, "Task failed",
+            "task_id", result.GetTaskId(),
+            "error", result.GetErrorMessage())
     case pb.TaskStatus_TASK_STATUS_CANCELLED:
-        log.Printf("Task was cancelled")
+        client.Logger.InfoContext(ctx, "Task was cancelled",
+            "task_id", result.GetTaskId())
     }
 }
 ```
@@ -236,28 +224,30 @@ func handleTaskResult(result *pb.TaskResult) {
 Subscribe to progress updates to track long-running tasks:
 
 ```go
-func subscribeToProgress(ctx context.Context, client pb.EventBusClient) {
+func subscribeToProgress(ctx context.Context, client *agenthub.AgentHubClient) {
     req := &pb.SubscribeToTaskResultsRequest{
         RequesterAgentId: myAgentID,
     }
 
-    stream, err := client.SubscribeToTaskProgress(ctx, req)
+    stream, err := client.Client.SubscribeToTaskProgress(ctx, req)
     if err != nil {
-        log.Printf("Error subscribing to progress: %v", err)
+        client.Logger.ErrorContext(ctx, "Error subscribing to progress", "error", err)
         return
     }
+
+    client.Logger.InfoContext(ctx, "Subscribed to task progress", "agent_id", myAgentID)
 
     for {
         progress, err := stream.Recv()
         if err != nil {
-            log.Printf("Error receiving progress: %v", err)
+            client.Logger.ErrorContext(ctx, "Error receiving progress", "error", err)
             return
         }
 
-        log.Printf("Task %s progress: %d%% - %s",
-            progress.GetTaskId(),
-            progress.GetProgressPercentage(),
-            progress.GetProgressMessage())
+        client.Logger.InfoContext(ctx, "Task progress update",
+            "task_id", progress.GetTaskId(),
+            "progress_percentage", progress.GetProgressPercentage(),
+            "progress_message", progress.GetProgressMessage())
     }
 }
 ```
@@ -266,49 +256,54 @@ func subscribeToProgress(ctx context.Context, client pb.EventBusClient) {
 
 ```go
 func main() {
-    conn, err := grpc.Dial(eventBusAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+    ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+    defer cancel()
+
+    // Create configuration with automatic observability
+    config := agenthub.NewGRPCConfig("publisher")
+    config.HealthPort = "8081"
+
+    // Create AgentHub client with built-in observability
+    client, err := agenthub.NewAgentHubClient(config)
     if err != nil {
-        log.Fatalf("Failed to connect: %v", err)
+        panic("Failed to create AgentHub client: " + err.Error())
     }
-    defer conn.Close()
 
-    client := pb.NewEventBusClient(conn)
-    ctx := context.Background()
+    defer func() {
+        shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer shutdownCancel()
+        if err := client.Shutdown(shutdownCtx); err != nil {
+            client.Logger.ErrorContext(shutdownCtx, "Error during shutdown", "error", err)
+        }
+    }()
 
-    // Start result and progress subscribers
-    go subscribeToResults(ctx, client)
-    go subscribeToProgress(ctx, client)
+    // Start the client (enables observability)
+    if err := client.Start(ctx); err != nil {
+        client.Logger.ErrorContext(ctx, "Failed to start client", "error", err)
+        panic(err)
+    }
 
-    // Publish various tasks
-    publishMathTask(ctx, client)
+    // Create task publisher with automatic tracing and metrics
+    taskPublisher := &agenthub.TaskPublisher{
+        Client:         client.Client,
+        TraceManager:   client.TraceManager,
+        MetricsManager: client.MetricsManager,
+        Logger:         client.Logger,
+        ComponentName:  "publisher",
+    }
+
+    client.Logger.InfoContext(ctx, "Starting publisher demo")
+
+    // Publish various tasks with automatic observability
+    publishMathTask(ctx, taskPublisher)
     time.Sleep(2 * time.Second)
 
-    publishDataProcessingTask(ctx, client)
+    publishDataProcessingTask(ctx, taskPublisher)
     time.Sleep(2 * time.Second)
 
-    broadcastTask(ctx, client)
+    broadcastTask(ctx, taskPublisher)
 
-    // Keep running to receive results
-    log.Println("Publisher running. Press Ctrl+C to stop.")
-    select {} // Block forever
-}
-
-// Helper function to publish any task
-func publishTask(ctx context.Context, client pb.EventBusClient, task *pb.TaskMessage) {
-    req := &pb.PublishTaskRequest{Task: task}
-
-    res, err := client.PublishTask(ctx, req)
-    if err != nil {
-        log.Printf("Error publishing task %s: %v", task.GetTaskId(), err)
-        return
-    }
-
-    if !res.GetSuccess() {
-        log.Printf("Failed to publish task %s: %s", task.GetTaskId(), res.GetError())
-        return
-    }
-
-    log.Printf("Task %s published successfully", task.GetTaskId())
+    client.Logger.InfoContext(ctx, "All tasks published! Check subscriber logs for results")
 }
 ```
 

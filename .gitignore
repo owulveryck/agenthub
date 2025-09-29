@@ -38,6 +38,8 @@ docs/node_modules
 !docs/README.md
 !docs/resources/
 !docs/resources/**
+
+!/LICENSE
 # Exclude docs/public, docs/node_modules, and generated resources
 docs/public/
 docs/node_modules/
