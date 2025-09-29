@@ -15,6 +15,7 @@ docs/node_modules
 !*.pb
 !*.yml
 !test-demo.sh
+!docs/
 # etc...
 # Grafana dashboards
 observability/grafana/dashboards/agenthub-broker-dashboard.json
