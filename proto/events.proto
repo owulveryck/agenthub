@@ -3,7 +3,7 @@ syntax = "proto3";
 package events;
 
 // Specify the Go package for generated code.
-option go_package = "internal/grpc;pb";
+option go_package = "internal/events/observability;observability";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";

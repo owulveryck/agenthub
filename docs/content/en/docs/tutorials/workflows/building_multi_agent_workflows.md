@@ -70,7 +70,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/owulveryck/agenthub/internal/grpc"
+	pb "github.com/owulveryck/agenthub/events/a2a"
 )
 
 const (
@@ -317,7 +317,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/owulveryck/agenthub/internal/grpc"
+	pb "github.com/owulveryck/agenthub/events/a2a"
 )
 
 const (
@@ -451,7 +451,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/owulveryck/agenthub/internal/grpc"
+	pb "github.com/owulveryck/agenthub/events/a2a"
 )
 
 const (

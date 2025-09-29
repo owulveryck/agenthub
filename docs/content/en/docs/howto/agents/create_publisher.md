@@ -1,12 +1,12 @@
 ---
-title: "How to Create a Task Publisher"
+title: "How to Create an A2A Task Publisher"
 weight: 20
-description: "Learn how to create an agent that publishes Agent2Agent protocol tasks to other agents through the AgentHub broker."
+description: "Learn how to create an agent that publishes Agent2Agent (A2A) protocol-compliant tasks to other agents through the AgentHub EDA broker."
 ---
 
-# How to Create a Task Publisher
+# How to Create an A2A Task Publisher
 
-This guide shows you how to create an agent that publishes Agent2Agent protocol tasks to other agents through the AgentHub broker.
+This guide shows you how to create an agent that publishes Agent2Agent (A2A) protocol-compliant tasks to other agents through the AgentHub Event-Driven Architecture (EDA) broker.
 
 ## Basic Setup
 
@@ -21,7 +21,7 @@ import (
     "time"
 
     "github.com/owulveryck/agenthub/internal/agenthub"
-    pb "github.com/owulveryck/agenthub/internal/grpc"
+    pb "github.com/owulveryck/agenthub/events/a2a"
 )
 
 const (
@@ -57,63 +57,100 @@ func main() {
         panic(err)
     }
 
-    // Create task publisher with automatic tracing and metrics
-    taskPublisher := &agenthub.TaskPublisher{
+    // Create A2A task publisher with automatic tracing and metrics
+    taskPublisher := &agenthub.A2ATaskPublisher{
         Client:         client.Client,
         TraceManager:   client.TraceManager,
         MetricsManager: client.MetricsManager,
         Logger:         client.Logger,
         ComponentName:  "publisher",
+        AgentID:        myAgentID,
     }
 
-    // Your task publishing code goes here
+    // Your A2A task publishing code goes here
 }
 ```
 
-## Publishing a Simple Task
+## Publishing a Simple A2A Task
 
-Here's how to publish a basic task using the TaskPublisher abstraction:
+Here's how to publish a basic A2A task using the A2ATaskPublisher abstraction:
 
 ```go
-func publishSimpleTask(ctx context.Context, taskPublisher *agenthub.TaskPublisher) {
-    // Publish task using the unified abstraction
-    err := taskPublisher.PublishTask(ctx, &agenthub.PublishTaskRequest{
-        TaskType: "greeting",
-        Parameters: map[string]interface{}{
-            "message": "Hello from publisher!",
-            "name":    "Claude",
+func publishSimpleTask(ctx context.Context, taskPublisher *agenthub.A2ATaskPublisher) error {
+    // Create A2A-compliant content parts
+    content := []*pb.Part{
+        {
+            Part: &pb.Part_Text{
+                Text: "Hello! Please provide a greeting for Claude.",
+            },
         },
+    }
+
+    // Publish A2A task using the unified abstraction
+    task, err := taskPublisher.PublishTask(ctx, &agenthub.A2APublishTaskRequest{
+        TaskType:         "greeting",
+        Content:          content,
         RequesterAgentID: myAgentID,
-        ResponderAgentID: "target_agent_id", // Optional: specify target agent
+        ResponderAgentID: "agent_demo_subscriber", // Target agent
         Priority:         pb.Priority_PRIORITY_HIGH,
+        ContextID:        "ctx_greeting_demo", // Optional: conversation context
     })
     if err != nil {
-        // Logging is handled automatically by TaskPublisher
-        panic(fmt.Sprintf("Failed to publish greeting task: %v", err))
+        return fmt.Errorf("failed to publish greeting task: %w", err)
     }
+
+    taskPublisher.Logger.InfoContext(ctx, "Published A2A greeting task",
+        "task_id", task.GetId(),
+        "context_id", task.GetContextId())
+    return nil
 }
 ```
 
 ## Publishing Different Task Types
 
-### Math Calculation Task
+### Math Calculation Task with A2A Data Parts
 
 ```go
-func publishMathTask(ctx context.Context, taskPublisher *agenthub.TaskPublisher) {
-    err := taskPublisher.PublishTask(ctx, &agenthub.PublishTaskRequest{
-        TaskType: "math_calculation",
-        Parameters: map[string]interface{}{
-            "operation": "multiply",
-            "a":         15.0,
-            "b":         7.0,
+func publishMathTask(ctx context.Context, taskPublisher *agenthub.A2ATaskPublisher) error {
+    // Create A2A-compliant content with structured data
+    content := []*pb.Part{
+        {
+            Part: &pb.Part_Text{
+                Text: "Please perform the following mathematical calculation:",
+            },
         },
+        {
+            Part: &pb.Part_Data{
+                Data: &pb.DataPart{
+                    Data: &structpb.Struct{
+                        Fields: map[string]*structpb.Value{
+                            "operation": structpb.NewStringValue("multiply"),
+                            "a":         structpb.NewNumberValue(15.0),
+                            "b":         structpb.NewNumberValue(7.0),
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+    // Publish A2A math task
+    task, err := taskPublisher.PublishTask(ctx, &agenthub.A2APublishTaskRequest{
+        TaskType:         "math_calculation",
+        Content:          content,
         RequesterAgentID: myAgentID,
-        ResponderAgentID: "math_agent",
+        ResponderAgentID: "agent_demo_subscriber",
         Priority:         pb.Priority_PRIORITY_MEDIUM,
+        ContextID:        "ctx_math_demo",
     })
     if err != nil {
-        panic(fmt.Sprintf("Failed to publish math task: %v", err))
+        return fmt.Errorf("failed to publish math task: %w", err)
     }
+
+    taskPublisher.Logger.InfoContext(ctx, "Published A2A math task",
+        "task_id", task.GetId(),
+        "operation", "multiply")
+    return nil
 }
 ```
 

@@ -1,114 +1,263 @@
 syntax = "proto3";
 
-package eventbus;
+package agenthub;
 
 // Specify the Go package for generated code.
-// This should match your module path and the directory where generated files will reside.
-option go_package = "internal/grpc;pb";
+option go_package = "events/a2a;a2a";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "proto/a2a_core.proto";
 
-// Priority levels for tasks
+// ===== EDA Broker Event Wrappers =====
+//
+// The AgentHub protobuf definition provides an Event-Driven Architecture (EDA)
+// broker that transports Agent2Agent (A2A) protocol-compliant messages.
+// This hybrid approach maintains the scalability benefits of EDA while ensuring
+// full interoperability with A2A-compliant agents and systems.
+
+// AgentEvent wraps A2A messages for transport through the EDA broker.
+// This allows A2A messages to be routed, queued, and delivered using
+// event-driven patterns while maintaining A2A protocol compliance.
+message AgentEvent {
+  string event_id = 1;                     // Unique identifier for this event (for deduplication and tracking)
+  google.protobuf.Timestamp timestamp = 2; // When this event was created (for ordering and TTL)
+
+  // A2A-compliant payload - exactly one of these must be set
+  oneof payload {
+    a2a.Message message = 10;              // A2A Message for agent communication
+    a2a.Task task = 11;                    // A2A Task for work coordination
+    TaskStatusUpdateEvent status_update = 12; // Task lifecycle state changes
+    TaskArtifactUpdateEvent artifact_update = 13; // Task output artifacts
+  }
+
+  // EDA routing metadata for event distribution
+  AgentEventMetadata routing = 20;
+
+  // OpenTelemetry distributed tracing context
+  string trace_id = 30;                    // Trace ID for request correlation
+  string span_id = 31;                     // Span ID for operation tracking
+}
+
+// AgentEventMetadata provides routing and delivery information for events.
+// This enables sophisticated event routing patterns including point-to-point,
+// broadcast, topic-based, and priority-based delivery.
+message AgentEventMetadata {
+  string from_agent_id = 1;               // Source agent identifier (for reply routing)
+  string to_agent_id = 2;                 // Target agent ID (empty string means broadcast to all)
+  string event_type = 3;                  // Event classification ("message", "task", "status_update", "artifact")
+  repeated string subscriptions = 4;      // Topic-based routing tags for content-based filtering
+  Priority priority = 5;                  // Delivery priority for event queue ordering
+}
+
+// TaskStatusUpdateEvent notifies subscribers about A2A task lifecycle changes.
+// This event is published whenever a task transitions between states
+// (SUBMITTED → WORKING → COMPLETED/FAILED/CANCELLED).
+message TaskStatusUpdateEvent {
+  string task_id = 1;                     // A2A task identifier
+  string context_id = 2;                  // A2A conversation context
+  a2a.TaskStatus status = 3;              // New A2A task status with state and update message
+  bool final = 4;                         // True if this is the terminal state for the task
+  google.protobuf.Struct metadata = 5;    // Additional event metadata (timing, agent info, etc.)
+}
+
+// TaskArtifactUpdateEvent delivers A2A task output artifacts to subscribers.
+// Supports both atomic artifact delivery and streaming for large outputs.
+message TaskArtifactUpdateEvent {
+  string task_id = 1;                     // A2A task that produced this artifact
+  string context_id = 2;                  // A2A conversation context
+  a2a.Artifact artifact = 3;              // The A2A artifact containing structured output
+  bool append = 4;                        // True to append to existing artifact, false to replace
+  bool last_chunk = 5;                    // True if this completes a streaming artifact
+  google.protobuf.Struct metadata = 6;    // Delivery metadata (chunk info, compression, etc.)
+}
+
+// Priority levels for event processing and delivery ordering.
+// Higher priority events are processed before lower priority ones in queues.
 enum Priority {
-  PRIORITY_UNSPECIFIED = 0;
-  PRIORITY_LOW = 1;
-  PRIORITY_MEDIUM = 2;
-  PRIORITY_HIGH = 3;
-  PRIORITY_CRITICAL = 4;
+  PRIORITY_UNSPECIFIED = 0;              // Default priority (treated as MEDIUM)
+  PRIORITY_LOW = 1;                       // Background tasks, cleanup, telemetry
+  PRIORITY_MEDIUM = 2;                    // Normal agent-to-agent communication
+  PRIORITY_HIGH = 3;                      // Urgent tasks, real-time responses
+  PRIORITY_CRITICAL = 4;                  // System alerts, error conditions
 }
 
-// Task status for tracking progress
-enum TaskStatus {
-  TASK_STATUS_UNSPECIFIED = 0;
-  TASK_STATUS_PENDING = 1;
-  TASK_STATUS_IN_PROGRESS = 2;
-  TASK_STATUS_COMPLETED = 3;
-  TASK_STATUS_FAILED = 4;
-  TASK_STATUS_CANCELLED = 5;
+// ===== Request/Response Messages =====
+
+message PublishMessageRequest {
+  a2a.Message message = 1;                // A2A message
+  AgentEventMetadata routing = 2;         // EDA routing info
 }
 
-// Task Message following Agent2Agent protocol structure
-message TaskMessage {
-  string task_id = 1;                                    // Unique identifier
-  string task_type = 2;                                  // Type of task (e.g., "data_analysis", "image_generation")
-  google.protobuf.Struct parameters = 3;                // Task parameters as flexible JSON-like structure
-  string requester_agent_id = 4;                        // ID of requesting agent
-  string responder_agent_id = 5;                        // ID of target agent (optional)
-  google.protobuf.Timestamp deadline = 6;               // Optional deadline
-  Priority priority = 7;                                // Task priority
-  google.protobuf.Struct metadata = 8;                  // Optional additional metadata
-  google.protobuf.Timestamp created_at = 9;             // When task was created
+message PublishTaskUpdateRequest {
+  TaskStatusUpdateEvent update = 1;
+  AgentEventMetadata routing = 2;
 }
 
-// Task Result for task completion responses
-message TaskResult {
-  string task_id = 1;                                    // Reference to original task
-  TaskStatus status = 2;                                 // Final status
-  google.protobuf.Struct result = 3;                    // Task results as flexible structure
-  string error_message = 4;                             // Error details if failed
-  string executor_agent_id = 5;                         // ID of agent that executed the task
-  google.protobuf.Timestamp completed_at = 6;           // When task was completed
-  google.protobuf.Struct execution_metadata = 7;        // Optional execution details
+message PublishTaskArtifactRequest {
+  TaskArtifactUpdateEvent artifact = 1;
+  AgentEventMetadata routing = 2;
 }
 
-// Task Progress for status updates during execution
-message TaskProgress {
-  string task_id = 1;                                    // Reference to original task
-  TaskStatus status = 2;                                 // Current status
-  string progress_message = 3;                           // Human-readable progress description
-  int32 progress_percentage = 4;                         // Progress as percentage (0-100)
-  google.protobuf.Struct progress_data = 5;             // Optional structured progress data
-  string executor_agent_id = 6;                         // ID of agent executing the task
-  google.protobuf.Timestamp updated_at = 7;             // When this progress was reported
-}
-
-// Response for publishing requests
 message PublishResponse {
   bool success = 1;
   string error = 2;
+  string event_id = 3;                    // Generated event ID
 }
 
-// Request for publishing a task
-message PublishTaskRequest {
-  TaskMessage task = 1;
+message SubscribeToMessagesRequest {
+  string agent_id = 1;                    // Subscribe for this agent
+  repeated string message_types = 2;      // Optional filter
+  repeated string contexts = 3;           // Optional context filter
 }
 
-// Request for publishing a task result
-message PublishTaskResultRequest {
-  TaskResult result = 1;
-}
-
-// Request for publishing task progress
-message PublishTaskProgressRequest {
-  TaskProgress progress = 1;
-}
-
-// Request for subscribing to tasks for a specific agent
 message SubscribeToTasksRequest {
-  string agent_id = 1;                                   // Agent ID to receive tasks for
-  repeated string task_types = 2;                        // Optional: filter by task types
+  string agent_id = 1;                    // Subscribe for this agent
+  repeated string task_types = 2;         // Optional filter
+  repeated a2a.TaskState states = 3;      // Optional state filter
 }
 
-// Request for subscribing to task results
-message SubscribeToTaskResultsRequest {
-  string requester_agent_id = 1;                         // Agent ID that requested tasks
-  repeated string task_ids = 2;                          // Optional: filter by specific task IDs
+message SubscribeToAgentEventsRequest {
+  string agent_id = 1;                    // Subscribe for this agent
+  repeated string event_types = 2;        // Optional event type filter
 }
 
-// AgentHub service definition - implements broker for Agent2Agent protocol tasks
-service EventBus {
-  // AgentHub broker methods for Agent2Agent protocol tasks
-  rpc PublishTask (PublishTaskRequest) returns (PublishResponse);
-  rpc PublishTaskResult (PublishTaskResultRequest) returns (PublishResponse);
-  rpc PublishTaskProgress (PublishTaskProgressRequest) returns (PublishResponse);
+message GetTaskRequest {
+  string task_id = 1;
+  int32 history_length = 2;               // How much history to include
+}
 
-  // Subscribe to tasks assigned to a specific agent
-  rpc SubscribeToTasks (SubscribeToTasksRequest) returns (stream TaskMessage);
+message CancelTaskRequest {
+  string task_id = 1;
+  string reason = 2;                      // Optional cancellation reason
+}
 
-  // Subscribe to task results for tasks you requested
-  rpc SubscribeToTaskResults (SubscribeToTaskResultsRequest) returns (stream TaskResult);
+message ListTasksRequest {
+  string agent_id = 1;                    // Tasks for this agent
+  string context_id = 2;                  // Optional context filter
+  repeated a2a.TaskState states = 3;      // Optional state filter
+  int32 page_size = 4;
+  string page_token = 5;
+}
 
-  // Subscribe to task progress updates
-  rpc SubscribeToTaskProgress (SubscribeToTaskResultsRequest) returns (stream TaskProgress);
+message ListTasksResponse {
+  repeated a2a.Task tasks = 1;
+  string next_page_token = 2;
+}
+
+// ===== EDA-based AgentHub Service =====
+//
+// The AgentHub service provides an Event-Driven Architecture broker for
+// Agent2Agent (A2A) protocol messages. This service acts as a central hub
+// that routes A2A messages between agents while maintaining EDA scalability
+// patterns such as async delivery, fan-out routing, and event persistence.
+
+service AgentHub {
+  // ===== A2A Message Publishing (EDA style) =====
+
+  // PublishMessage submits an A2A message for delivery through the broker.
+  // The message is wrapped in an AgentEvent and routed based on metadata.
+  // Supports point-to-point, broadcast, and topic-based delivery patterns.
+  rpc PublishMessage(PublishMessageRequest) returns (PublishResponse);
+
+  // PublishTaskUpdate notifies subscribers about A2A task state changes.
+  // Used to broadcast task lifecycle events (started, progress, completed).
+  rpc PublishTaskUpdate(PublishTaskUpdateRequest) returns (PublishResponse);
+
+  // PublishTaskArtifact delivers A2A task output artifacts to subscribers.
+  // Supports both atomic delivery and streaming for large artifacts.
+  rpc PublishTaskArtifact(PublishTaskArtifactRequest) returns (PublishResponse);
+
+  // ===== A2A Event Subscriptions (EDA style) =====
+
+  // SubscribeToMessages creates a stream of A2A message events for an agent.
+  // The agent receives all messages routed to it or matching its subscriptions.
+  rpc SubscribeToMessages(SubscribeToMessagesRequest) returns (stream AgentEvent);
+
+  // SubscribeToTasks creates a stream of A2A task events for an agent.
+  // Includes new tasks, status updates, and artifact notifications.
+  rpc SubscribeToTasks(SubscribeToTasksRequest) returns (stream AgentEvent);
+
+  // SubscribeToAgentEvents creates a unified stream of all events for an agent.
+  // Combines messages, tasks, status updates, and artifacts in one stream.
+  rpc SubscribeToAgentEvents(SubscribeToAgentEventsRequest) returns (stream AgentEvent);
+
+  // ===== A2A Task Management (compatible with A2A spec) =====
+
+  // GetTask retrieves the current state of an A2A task by ID.
+  // Returns the complete task with history, status, and artifacts.
+  rpc GetTask(GetTaskRequest) returns (a2a.Task);
+
+  // CancelTask cancels an active A2A task and notifies subscribers.
+  // Only tasks in SUBMITTED or WORKING state can be cancelled.
+  rpc CancelTask(CancelTaskRequest) returns (a2a.Task);
+
+  // ListTasks returns A2A tasks matching the specified criteria.
+  // Supports filtering by agent, context, state, and pagination.
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
+
+  // ===== Agent Discovery (A2A compatible) =====
+
+  // GetAgentCard returns the broker's A2A agent card for discovery.
+  // Enables other agents to discover the broker's capabilities and endpoints.
+  rpc GetAgentCard(google.protobuf.Empty) returns (a2a.AgentCard);
+
+  // RegisterAgent registers an agent with the broker for event routing.
+  // Enables the broker to route events to the agent and track its capabilities.
+  rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
+}
+
+// ===== Agent Registration (EDA-specific) =====
+
+message RegisterAgentRequest {
+  a2a.AgentCard agent_card = 1;          // Agent's A2A card
+  repeated string subscriptions = 2;      // Event subscriptions
+  string health_check_url = 3;           // Optional health check endpoint
+}
+
+message RegisterAgentResponse {
+  bool success = 1;
+  string error = 2;
+  string agent_id = 3;                   // Assigned/confirmed agent ID
+}
+
+// ===== Legacy Support (DEPRECATED - for migration) =====
+
+// DEPRECATED: Use a2a.Task instead
+message TaskMessage {
+  option deprecated = true;
+  string task_id = 1;
+  string task_type = 2;
+  google.protobuf.Struct parameters = 3;
+  string requester_agent_id = 4;
+  string responder_agent_id = 5;
+  google.protobuf.Timestamp deadline = 6;
+  Priority priority = 7;
+  google.protobuf.Struct metadata = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+// DEPRECATED: Use a2a.Task with appropriate status instead
+message TaskResult {
+  option deprecated = true;
+  string task_id = 1;
+  a2a.TaskState status = 2;
+  google.protobuf.Struct result = 3;
+  string error_message = 4;
+  string executor_agent_id = 5;
+  google.protobuf.Timestamp completed_at = 6;
+  google.protobuf.Struct execution_metadata = 7;
+}
+
+// DEPRECATED: Use TaskStatusUpdateEvent instead
+message TaskProgress {
+  option deprecated = true;
+  string task_id = 1;
+  a2a.TaskState status = 2;
+  string progress_message = 3;
+  int32 progress_percentage = 4;
+  google.protobuf.Struct progress_data = 5;
+  string executor_agent_id = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }

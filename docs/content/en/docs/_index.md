@@ -9,7 +9,7 @@ menu:
 
 # AgentHub Documentation
 
-Welcome to the AgentHub documentation! This comprehensive guide will help you understand, install, and use the Agent2Agent communication broker to build sophisticated multi-agent systems.
+Welcome to the AgentHub documentation! This comprehensive guide will help you understand, install, and use the Agent2Agent (A2A) protocol-compliant communication broker to build sophisticated multi-agent systems with Event-Driven Architecture scalability.
 
 ## 🚀 Quick Start
 
@@ -58,6 +58,7 @@ Comprehensive technical documentation and API details:
 ### [Explanation](explanation/) - Understanding concepts
 In-depth discussions that provide context and background:
 - [The Agent2Agent Principle](explanation/the_agent_to_agent_principle/)
+- [A2A Protocol Migration](explanation/a2a_migration/) - **New: Understanding the A2A compliance migration**
 - [Understanding Tasks](explanation/the_tasks/)
 - [Broker Architecture](explanation/broker_architecture/)
 - [Performance and Scaling](explanation/performance_and_scaling/)
@@ -88,12 +89,13 @@ In-depth discussions that provide context and background:
 
 ## 🔧 System Overview
 
-AgentHub enables autonomous agents to collaborate through structured task delegation:
+AgentHub enables autonomous agents to collaborate through A2A protocol-compliant task delegation with EDA scalability:
 
-- **Asynchronous task delegation** with progress tracking
-- **Flexible agent addressing** (direct, broadcast, capability-based)
-- **Rich task semantics** with priorities and deadlines
-- **Built-in resilience** with timeout and retry capabilities
+- **A2A Protocol Compliance** with standardized Message, Task, and Artifact formats
+- **Event-Driven Architecture** for scalable asynchronous communication
+- **Flexible agent addressing** (direct, broadcast, topic-based routing)
+- **Rich task semantics** with A2A lifecycle states and priorities
+- **Built-in resilience** with EDA patterns and graceful failure handling
 - **Comprehensive observability** with distributed tracing and metrics
 
 ## 🛠️ Key Technologies

@@ -22,7 +22,7 @@ func main() {
 		cancel()
 	}()
 
-	// Start the broker using the new abstraction
+	// Start the A2A-compliant broker using the new abstraction
 	if err := agenthub.StartBroker(ctx); err != nil {
 		panic(err)
 	}

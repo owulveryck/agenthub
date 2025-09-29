@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	pb "github.com/owulveryck/agenthub/internal/grpc"
+	pb "github.com/owulveryck/agenthub/events/a2a"
 	"github.com/owulveryck/agenthub/internal/observability"
 )
 
@@ -164,7 +164,7 @@ func (s *AgentHubServer) Shutdown(ctx context.Context) error {
 
 // AgentHubClient wraps the gRPC client with observability
 type AgentHubClient struct {
-	Client         pb.EventBusClient
+	Client         pb.AgentHubClient
 	Connection     *grpc.ClientConn
 	Observability  *observability.Observability
 	TraceManager   *observability.TraceManager
@@ -209,7 +209,7 @@ func NewAgentHubClient(config *GRPCConfig) (*AgentHubClient, error) {
 		return nil, fmt.Errorf("failed to connect to broker at %s: %w", config.BrokerAddr, err)
 	}
 
-	client := pb.NewEventBusClient(conn)
+	client := pb.NewAgentHubClient(conn)
 
 	// Add gRPC connection health check
 	healthServer.AddChecker("agenthub_connection", observability.NewGRPCHealthChecker("agenthub_connection", config.BrokerAddr))

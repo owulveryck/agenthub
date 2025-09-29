@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	pb "github.com/owulveryck/agenthub/internal/grpc"
+	pb "github.com/owulveryck/agenthub/events/a2a"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

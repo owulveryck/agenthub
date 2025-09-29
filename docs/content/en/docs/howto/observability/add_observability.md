@@ -207,7 +207,7 @@ import (
 	"time"
 
 	"github.com/owulveryck/agenthub/internal/agenthub"
-	pb "github.com/owulveryck/agenthub/internal/grpc"
+	pb "github.com/owulveryck/agenthub/events/a2a"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -271,7 +271,7 @@ import (
 	"syscall"
 
 	"github.com/owulveryck/agenthub/internal/agenthub"
-	pb "github.com/owulveryck/agenthub/internal/grpc"
+	pb "github.com/owulveryck/agenthub/events/a2a"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 

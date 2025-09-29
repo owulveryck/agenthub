@@ -11,10 +11,11 @@ GO_PROTOC_GEN := $(shell go env GOPATH)/bin/protoc-gen-go
 GO_GRPC_PROTOC_GEN := $(shell go env GOPATH)/bin/protoc-gen-go-grpc
 
 # Source proto files
-PROTO_SRC := proto/eventbus.proto proto/events.proto
+PROTO_SRC := proto/eventbus.proto proto/events.proto proto/a2a_core.proto
 
-# Target directory for generated Go code
-GO_OUT_DIR := internal/grpc
+# Target directories for generated Go code
+A2A_OUT_DIR := events/a2a
+OBSERVABILITY_OUT_DIR := internal/events/observability
 
 # Go build output names
 SERVER_BINARY := eventbus-server
@@ -33,15 +34,20 @@ GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller bi
 all: build
 
 # Target to generate protobuf Go code
-proto: $(GO_OUT_DIR)/eventbus.pb.go $(GO_OUT_DIR)/eventbus_grpc.pb.go $(GO_OUT_DIR)/events.pb.go
+proto: $(A2A_OUT_DIR)/eventbus.pb.go $(A2A_OUT_DIR)/eventbus_grpc.pb.go $(A2A_OUT_DIR)/a2a_core.pb.go $(OBSERVABILITY_OUT_DIR)/events.pb.go
 
-# Rule to generate .pb.go files
-$(GO_OUT_DIR)/%.pb.go: $(PROTO_SRC)
-	@echo "Generating protobuf code..."
-	@mkdir -p $(GO_OUT_DIR) # Ensure output directory exists
-	$(PROTOC) --go_out=. --go-grpc_out=. proto/eventbus.proto
+# Rule to generate A2A protocol files
+$(A2A_OUT_DIR)/eventbus.pb.go $(A2A_OUT_DIR)/eventbus_grpc.pb.go $(A2A_OUT_DIR)/a2a_core.pb.go: proto/eventbus.proto proto/a2a_core.proto
+	@echo "Generating a2a protobuf code..."
+	@mkdir -p $(A2A_OUT_DIR) # Ensure output directory exists
+	$(PROTOC) --go_out=. --go-grpc_out=. proto/eventbus.proto proto/a2a_core.proto
+	@echo "A2A protobuf code generated successfully."
+
+$(OBSERVABILITY_OUT_DIR)/events.pb.go: proto/events.proto
+	@echo "Generating observability protobuf code..."
+	@mkdir -p $(OBSERVABILITY_OUT_DIR) # Ensure output directory exists
 	$(PROTOC) --go_out=. proto/events.proto
-	@echo "Protobuf code generated successfully."
+	@echo "Observability protobuf code generated successfully."
 
 # Rule to generate .pb.gw.go files (if you add gRPC-Gateway later)
 # $(GO_OUT_DIR)/%.pb.gw.go: $(PROTO_SRC)
@@ -55,16 +61,16 @@ $(GO_OUT_DIR)/%.pb.go: $(PROTO_SRC)
 
 # Target to build all binaries
 build: proto
-	@echo "Building server binary..."
+	@echo "Building A2A-compliant server binary..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(SERVER_BINARY) broker/main.go
 
-	@echo "Building publisher binary..."
+	@echo "Building A2A-compliant publisher binary..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(PUBLISHER_BINARY) agents/publisher/main.go
 
-	@echo "Building subscriber binary..."
+	@echo "Building A2A-compliant subscriber binary..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(SUBSCRIBER_BINARY) agents/subscriber/main.go
 
-	@echo "Build complete. Binaries are in the 'bin/' directory."
+	@echo "Build complete. A2A-compliant binaries are in the 'bin/' directory."
 
 # Target to run the event bus server
 run-server:
@@ -84,7 +90,9 @@ run-subscriber:
 # Target to clean up generated files and binaries
 clean:
 	@echo "Cleaning up generated files and binaries..."
-	rm -rf $(GO_OUT_DIR)/*.pb.go
+	rm -rf $(A2A_OUT_DIR)/*.pb.go
+	rm -rf $(OBSERVABILITY_OUT_DIR)/*.pb.go
+	rm -rf internal/grpc/*.pb.go
 	rm -rf bin/
 	@echo "Clean complete."
 

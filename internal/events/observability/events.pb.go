@@ -4,17 +4,16 @@
 // 	protoc        v6.32.1
 // source: proto/events.proto
 
-package pb
+package observability
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -909,7 +908,7 @@ const file_proto_events_proto_rawDesc = "" +
 	"\x06fields\x18\x02 \x03(\v2\x1b.events.SpanLog.FieldsEntryR\x06fields\x1a9\n" +
 	"\vFieldsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x12Z\x10internal/grpc;pbb\x06proto3"
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B-Z+internal/events/observability;observabilityb\x06proto3"
 
 var (
 	file_proto_events_proto_rawDescOnce sync.Once

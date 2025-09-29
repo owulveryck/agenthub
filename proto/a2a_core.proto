@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package a2a;
+
+// Specify the Go package for generated code.
+option go_package = "events/a2a;a2a";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// ===== A2A Core Message Types =====
+
+// A2A Role enum following the specification
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_USER = 1;
+  ROLE_AGENT = 2;
+}
+
+// A2A Task State following the specification exactly
+enum TaskState {
+  TASK_STATE_UNSPECIFIED = 0;
+  TASK_STATE_SUBMITTED = 1;      // Acknowledged but not started
+  TASK_STATE_WORKING = 2;        // Actively being processed
+  TASK_STATE_COMPLETED = 3;      // Successfully finished
+  TASK_STATE_FAILED = 4;         // Failed with error
+  TASK_STATE_CANCELLED = 5;      // Cancelled before completion
+  TASK_STATE_INPUT_REQUIRED = 6; // Waiting for more input
+  TASK_STATE_REJECTED = 7;       // Agent declined to do task
+  TASK_STATE_AUTH_REQUIRED = 8;  // Needs authentication
+}
+
+// A2A Part (content union type)
+message Part {
+  oneof part {
+    string text = 1;           // TextPart - plain text content
+    FilePart file = 2;         // FilePart - file-based content
+    DataPart data = 3;         // DataPart - structured JSON data
+  }
+  google.protobuf.Struct metadata = 4; // Optional part-specific metadata
+}
+
+// A2A FilePart for file-based content
+message FilePart {
+  oneof file {
+    string file_with_uri = 1;    // URI pointing to file content
+    bytes file_with_bytes = 2;   // Direct file content as bytes
+  }
+  string mime_type = 3;          // MIME type (e.g., "image/png")
+  string name = 4;               // Optional filename
+}
+
+// A2A DataPart for structured data
+message DataPart {
+  google.protobuf.Struct data = 1;  // JSON-like structured data
+}
+
+// A2A Message (core communication unit)
+message Message {
+  string message_id = 1;                    // Required unique message ID
+  string context_id = 2;                    // Groups related interactions
+  string task_id = 3;                       // Optional task association
+  Role role = 4;                            // "user" or "agent"
+  repeated Part content = 5;                // The actual message content
+  google.protobuf.Struct metadata = 6;      // Optional message metadata
+  repeated string extensions = 7;           // Extension URIs
+}
+
+// A2A TaskStatus
+message TaskStatus {
+  TaskState state = 1;                      // Current task state
+  Message update = 2;                       // Status message from agent
+  google.protobuf.Timestamp timestamp = 3; // When this status was recorded
+}
+
+// A2A Task (stateful work unit)
+message Task {
+  string id = 1;                           // Unique task identifier
+  string context_id = 2;                   // Context grouping identifier
+  TaskStatus status = 3;                   // Current task status
+  repeated Artifact artifacts = 4;         // Output artifacts from task
+  repeated Message history = 5;            // Complete interaction history
+  google.protobuf.Struct metadata = 6;     // Custom task metadata
+}
+
+// A2A Artifact (task outputs)
+message Artifact {
+  string artifact_id = 1;                 // Unique ID within task
+  string name = 3;                        // Human readable name
+  string description = 4;                 // Optional description
+  repeated Part parts = 5;                // Artifact content
+  google.protobuf.Struct metadata = 6;    // Optional artifact metadata
+  repeated string extensions = 7;         // Extension URIs
+}
+
+// ===== A2A Agent Card Types (for discovery) =====
+
+// Agent Card for agent discovery and capabilities
+message AgentCard {
+  string protocol_version = 1;            // A2A protocol version supported
+  string name = 2;                        // Human readable agent name
+  string description = 3;                 // Agent description
+  string url = 4;                         // Primary service endpoint
+  string preferred_transport = 5;         // Preferred transport protocol
+  repeated AgentInterface additional_interfaces = 6; // Additional transport options
+  AgentProvider provider = 7;             // Provider information
+  string version = 8;                     // Agent version
+  string documentation_url = 9;           // Documentation URL
+  AgentCapabilities capabilities = 10;    // Supported A2A features
+  repeated AgentSkill skills = 11;        // Agent skills/capabilities
+  bool supports_authenticated_extended_card = 12; // Extended card support
+  string icon_url = 13;                   // Optional icon URL
+}
+
+// Agent provider information
+message AgentProvider {
+  string url = 1;                         // Provider URL
+  string organization = 2;                // Organization name
+}
+
+// Agent capabilities declaration
+message AgentCapabilities {
+  bool streaming = 1;                     // Supports streaming responses
+  bool push_notifications = 2;            // Supports push notifications
+  repeated AgentExtension extensions = 3; // Supported extensions
+}
+
+// Agent extension declaration
+message AgentExtension {
+  string uri = 1;                         // Extension URI
+  string description = 2;                 // Extension description
+  bool required = 3;                      // Whether extension is required
+  google.protobuf.Struct params = 4;      // Optional extension configuration
+}
+
+// Agent skill/capability description
+message AgentSkill {
+  string id = 1;                          // Unique skill identifier
+  string name = 2;                        // Human readable skill name
+  string description = 3;                 // Skill description
+  repeated string tags = 4;               // Categorization tags
+  repeated string examples = 5;           // Example queries/requests
+  repeated string input_modes = 6;        // Supported input MIME types
+  repeated string output_modes = 7;       // Supported output MIME types
+}
+
+// Agent interface for multiple transport support
+message AgentInterface {
+  string url = 1;                         // Interface URL
+  string transport = 2;                   // Transport protocol (JSONRPC, GRPC, HTTP+JSON)
+}

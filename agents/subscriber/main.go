@@ -11,12 +11,21 @@ import (
 )
 
 const (
-	agentID = "agent_demo_subscriber"
+	subscriberAgentID = "agent_demo_subscriber"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	// Handle graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigChan
+		cancel()
+	}()
 
 	// Create gRPC configuration for subscriber
 	config := agenthub.NewGRPCConfig("subscriber")
@@ -42,40 +51,19 @@ func main() {
 		panic(err)
 	}
 
-	// Create task subscriber
-	taskSubscriber := agenthub.NewTaskSubscriber(client, agentID)
+	// Create A2A task subscriber
+	taskSubscriber := agenthub.NewA2ATaskSubscriber(client, subscriberAgentID)
 
-	// Register default task handlers
+	// Register default handlers for A2A tasks
 	taskSubscriber.RegisterDefaultHandlers()
 
-	// Handle graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	client.Logger.InfoContext(ctx, "Starting A2A subscriber demo")
+	client.Logger.InfoContext(ctx, "Subscribing to A2A tasks and processing them")
 
-	go func() {
-		<-sigChan
-		client.Logger.Info("Received shutdown signal")
-		cancel()
-	}()
+	// Start subscribing to A2A tasks
+	if err := taskSubscriber.SubscribeToTasks(ctx); err != nil {
+		client.Logger.ErrorContext(ctx, "Error in task subscription", "error", err)
+	}
 
-	client.Logger.InfoContext(ctx, "Starting subscriber")
-
-	// Start task subscribers in goroutines
-	go func() {
-		if err := taskSubscriber.SubscribeToTasks(ctx); err != nil {
-			client.Logger.ErrorContext(ctx, "Task subscription failed", "error", err)
-		}
-	}()
-
-	go func() {
-		if err := taskSubscriber.SubscribeToTaskResults(ctx); err != nil {
-			client.Logger.ErrorContext(ctx, "Task result subscription failed", "error", err)
-		}
-	}()
-
-	client.Logger.InfoContext(ctx, "Agent started with observability. Listening for events and tasks.")
-
-	// Wait for context cancellation
-	<-ctx.Done()
-	client.Logger.Info("Subscriber shutdown complete")
+	client.Logger.InfoContext(ctx, "A2A subscriber shutting down")
 }

@@ -1,17 +1,17 @@
 ---
-title: "Broker Architecture"
+title: "A2A-Compliant EDA Broker Architecture"
 weight: 20
 description: >
-  Deep dive into the internal architecture of the AgentHub broker, how it implements Agent2Agent communication patterns, and the design decisions behind its implementation.
+  Deep dive into the internal architecture of the AgentHub EDA broker, how it implements Agent2Agent (A2A) protocol-compliant communication patterns while maintaining Event-Driven Architecture benefits.
 ---
 
-# AgentHub Broker Architecture
+# AgentHub A2A-Compliant EDA Broker Architecture
 
-This document explains the internal architecture of the AgentHub broker, how it implements Agent2Agent communication patterns, and the design decisions behind its implementation.
+This document explains the internal architecture of the AgentHub Event-Driven Architecture (EDA) broker, how it implements Agent2Agent (A2A) protocol-compliant communication patterns, and the design decisions behind its hybrid approach.
 
 ## Architectural Overview
 
-The AgentHub broker serves as a centralized communication hub that enables Agent2Agent protocol communication between distributed agents. It implements a publish-subscribe pattern with intelligent routing capabilities.
+The AgentHub broker serves as a centralized Event-Driven Architecture hub that transports Agent2Agent (A2A) protocol-compliant messages between distributed agents. It combines the scalability benefits of EDA with the interoperability guarantees of the A2A protocol.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

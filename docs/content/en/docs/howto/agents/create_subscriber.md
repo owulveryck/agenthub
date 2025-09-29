@@ -1,12 +1,12 @@
 ---
-title: "How to Create a Task Subscriber (Agent)"
+title: "How to Create an A2A Task Subscriber (Agent)"
 weight: 30
-description: "Learn how to create an agent that can receive, process, and respond to Agent2Agent protocol tasks through the AgentHub broker using unified abstractions."
+description: "Learn how to create an agent that can receive, process, and respond to Agent2Agent (A2A) protocol tasks through the AgentHub EDA broker using A2A-compliant abstractions."
 ---
 
-# How to Create a Task Subscriber (Agent)
+# How to Create an A2A Task Subscriber (Agent)
 
-This guide shows you how to create an agent that can receive, process, and respond to Agent2Agent protocol tasks through the AgentHub broker using AgentHub's unified abstractions.
+This guide shows you how to create an agent that can receive, process, and respond to Agent2Agent (A2A) protocol tasks through the AgentHub Event-Driven Architecture (EDA) broker using AgentHub's A2A-compliant abstractions.
 
 ## Basic Agent Setup
 
@@ -23,7 +23,7 @@ import (
     "time"
 
     "github.com/owulveryck/agenthub/internal/agenthub"
-    pb "github.com/owulveryck/agenthub/internal/grpc"
+    pb "github.com/owulveryck/agenthub/events/a2a"
     "google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -60,10 +60,10 @@ func main() {
         panic(err)
     }
 
-    // Create task subscriber with automatic observability
-    taskSubscriber := agenthub.NewTaskSubscriber(client, agentID)
+    // Create A2A task subscriber with automatic observability
+    taskSubscriber := agenthub.NewA2ATaskSubscriber(client, agentID)
 
-    // Register task handlers (see below for examples)
+    // Register A2A task handlers (see below for examples)
     taskSubscriber.RegisterDefaultHandlers()
 
     // Handle graceful shutdown
@@ -279,7 +279,7 @@ import (
     "time"
 
     "github.com/owulveryck/agenthub/internal/agenthub"
-    pb "github.com/owulveryck/agenthub/internal/grpc"
+    pb "github.com/owulveryck/agenthub/events/a2a"
     "google.golang.org/protobuf/types/known/structpb"
 )
 
