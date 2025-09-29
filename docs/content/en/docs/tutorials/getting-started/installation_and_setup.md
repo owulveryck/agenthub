@@ -257,20 +257,56 @@ Install the Go extension:
 
 Ensure your editor has Go language support and Protocol Buffer syntax highlighting.
 
-### Step 11: Set Up Environment Variables (Optional)
+### Step 11: Set Up Environment Variables (Recommended)
 
-Create a `.env` file for local development:
+AgentHub uses environment variables for configuration. Create a `.envrc` file for local development:
 
 ```bash
-cat > .env << EOF
-# AgentHub Configuration
-AGENTHUB_PORT=50051
-AGENTHUB_LOG_LEVEL=info
+cat > .envrc << EOF
+# Core AgentHub Configuration
+export AGENTHUB_BROKER_ADDR="localhost"
+export AGENTHUB_BROKER_PORT="50051"
+export AGENTHUB_GRPC_PORT=":50051"
 
-# Development Settings
-GO_ENV=development
+# Health Check Ports
+export BROKER_HEALTH_PORT="8080"
+export PUBLISHER_HEALTH_PORT="8081"
+export SUBSCRIBER_HEALTH_PORT="8082"
+
+# Observability (optional for development)
+export JAEGER_ENDPOINT="http://localhost:14268/api/traces"
+export SERVICE_NAME="agenthub-dev"
+export SERVICE_VERSION="dev"
+export ENVIRONMENT="development"
+export LOG_LEVEL="DEBUG"
 EOF
 ```
+
+**Install direnv for automatic loading (recommended):**
+
+```bash
+# macOS
+brew install direnv
+
+# Ubuntu/Debian
+sudo apt install direnv
+
+# After installation, add to your shell
+echo 'eval "$(direnv hook bash)"' >> ~/.bashrc  # For bash
+echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc    # For zsh
+```
+
+**Allow the environment file:**
+```bash
+direnv allow
+```
+
+**Alternative: Manual loading**
+```bash
+source .envrc
+```
+
+> 📖 **For complete environment variable reference**, see [Environment Variables Reference](../../reference/configuration/environment_variables/)
 
 ### Step 12: Verify Make Targets
 

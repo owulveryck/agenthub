@@ -10,18 +10,22 @@ description: >
 
 These hands-on tutorials will guide you through learning AgentHub by doing. Each tutorial is designed to be followed step-by-step and will help you build practical experience with the system.
 
+## 📚 Tutorial Categories
+
+- **[Getting Started](getting-started/)** - Essential setup and first steps with AgentHub
+- **[Observability](observability/)** - Monitoring, tracing, and dashboard tutorials
+- **[Workflows](workflows/)** - Building complex multi-agent systems
+
 ## 🎯 Learning Path
 
-### Getting Started
-1. **[Installation and Setup](installation_and_setup/)** - Set up your development environment
-2. **[Running the Demo](run_demo/)** - See AgentHub in action with example agents
+### 1. Start Here
+Begin with **[Getting Started](getting-started/)** tutorials to install and run your first examples
 
-### Building Systems
-3. **[Building Multi-Agent Workflows](building_multi_agent_workflows/)** - Create complex agent interactions
-4. **[Dashboard Tour](dashboard_tour/)** - Explore the monitoring and observability features
+### 2. Build Systems
+Progress to **[Workflows](workflows/)** to create sophisticated agent interactions
 
-### Advanced Topics
-5. **[Observability Demo](observability_demo/)** - Deep dive into tracing and metrics
+### 3. Monitor & Observe
+Master **[Observability](observability/)** to monitor and troubleshoot your deployments
 
 ## 📋 Prerequisites
 

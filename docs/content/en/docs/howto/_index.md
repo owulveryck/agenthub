@@ -10,24 +10,16 @@ description: >
 
 These practical guides will help you solve specific problems and accomplish particular tasks with AgentHub. Each guide focuses on a specific goal and assumes you have some familiarity with the basic concepts.
 
-## 🛠️ Agent Development
+## 📚 How-to Categories
 
-- **[Create a Publisher](create_publisher/)** - Build agents that delegate tasks to others
-- **[Create a Subscriber](create_subscriber/)** - Build agents that process tasks from others
-
-## 🔍 Observability & Monitoring
-
-- **[Add Observability](add_observability/)** - Integrate tracing and metrics into your agents
-- **[Use Dashboards](use_dashboards/)** - Monitor your agent system effectively
-
-## 🐛 Troubleshooting
-
-- **[Debugging Agent Issues](debugging_agent_issues/)** - Solve common problems and diagnose issues
+- **[Agent Development](agents/)** - Creating and managing different types of agents
+- **[Observability](observability/)** - Setting up monitoring, metrics, and dashboards
+- **[Debugging](debugging/)** - Troubleshooting and problem-solving guides
 
 ## 📋 Before You Start
 
 These guides assume you have:
-- Completed the [Installation and Setup](../tutorials/installation_and_setup/) tutorial
+- Completed the [Installation and Setup](../tutorials/getting-started/installation_and_setup/) tutorial
 - Basic understanding of AgentHub concepts
 - A working development environment
 

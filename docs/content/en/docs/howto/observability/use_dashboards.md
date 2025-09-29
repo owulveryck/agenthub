@@ -11,7 +11,7 @@ description: "Master the AgentHub observability dashboards to monitor, analyze, 
 ## Prerequisites
 
 - AgentHub observability stack running (`docker-compose up -d`)
-- Observable agents running (with `-tags observability`)
+- AgentHub agents running with observability enabled
 - Basic understanding of metrics concepts
 - 10-15 minutes
 

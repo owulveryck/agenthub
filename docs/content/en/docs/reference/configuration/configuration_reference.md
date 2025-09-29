@@ -108,7 +108,7 @@ go run agents/publisher/main.go
 # Use custom observability endpoints
 export JAEGER_ENDPOINT=jaeger.example.com:4317
 export PROMETHEUS_PORT=9091
-go run -tags observability broker/main_observability.go
+go run broker/main.go
 ```
 
 ### Configuration Best Practices

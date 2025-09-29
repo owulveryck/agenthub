@@ -10,21 +10,11 @@ description: >
 
 This section provides in-depth discussions and explanations to help you understand the concepts, design decisions, and architecture behind AgentHub. These materials are designed to broaden your understanding beyond just how to use the system.
 
-## 🧠 Core Concepts
+## 📚 Explanation Categories
 
-- **[The Agent2Agent Principle](the_agent_to_agent_principle/)** - Philosophy and design principles
-- **[Understanding Tasks](the_tasks/)** - Task semantics, lifecycle, and patterns
-- **[Unified Abstraction Library](unified_abstraction_library/)** - High-level abstraction design
-
-## 🏗️ Architecture & Design
-
-- **[Broker Architecture](broker_architecture/)** - Internal design and trade-offs
-- **[Performance and Scaling](performance_and_scaling/)** - Performance characteristics and strategies
-- **[Distributed Tracing](distributed_tracing/)** - Observability architecture
-
-## 🔧 Implementation Details
-
-- **[Go Build Tags](go_build_tags/)** - Build system and feature flags
+- **[Architecture](architecture/)** - System design and architectural principles
+- **[Core Concepts](concepts/)** - Fundamental concepts and mental models
+- **[Features](features/)** - Deep dives into specific features and capabilities
 
 ## 🎯 How to Use These Explanations
 
@@ -37,19 +27,16 @@ These documents are designed to:
 ## 📖 Reading Path
 
 ### For Understanding Core Concepts
-1. [The Agent2Agent Principle](the_agent_to_agent_principle/)
-2. [Understanding Tasks](the_tasks/)
-3. [Broker Architecture](broker_architecture/)
+1. [Core Concepts](concepts/) - Start with fundamental principles
+2. [Architecture](architecture/) - Understand system design
+3. [Features](features/) - Explore specific capabilities
 
 ### For System Design
-1. [Broker Architecture](broker_architecture/)
-2. [Performance and Scaling](performance_and_scaling/)
-3. [Unified Abstraction Library](unified_abstraction_library/)
+1. [Architecture](architecture/) - System design patterns
+2. [Features](features/) - Performance and scaling considerations
 
-### For Implementation
-1. [Unified Abstraction Library](unified_abstraction_library/)
-2. [Distributed Tracing](distributed_tracing/)
-3. [Go Build Tags](go_build_tags/)
+### For Implementation Details
+1. [Features](features/) - Technical implementation deep dives
 
 ## 💡 Discussion Topics
 

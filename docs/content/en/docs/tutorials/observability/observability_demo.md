@@ -21,8 +21,11 @@ By the end of this tutorial, you'll have:
 
 - **Go 1.24+** installed
 - **Docker and Docker Compose** installed
+- **Environment variables configured** (see [Installation and Setup](../getting-started/installation_and_setup/))
 - **10 minutes** of your time
 - **Basic terminal** knowledge
+
+> 💡 **Environment Note**: AgentHub agents automatically enable observability when `JAEGER_ENDPOINT` is configured. See [Environment Variables Reference](../../reference/configuration/environment_variables/) for all configuration options.
 
 ## Step 1: Clone and Setup (1 minute)
 
@@ -80,7 +83,7 @@ Open a new terminal and navigate back to the project root:
 
 ```bash
 # From agenthub root directory
-go run -tags observability broker/main_observability.go
+go run broker/main.go
 ```
 
 **Expected Output:**
@@ -99,7 +102,7 @@ time=2025-09-28T21:00:00.000Z level=INFO msg="AgentHub broker gRPC server with o
 Open another terminal:
 
 ```bash
-go run -tags observability agents/subscriber/main_observability.go
+go run agents/subscriber/main.go
 ```
 
 **Expected Output:**
@@ -118,7 +121,7 @@ time=2025-09-28T21:00:01.000Z level=INFO msg="Agent started with observability. 
 Open a third terminal:
 
 ```bash
-go run -tags observability agents/publisher/main_observability.go
+go run agents/publisher/main.go
 ```
 
 **Expected Output:**
@@ -279,7 +282,7 @@ You've successfully experienced the complete AgentHub observability stack!
 |-----------|-------------|
 | Services won't start | Run `docker-compose down && docker-compose up -d` |
 | No metrics in Grafana | Check Prometheus targets: http://localhost:9090/targets |
-| No traces in Jaeger | Verify agents are running with `-tags observability` |
+| No traces in Jaeger | Verify JAEGER_ENDPOINT environment variable is set correctly |
 | Permission errors | Ensure Docker has proper permissions |
 
 ## Clean Up
