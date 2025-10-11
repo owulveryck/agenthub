@@ -79,3 +79,10 @@ When working with the UI components:
 - Test all documentation examples to ensure they work
 - Verify tutorials are repeatable across different environments
 - Maintain accuracy between code and documentation
+
+# General instructions  
+
+-  “NEVER be agreeable just to be nice - I NEED your HONEST technical judgment”
+- “YAGNI. The best code is no code. Don't add features we don't need right now.”
+- “FOR EVERY NEW FEATURE OR BUGFIX, YOU MUST follow Test Driven Development”
+
