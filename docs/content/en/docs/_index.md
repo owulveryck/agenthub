@@ -36,6 +36,7 @@ Step-by-step guides that teach you how to use AgentHub through practical exercis
 - [Building Multi-Agent Workflows](tutorials/building_multi_agent_workflows/)
 - [Dashboard Tour](tutorials/dashboard_tour/)
 - [Observability Demo](tutorials/observability_demo/)
+- [Cortex Tutorials](tutorials/cortex/) - **New: Asynchronous AI orchestration**
 
 ### [How-to Guides](howto/) - Solving specific problems
 Goal-oriented guides for accomplishing specific tasks:
@@ -61,6 +62,7 @@ In-depth discussions that provide context and background:
 - [A2A Protocol Migration](explanation/a2a_migration/) - **New: Understanding the A2A compliance migration**
 - [Understanding Tasks](explanation/the_tasks/)
 - [Broker Architecture](explanation/broker_architecture/)
+- [Cortex Architecture](explanation/architecture/cortex_architecture/) - **New: Asynchronous AI orchestration design**
 - [Performance and Scaling](explanation/performance_and_scaling/)
 - [Unified Abstraction Library](explanation/unified_abstraction_library/)
 - [Distributed Tracing](explanation/distributed_tracing/)
