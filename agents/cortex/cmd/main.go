@@ -115,6 +115,17 @@ func main() {
 
 			// Process message events
 			if messageEvent := event.GetMessage(); messageEvent != nil {
+				// Skip messages from Cortex itself to prevent infinite loops
+				// Cortex should only process USER messages and AGENT task results
+				if messageEvent.Metadata != nil && messageEvent.Metadata.Fields != nil {
+					if fromAgent, exists := messageEvent.Metadata.Fields["from_agent"]; exists {
+						if fromAgent.GetStringValue() == cortexAgentID {
+							// This is a message Cortex published, ignore it
+							continue
+						}
+					}
+				}
+
 				// Extract parent trace context from the event for distributed tracing
 				eventCtx := ctx
 				if event.GetTraceId() != "" && event.GetSpanId() != "" {
