@@ -148,7 +148,7 @@ func main() {
 			return
 		}
 
-		// Create and send chat request
+		// Create and send chat request with tracing
 		message := &pb.Message{
 			MessageId: fmt.Sprintf("cli_msg_%d", time.Now().UnixNano()),
 			ContextId: sessionID,
@@ -165,7 +165,28 @@ func main() {
 			},
 		}
 
-		_, err := client.Client.PublishMessage(ctx, &pb.PublishMessageRequest{
+		// Start tracing for user message publication
+		pubCtx, pubSpan := client.TraceManager.StartA2AMessageSpan(
+			ctx,
+			"cli_publish_user_message",
+			message.MessageId,
+			message.Role.String(),
+		)
+		defer pubSpan.End()
+
+		// Add A2A message attributes
+		client.TraceManager.AddA2AMessageAttributes(
+			pubSpan,
+			message.MessageId,
+			message.ContextId,
+			message.Role.String(),
+			"chat_request",
+			len(message.Content),
+			message.Metadata != nil,
+		)
+		client.TraceManager.AddComponentAttribute(pubSpan, "chat_cli")
+
+		_, err := client.Client.PublishMessage(pubCtx, &pb.PublishMessageRequest{
 			Message: message,
 			Routing: &pb.AgentEventMetadata{
 				FromAgentId: cliAgentID,
@@ -176,7 +197,10 @@ func main() {
 		})
 
 		if err != nil {
+			client.TraceManager.RecordError(pubSpan, err)
 			fmt.Printf("Error sending message: %v\n", err)
+		} else {
+			client.TraceManager.SetSpanSuccess(pubSpan)
 		}
 
 		// Wait a moment for response (basic approach for CLI)

@@ -9,6 +9,8 @@ import (
 	"github.com/owulveryck/agenthub/agents/cortex/llm"
 	"github.com/owulveryck/agenthub/agents/cortex/state"
 	pb "github.com/owulveryck/agenthub/events/a2a"
+	"github.com/owulveryck/agenthub/internal/observability"
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -74,7 +76,7 @@ func (c *Cortex) GetAvailableAgents() []*pb.AgentCard {
 // - Chat requests from users
 // - Task results from agents
 // - Agent card registrations
-func (c *Cortex) HandleMessage(ctx context.Context, msg *pb.Message) error {
+func (c *Cortex) HandleMessage(ctx context.Context, traceManager *observability.TraceManager, msg *pb.Message) error {
 	if msg == nil {
 		return fmt.Errorf("message cannot be nil")
 	}
@@ -91,71 +93,163 @@ func (c *Cortex) HandleMessage(ctx context.Context, msg *pb.Message) error {
 
 		// Check if this is a task result
 		if msg.TaskId != "" && msg.Role == pb.Role_ROLE_AGENT {
-			return c.handleTaskResult(ctx, conversationState, msg)
+			return c.handleTaskResult(ctx, traceManager, conversationState, msg)
 		}
 
 		// Otherwise, it's a new chat request
-		return c.handleChatRequest(ctx, conversationState, msg)
+		return c.handleChatRequest(ctx, traceManager, conversationState, msg)
 	})
 }
 
 // handleChatRequest processes a new chat request from a user.
-func (c *Cortex) handleChatRequest(ctx context.Context, conversationState *state.ConversationState, msg *pb.Message) error {
+func (c *Cortex) handleChatRequest(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, msg *pb.Message) error {
+	// Start tracing for chat request processing
+	reqCtx, reqSpan := traceManager.StartSpan(ctx, "cortex_chat_request",
+		attribute.String("session_id", conversationState.SessionID),
+		attribute.String("message_id", msg.GetMessageId()),
+		attribute.Int("message_history_count", len(conversationState.Messages)),
+	)
+	defer reqSpan.End()
+
+	traceManager.AddComponentAttribute(reqSpan, "cortex_orchestrator")
+
 	// Get available agents
 	availableAgents := c.GetAvailableAgents()
+	traceManager.AddSpanEvent(reqSpan, "available_agents_retrieved",
+		attribute.Int("agent_count", len(availableAgents)),
+	)
 
 	// Call LLM to decide what to do
-	decision, err := c.llmClient.Decide(ctx, conversationState.Messages, availableAgents, msg)
+	llmCtx, llmSpan := traceManager.StartSpan(reqCtx, "cortex_llm_decide",
+		attribute.String("message_id", msg.GetMessageId()),
+		attribute.Int("available_agents", len(availableAgents)),
+	)
+	decision, err := c.llmClient.Decide(llmCtx, conversationState.Messages, availableAgents, msg)
 	if err != nil {
+		traceManager.RecordError(llmSpan, err)
+		traceManager.RecordError(reqSpan, err)
+		llmSpan.End()
 		return fmt.Errorf("LLM decision failed: %w", err)
 	}
+	traceManager.SetSpanSuccess(llmSpan)
+	traceManager.AddSpanEvent(llmSpan, "llm_decision_made",
+		attribute.Int("action_count", len(decision.Actions)),
+	)
+	llmSpan.End()
 
 	// Execute the decided actions
-	return c.executeActions(ctx, conversationState, decision.Actions, msg)
+	err = c.executeActions(reqCtx, traceManager, conversationState, decision.Actions, msg)
+	if err != nil {
+		traceManager.RecordError(reqSpan, err)
+		return err
+	}
+
+	traceManager.SetSpanSuccess(reqSpan)
+	return nil
 }
 
 // handleTaskResult processes a task result from an agent.
-func (c *Cortex) handleTaskResult(ctx context.Context, conversationState *state.ConversationState, msg *pb.Message) error {
+func (c *Cortex) handleTaskResult(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, msg *pb.Message) error {
+	// Start tracing for task result processing
+	resCtx, resSpan := traceManager.StartSpan(ctx, "cortex_task_result",
+		attribute.String("session_id", conversationState.SessionID),
+		attribute.String("task_id", msg.GetTaskId()),
+		attribute.String("message_id", msg.GetMessageId()),
+	)
+	defer resSpan.End()
+
+	traceManager.AddComponentAttribute(resSpan, "cortex_orchestrator")
+
 	// Remove the task from pending tasks
 	delete(conversationState.PendingTasks, msg.TaskId)
+	traceManager.AddSpanEvent(resSpan, "task_completed",
+		attribute.String("task_id", msg.GetTaskId()),
+		attribute.Int("remaining_tasks", len(conversationState.PendingTasks)),
+	)
 
 	// Get available agents
 	availableAgents := c.GetAvailableAgents()
 
 	// Call LLM to decide how to synthesize this result
-	decision, err := c.llmClient.Decide(ctx, conversationState.Messages, availableAgents, msg)
+	llmCtx, llmSpan := traceManager.StartSpan(resCtx, "cortex_llm_synthesize",
+		attribute.String("task_id", msg.GetTaskId()),
+		attribute.Int("available_agents", len(availableAgents)),
+	)
+	decision, err := c.llmClient.Decide(llmCtx, conversationState.Messages, availableAgents, msg)
 	if err != nil {
+		traceManager.RecordError(llmSpan, err)
+		traceManager.RecordError(resSpan, err)
+		llmSpan.End()
 		return fmt.Errorf("LLM decision failed: %w", err)
 	}
+	traceManager.SetSpanSuccess(llmSpan)
+	traceManager.AddSpanEvent(llmSpan, "llm_synthesis_complete",
+		attribute.Int("action_count", len(decision.Actions)),
+	)
+	llmSpan.End()
 
 	// Execute the decided actions
-	return c.executeActions(ctx, conversationState, decision.Actions, msg)
+	err = c.executeActions(resCtx, traceManager, conversationState, decision.Actions, msg)
+	if err != nil {
+		traceManager.RecordError(resSpan, err)
+		return err
+	}
+
+	traceManager.SetSpanSuccess(resSpan)
+	return nil
 }
 
 // executeActions executes the actions decided by the LLM.
-func (c *Cortex) executeActions(ctx context.Context, conversationState *state.ConversationState, actions []llm.Action, triggeringMsg *pb.Message) error {
-	for _, action := range actions {
+func (c *Cortex) executeActions(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, actions []llm.Action, triggeringMsg *pb.Message) error {
+	actCtx, actSpan := traceManager.StartSpan(ctx, "cortex_execute_actions",
+		attribute.Int("action_count", len(actions)),
+		attribute.String("session_id", conversationState.SessionID),
+	)
+	defer actSpan.End()
+
+	traceManager.AddComponentAttribute(actSpan, "cortex_orchestrator")
+
+	for i, action := range actions {
+		traceManager.AddSpanEvent(actSpan, "executing_action",
+			attribute.Int("action_index", i),
+			attribute.String("action_type", action.Type),
+		)
+
 		switch action.Type {
 		case "chat.response":
-			if err := c.executeChatResponse(ctx, conversationState, action, triggeringMsg); err != nil {
+			if err := c.executeChatResponse(actCtx, traceManager, conversationState, action, triggeringMsg); err != nil {
+				traceManager.RecordError(actSpan, err)
 				return fmt.Errorf("failed to execute chat response: %w", err)
 			}
 
 		case "task.request":
-			if err := c.executeTaskRequest(ctx, conversationState, action, triggeringMsg); err != nil {
+			if err := c.executeTaskRequest(actCtx, traceManager, conversationState, action, triggeringMsg); err != nil {
+				traceManager.RecordError(actSpan, err)
 				return fmt.Errorf("failed to execute task request: %w", err)
 			}
 
 		default:
-			return fmt.Errorf("unknown action type: %s", action.Type)
+			err := fmt.Errorf("unknown action type: %s", action.Type)
+			traceManager.RecordError(actSpan, err)
+			return err
 		}
 	}
 
+	traceManager.SetSpanSuccess(actSpan)
 	return nil
 }
 
 // executeChatResponse sends a chat response to the user.
-func (c *Cortex) executeChatResponse(ctx context.Context, conversationState *state.ConversationState, action llm.Action, triggeringMsg *pb.Message) error {
+func (c *Cortex) executeChatResponse(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, action llm.Action, triggeringMsg *pb.Message) error {
+	// Start tracing for chat response execution
+	respCtx, respSpan := traceManager.StartSpan(ctx, "cortex_send_chat_response",
+		attribute.String("session_id", conversationState.SessionID),
+		attribute.String("response_length", fmt.Sprintf("%d", len(action.ResponseText))),
+	)
+	defer respSpan.End()
+
+	traceManager.AddComponentAttribute(respSpan, "cortex_orchestrator")
+
 	// Create response message
 	responseMsg := &pb.Message{
 		MessageId: fmt.Sprintf("cortex_response_%d", time.Now().UnixNano()),
@@ -173,22 +267,49 @@ func (c *Cortex) executeChatResponse(ctx context.Context, conversationState *sta
 		},
 	}
 
+	traceManager.AddSpanEvent(respSpan, "chat_response_created",
+		attribute.String("message_id", responseMsg.MessageId),
+		attribute.Int("response_length", len(action.ResponseText)),
+	)
+
 	// Add to conversation history
 	conversationState.Messages = append(conversationState.Messages, responseMsg)
 
-	// Publish the message
+	// Publish the message (trace context automatically propagated via respCtx)
 	routing := &pb.AgentEventMetadata{
 		FromAgentId: CortexAgentID,
 		EventType:   "a2a.message.chat_response",
 		Priority:    pb.Priority_PRIORITY_MEDIUM,
 	}
 
-	return c.messagePublisher.PublishMessage(ctx, responseMsg, routing)
+	err := c.messagePublisher.PublishMessage(respCtx, responseMsg, routing)
+	if err != nil {
+		traceManager.RecordError(respSpan, err)
+		return err
+	}
+
+	traceManager.SetSpanSuccess(respSpan)
+	traceManager.AddSpanEvent(respSpan, "chat_response_published",
+		attribute.String("message_id", responseMsg.MessageId),
+	)
+
+	return nil
 }
 
 // executeTaskRequest dispatches a task request to an agent.
-func (c *Cortex) executeTaskRequest(ctx context.Context, conversationState *state.ConversationState, action llm.Action, triggeringMsg *pb.Message) error {
+func (c *Cortex) executeTaskRequest(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, action llm.Action, triggeringMsg *pb.Message) error {
 	taskID := fmt.Sprintf("task_%d", time.Now().UnixNano())
+
+	// Start tracing for task request execution
+	taskCtx, taskSpan := traceManager.StartSpan(ctx, "cortex_dispatch_task",
+		attribute.String("session_id", conversationState.SessionID),
+		attribute.String("task_id", taskID),
+		attribute.String("task_type", action.TaskType),
+		attribute.String("target_agent", action.TargetAgent),
+	)
+	defer taskSpan.End()
+
+	traceManager.AddComponentAttribute(taskSpan, "cortex_orchestrator")
 
 	// Create task request message
 	taskMsg := &pb.Message{
@@ -208,6 +329,12 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, conversationState *stat
 		},
 	}
 
+	traceManager.AddSpanEvent(taskSpan, "task_request_created",
+		attribute.String("task_id", taskID),
+		attribute.String("message_id", taskMsg.MessageId),
+		attribute.String("target_agent", action.TargetAgent),
+	)
+
 	// Track this task as pending
 	conversationState.PendingTasks[taskID] = &state.TaskContext{
 		TaskID:        taskID,
@@ -217,7 +344,11 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, conversationState *stat
 		UserNotified:  true, // We assume we've already sent an acknowledgment
 	}
 
-	// Publish the task request
+	traceManager.AddSpanEvent(taskSpan, "task_tracked_as_pending",
+		attribute.Int("total_pending_tasks", len(conversationState.PendingTasks)),
+	)
+
+	// Publish the task request (trace context automatically propagated via taskCtx)
 	routing := &pb.AgentEventMetadata{
 		FromAgentId: CortexAgentID,
 		ToAgentId:   action.TargetAgent,
@@ -225,5 +356,17 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, conversationState *stat
 		Priority:    pb.Priority_PRIORITY_MEDIUM,
 	}
 
-	return c.messagePublisher.PublishMessage(ctx, taskMsg, routing)
+	err := c.messagePublisher.PublishMessage(taskCtx, taskMsg, routing)
+	if err != nil {
+		traceManager.RecordError(taskSpan, err)
+		return err
+	}
+
+	traceManager.SetSpanSuccess(taskSpan)
+	traceManager.AddSpanEvent(taskSpan, "task_request_published",
+		attribute.String("task_id", taskID),
+		attribute.String("message_id", taskMsg.MessageId),
+	)
+
+	return nil
 }

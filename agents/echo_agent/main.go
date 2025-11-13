@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+
 	pb "github.com/owulveryck/agenthub/events/a2a"
 	"github.com/owulveryck/agenthub/internal/agenthub"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -113,11 +115,21 @@ func main() {
 
 			// Process message events
 			if messageEvent := event.GetMessage(); messageEvent != nil {
+				// Extract parent trace context from the event for distributed tracing
+				eventCtx := ctx
+				if event.GetTraceId() != "" && event.GetSpanId() != "" {
+					// Create W3C traceparent header format: version-trace_id-span_id-flags
+					headers := map[string]string{
+						"traceparent": fmt.Sprintf("00-%s-%s-01", event.GetTraceId(), event.GetSpanId()),
+					}
+					eventCtx = client.TraceManager.ExtractTraceContext(ctx, headers)
+				}
+
 				// Check if this is an echo request
 				if messageEvent.Metadata != nil {
 					if taskType, exists := messageEvent.Metadata.Fields["task_type"]; exists {
 						if taskType.GetStringValue() == "echo_request" || taskType.GetStringValue() == "echo" {
-							handleEchoRequest(ctx, client, messageEvent)
+							handleEchoRequest(eventCtx, client, messageEvent)
 						}
 					}
 				}
@@ -128,7 +140,7 @@ func main() {
 					if messageEvent.Metadata != nil {
 						if taskType, exists := messageEvent.Metadata.Fields["task_type"]; exists {
 							if taskType.GetStringValue() == "echo" {
-								handleEchoRequest(ctx, client, messageEvent)
+								handleEchoRequest(eventCtx, client, messageEvent)
 							}
 						}
 					}
@@ -150,10 +162,32 @@ func main() {
 }
 
 func handleEchoRequest(ctx context.Context, client *agenthub.AgentHubClient, message *pb.Message) {
-	client.Logger.InfoContext(ctx, "Received echo request",
+	// Start tracing for echo request processing
+	reqCtx, reqSpan := client.TraceManager.StartA2AMessageSpan(
+		ctx,
+		"handle_echo_request",
+		message.GetMessageId(),
+		message.GetRole().String(),
+	)
+	defer reqSpan.End()
+
+	// Add comprehensive A2A attributes for request processing
+	client.TraceManager.AddA2AMessageAttributes(
+		reqSpan,
+		message.GetMessageId(),
+		message.GetContextId(),
+		message.GetRole().String(),
+		"echo_request",
+		len(message.GetContent()),
+		message.GetMetadata() != nil,
+	)
+	client.TraceManager.AddComponentAttribute(reqSpan, "echo_agent")
+
+	client.Logger.InfoContext(reqCtx, "Received echo request",
 		"message_id", message.GetMessageId(),
 		"context_id", message.GetContextId(),
 		"task_id", message.GetTaskId(),
+		"trace_id", reqSpan.SpanContext().TraceID().String(),
 	)
 
 	// Extract the input message
@@ -162,8 +196,18 @@ func handleEchoRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 		inputText = message.Content[0].GetText()
 	}
 
+	client.TraceManager.AddSpanEvent(reqSpan, "extracted_input_message",
+		attribute.String("input_text", inputText),
+		attribute.Int("content_parts", len(message.GetContent())),
+	)
+
 	// Create echo response
 	echoText := fmt.Sprintf("Echo: %s", inputText)
+
+	client.TraceManager.AddSpanEvent(reqSpan, "created_echo_response",
+		attribute.String("echo_text", echoText),
+		attribute.Int("response_length", len(echoText)),
+	)
 
 	responseMessage := &pb.Message{
 		MessageId: fmt.Sprintf("msg_echo_response_%d", time.Now().Unix()),
@@ -187,8 +231,29 @@ func handleEchoRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 		},
 	}
 
+	// Start tracing for response publishing
+	pubCtx, pubSpan := client.TraceManager.StartA2AMessageSpan(
+		reqCtx,
+		"publish_echo_response",
+		responseMessage.GetMessageId(),
+		responseMessage.GetRole().String(),
+	)
+	defer pubSpan.End()
+
+	// Add A2A attributes for response publishing
+	client.TraceManager.AddA2AMessageAttributes(
+		pubSpan,
+		responseMessage.GetMessageId(),
+		responseMessage.GetContextId(),
+		responseMessage.GetRole().String(),
+		"echo_result",
+		len(responseMessage.GetContent()),
+		responseMessage.GetMetadata() != nil,
+	)
+	client.TraceManager.AddComponentAttribute(pubSpan, "echo_agent")
+
 	// Publish the echo response
-	resp, err := client.Client.PublishMessage(ctx, &pb.PublishMessageRequest{
+	resp, err := client.Client.PublishMessage(pubCtx, &pb.PublishMessageRequest{
 		Message: responseMessage,
 		Routing: &pb.AgentEventMetadata{
 			FromAgentId: echoAgentID,
@@ -199,19 +264,30 @@ func handleEchoRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 	})
 
 	if err != nil {
-		client.Logger.ErrorContext(ctx, "Failed to publish echo response",
+		client.TraceManager.RecordError(reqSpan, err)
+		client.TraceManager.RecordError(pubSpan, err)
+		client.Logger.ErrorContext(pubCtx, "Failed to publish echo response",
 			"error", err,
 			"message_id", message.GetMessageId(),
+			"trace_id", pubSpan.SpanContext().TraceID().String(),
 		)
 		return
 	}
 
-	client.Logger.InfoContext(ctx, "Published echo response",
+	client.TraceManager.SetSpanSuccess(reqSpan)
+	client.TraceManager.SetSpanSuccess(pubSpan)
+	client.TraceManager.AddSpanEvent(pubSpan, "response_published",
+		attribute.String("event_id", resp.GetEventId()),
+		attribute.String("echo_text", echoText),
+	)
+
+	client.Logger.InfoContext(pubCtx, "Published echo response",
 		"message_id", message.GetMessageId(),
 		"response_message_id", responseMessage.GetMessageId(),
 		"context_id", message.GetContextId(),
 		"task_id", message.GetTaskId(),
 		"event_id", resp.GetEventId(),
 		"echo_text", echoText,
+		"trace_id", pubSpan.SpanContext().TraceID().String(),
 	)
 }

@@ -26,6 +26,7 @@ type AgentHubMessagePublisher struct {
 }
 
 func (a *AgentHubMessagePublisher) PublishMessage(ctx context.Context, msg *pb.Message, routing *pb.AgentEventMetadata) error {
+	// Publish message - broker will automatically extract trace context from ctx
 	_, err := a.client.Client.PublishMessage(ctx, &pb.PublishMessageRequest{
 		Message: msg,
 		Routing: routing,
@@ -114,7 +115,17 @@ func main() {
 
 			// Process message events
 			if messageEvent := event.GetMessage(); messageEvent != nil {
-				handleMessage(ctx, client, cortexInstance, messageEvent)
+				// Extract parent trace context from the event for distributed tracing
+				eventCtx := ctx
+				if event.GetTraceId() != "" && event.GetSpanId() != "" {
+					// Create W3C traceparent header format: version-trace_id-span_id-flags
+					headers := map[string]string{
+						"traceparent": fmt.Sprintf("00-%s-%s-01", event.GetTraceId(), event.GetSpanId()),
+					}
+					eventCtx = client.TraceManager.ExtractTraceContext(ctx, headers)
+				}
+
+				handleMessage(eventCtx, client, cortexInstance, messageEvent)
 			}
 		}
 	}()
@@ -137,11 +148,39 @@ func main() {
 
 // handleMessage processes incoming messages through Cortex
 func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, cortexInstance *cortex.Cortex, message *pb.Message) {
-	client.Logger.InfoContext(ctx, "Cortex received message",
+	// Start tracing for Cortex message handling
+	handlerCtx, handlerSpan := client.TraceManager.StartA2AMessageSpan(
+		ctx,
+		"cortex_handle_message",
+		message.GetMessageId(),
+		message.GetRole().String(),
+	)
+	defer handlerSpan.End()
+
+	// Add comprehensive A2A attributes for message handling
+	taskType := ""
+	if message.Metadata != nil && message.Metadata.Fields != nil {
+		if taskTypeValue, exists := message.Metadata.Fields["task_type"]; exists {
+			taskType = taskTypeValue.GetStringValue()
+		}
+	}
+	client.TraceManager.AddA2AMessageAttributes(
+		handlerSpan,
+		message.GetMessageId(),
+		message.GetContextId(),
+		message.GetRole().String(),
+		taskType,
+		len(message.GetContent()),
+		message.GetMetadata() != nil,
+	)
+	client.TraceManager.AddComponentAttribute(handlerSpan, "cortex")
+
+	client.Logger.InfoContext(handlerCtx, "Cortex received message",
 		"message_id", message.GetMessageId(),
 		"context_id", message.GetContextId(),
 		"role", message.GetRole().String(),
 		"task_id", message.GetTaskId(),
+		"trace_id", handlerSpan.SpanContext().TraceID().String(),
 	)
 
 	// Check if this is an agent card registration
@@ -149,25 +188,31 @@ func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, cortexI
 		if msgType, exists := message.Metadata.Fields["message_type"]; exists {
 			if msgType.GetStringValue() == "agent_card" {
 				// TODO: Extract agent card from message and register
-				client.Logger.InfoContext(ctx, "Agent card registration received (not yet implemented)")
+				client.Logger.InfoContext(handlerCtx, "Agent card registration received (not yet implemented)")
+				client.TraceManager.AddSpanEvent(handlerSpan, "agent_card_registration_skipped")
+				client.TraceManager.SetSpanSuccess(handlerSpan)
 				return
 			}
 		}
 	}
 
 	// Process the message through Cortex
-	err := cortexInstance.HandleMessage(ctx, message)
+	err := cortexInstance.HandleMessage(handlerCtx, client.TraceManager, message)
 	if err != nil {
-		client.Logger.ErrorContext(ctx, "Cortex failed to handle message",
+		client.TraceManager.RecordError(handlerSpan, err)
+		client.Logger.ErrorContext(handlerCtx, "Cortex failed to handle message",
 			"error", err,
 			"message_id", message.GetMessageId(),
+			"trace_id", handlerSpan.SpanContext().TraceID().String(),
 		)
 		return
 	}
 
-	client.Logger.InfoContext(ctx, "Cortex successfully processed message",
+	client.TraceManager.SetSpanSuccess(handlerSpan)
+	client.Logger.InfoContext(handlerCtx, "Cortex successfully processed message",
 		"message_id", message.GetMessageId(),
 		"context_id", message.GetContextId(),
+		"trace_id", handlerSpan.SpanContext().TraceID().String(),
 	)
 }
 
