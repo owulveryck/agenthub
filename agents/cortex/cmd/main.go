@@ -217,7 +217,7 @@ func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, cortexI
 }
 
 // createLLMClient creates the LLM client based on configuration
-// For POC, we use a mock that provides simple echo behavior
+// For POC, we use a mock that dispatches tasks to echo_agent for proper orchestration
 // In production, replace with real LLM client (Vertex AI, OpenAI, etc.)
 func createLLMClient() llm.Client {
 	// Check if we should use a real LLM
@@ -227,6 +227,8 @@ func createLLMClient() llm.Client {
 		fmt.Println("Warning: CORTEX_LLM_MODEL set but real LLM client not yet implemented, using mock")
 	}
 
-	// Use mock with simple echo behavior for POC
-	return llm.NewMockClientWithFunc(llm.SimpleEchoDecider())
+	// Use mock that properly orchestrates with echo_agent
+	// This dispatches tasks to agent_echo instead of responding directly,
+	// demonstrating proper async multi-agent orchestration
+	return llm.NewMockClientWithFunc(llm.TaskDispatcherDecider("echo", "agent_echo"))
 }
