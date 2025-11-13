@@ -108,10 +108,33 @@ func SimpleEchoDecider() func(context.Context, []*pb.Message, []*pb.AgentCard, *
 
 // TaskDispatcherDecider returns a decision function that dispatches tasks to agents.
 // This is useful for testing task routing.
+// It intelligently handles both user requests and task results:
+// - USER messages: dispatch task to agent
+// - AGENT task results: synthesize final response (no new task)
 func TaskDispatcherDecider(taskType, targetAgent string) func(context.Context, []*pb.Message, []*pb.AgentCard, *pb.Message) (*Decision, error) {
 	return func(ctx context.Context, history []*pb.Message, agents []*pb.AgentCard, event *pb.Message) (*Decision, error) {
+		// Check if this is a task result (from an agent)
+		if event.GetRole() == pb.Role_ROLE_AGENT && event.GetTaskId() != "" {
+			// This is a task result - synthesize final response
+			var resultText string
+			if len(event.Content) > 0 {
+				resultText = event.Content[0].GetText()
+			}
+
+			return &Decision{
+				Reasoning: fmt.Sprintf("Task result received from %s, sending final response to user", targetAgent),
+				Actions: []Action{
+					{
+						Type:         "chat.response",
+						ResponseText: fmt.Sprintf("Task completed! Result: %s", resultText),
+					},
+				},
+			}, nil
+		}
+
+		// This is a user message - dispatch task
 		return &Decision{
-			Reasoning: fmt.Sprintf("Dispatching %s task to %s", taskType, targetAgent),
+			Reasoning: fmt.Sprintf("User request received, dispatching %s task to %s", taskType, targetAgent),
 			Actions: []Action{
 				{
 					Type:         "chat.response",
