@@ -165,7 +165,7 @@ func handleEchoRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 	// Start tracing for echo request processing
 	reqCtx, reqSpan := client.TraceManager.StartA2AMessageSpan(
 		ctx,
-		"handle_echo_request",
+		"echo_agent.handle_request",
 		message.GetMessageId(),
 		message.GetRole().String(),
 	)
@@ -234,7 +234,7 @@ func handleEchoRequest(ctx context.Context, client *agenthub.AgentHubClient, mes
 	// Start tracing for response publishing
 	pubCtx, pubSpan := client.TraceManager.StartA2AMessageSpan(
 		reqCtx,
-		"publish_echo_response",
+		"echo_agent.publish_response",
 		responseMessage.GetMessageId(),
 		responseMessage.GetRole().String(),
 	)

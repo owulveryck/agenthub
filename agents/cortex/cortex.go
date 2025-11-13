@@ -104,7 +104,7 @@ func (c *Cortex) HandleMessage(ctx context.Context, traceManager *observability.
 // handleChatRequest processes a new chat request from a user.
 func (c *Cortex) handleChatRequest(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, msg *pb.Message) error {
 	// Start tracing for chat request processing
-	reqCtx, reqSpan := traceManager.StartSpan(ctx, "cortex_chat_request",
+	reqCtx, reqSpan := traceManager.StartSpan(ctx, "cortex.chat_request",
 		attribute.String("session_id", conversationState.SessionID),
 		attribute.String("message_id", msg.GetMessageId()),
 		attribute.Int("message_history_count", len(conversationState.Messages)),
@@ -120,7 +120,7 @@ func (c *Cortex) handleChatRequest(ctx context.Context, traceManager *observabil
 	)
 
 	// Call LLM to decide what to do
-	llmCtx, llmSpan := traceManager.StartSpan(reqCtx, "cortex_llm_decide",
+	llmCtx, llmSpan := traceManager.StartSpan(reqCtx, "cortex.llm_decide",
 		attribute.String("message_id", msg.GetMessageId()),
 		attribute.Int("available_agents", len(availableAgents)),
 		attribute.Int("conversation_history_length", len(conversationState.Messages)),
@@ -201,7 +201,7 @@ func (c *Cortex) handleChatRequest(ctx context.Context, traceManager *observabil
 // handleTaskResult processes a task result from an agent.
 func (c *Cortex) handleTaskResult(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, msg *pb.Message) error {
 	// Start tracing for task result processing
-	resCtx, resSpan := traceManager.StartSpan(ctx, "cortex_task_result",
+	resCtx, resSpan := traceManager.StartSpan(ctx, "cortex.task_result",
 		attribute.String("session_id", conversationState.SessionID),
 		attribute.String("task_id", msg.GetTaskId()),
 		attribute.String("message_id", msg.GetMessageId()),
@@ -221,7 +221,7 @@ func (c *Cortex) handleTaskResult(ctx context.Context, traceManager *observabili
 	availableAgents := c.GetAvailableAgents()
 
 	// Call LLM to decide how to synthesize this result
-	llmCtx, llmSpan := traceManager.StartSpan(resCtx, "cortex_llm_synthesize",
+	llmCtx, llmSpan := traceManager.StartSpan(resCtx, "cortex.llm_synthesize",
 		attribute.String("task_id", msg.GetTaskId()),
 		attribute.Int("available_agents", len(availableAgents)),
 		attribute.Int("conversation_history_length", len(conversationState.Messages)),
@@ -302,7 +302,7 @@ func (c *Cortex) handleTaskResult(ctx context.Context, traceManager *observabili
 
 // executeActions executes the actions decided by the LLM.
 func (c *Cortex) executeActions(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, actions []llm.Action, triggeringMsg *pb.Message) error {
-	actCtx, actSpan := traceManager.StartSpan(ctx, "cortex_execute_actions",
+	actCtx, actSpan := traceManager.StartSpan(ctx, "cortex.execute_actions",
 		attribute.Int("action_count", len(actions)),
 		attribute.String("session_id", conversationState.SessionID),
 		attribute.String("triggering_message_id", triggeringMsg.GetMessageId()),
@@ -399,7 +399,7 @@ func (c *Cortex) executeActions(ctx context.Context, traceManager *observability
 // executeChatResponse sends a chat response to the user.
 func (c *Cortex) executeChatResponse(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, action llm.Action, triggeringMsg *pb.Message) error {
 	// Start tracing for chat response execution
-	respCtx, respSpan := traceManager.StartSpan(ctx, "cortex_send_chat_response",
+	respCtx, respSpan := traceManager.StartSpan(ctx, "cortex.send_chat_response",
 		attribute.String("session_id", conversationState.SessionID),
 		attribute.String("response_length", fmt.Sprintf("%d", len(action.ResponseText))),
 	)
@@ -458,7 +458,7 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, traceManager *observabi
 	taskID := fmt.Sprintf("task_%d", time.Now().UnixNano())
 
 	// Start tracing for task request execution
-	taskCtx, taskSpan := traceManager.StartSpan(ctx, "cortex_dispatch_task",
+	taskCtx, taskSpan := traceManager.StartSpan(ctx, "cortex.dispatch_task",
 		attribute.String("session_id", conversationState.SessionID),
 		attribute.String("task_id", taskID),
 		attribute.String("task_type", action.TaskType),

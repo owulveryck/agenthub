@@ -168,7 +168,7 @@ func main() {
 		// Start tracing for user message publication
 		pubCtx, pubSpan := client.TraceManager.StartA2AMessageSpan(
 			ctx,
-			"cli_publish_user_message",
+			"chat_cli.publish_message",
 			message.MessageId,
 			message.Role.String(),
 		)

@@ -162,7 +162,7 @@ func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, cortexI
 	// Start tracing for Cortex message handling
 	handlerCtx, handlerSpan := client.TraceManager.StartA2AMessageSpan(
 		ctx,
-		"cortex_handle_message",
+		"cortex.handle_message",
 		message.GetMessageId(),
 		message.GetRole().String(),
 	)
