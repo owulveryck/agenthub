@@ -238,8 +238,8 @@ func createLLMClient() llm.Client {
 		fmt.Println("Warning: CORTEX_LLM_MODEL set but real LLM client not yet implemented, using mock")
 	}
 
-	// Use mock that properly orchestrates with echo_agent
-	// This dispatches tasks to agent_echo instead of responding directly,
-	// demonstrating proper async multi-agent orchestration
-	return llm.NewMockClientWithFunc(llm.TaskDispatcherDecider("echo", "agent_echo"))
+	// Use intelligent mock that analyzes user intent
+	// This only dispatches to echo_agent when user explicitly requests an echo,
+	// otherwise responds directly. Always explains reasoning and decisions.
+	return llm.NewMockClientWithFunc(llm.IntelligentDecider())
 }
