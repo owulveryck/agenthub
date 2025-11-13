@@ -57,9 +57,8 @@ func NewAgentHubService(server *AgentHubServer) *AgentHubService {
 
 // PublishMessage publishes A2A messages through the broker
 func (s *AgentHubService) PublishMessage(ctx context.Context, req *pb.PublishMessageRequest) (*pb.PublishResponse, error) {
-	ctx, span := s.Server.TraceManager.StartPublishSpan(ctx, "a2a_message", req.GetMessage().GetRole().String())
+	ctx, span := s.Server.TraceManager.StartPublishSpan(ctx, "broker", "a2a_message", req.GetMessage().GetRole().String())
 	defer span.End()
-	s.Server.TraceManager.AddComponentAttribute(span, "broker")
 
 	timer := s.Server.MetricsManager.StartTimer()
 	defer timer(ctx, "a2a_message", "broker")
@@ -147,6 +146,7 @@ func (s *AgentHubService) PublishMessage(ctx context.Context, req *pb.PublishMes
 	// Route message event to subscribers with enhanced tracing
 	routeCtx, routeSpan := s.Server.TraceManager.StartA2AEventRouteSpan(
 		ctx,
+		"broker",
 		eventID,
 		"message",
 		s.getSubscriberCount("message", messageEvent.GetRouting()),
@@ -206,7 +206,7 @@ func (s *AgentHubService) PublishMessage(ctx context.Context, req *pb.PublishMes
 
 // PublishTaskUpdate publishes task status updates
 func (s *AgentHubService) PublishTaskUpdate(ctx context.Context, req *pb.PublishTaskUpdateRequest) (*pb.PublishResponse, error) {
-	ctx, span := s.Server.TraceManager.StartPublishSpan(ctx, "task_status_update", req.GetUpdate().GetTaskId())
+	ctx, span := s.Server.TraceManager.StartPublishSpan(ctx, "broker", "task_status_update", req.GetUpdate().GetTaskId())
 	defer span.End()
 
 	update := req.GetUpdate()
@@ -245,7 +245,7 @@ func (s *AgentHubService) PublishTaskUpdate(ctx context.Context, req *pb.Publish
 
 // PublishTaskArtifact publishes task artifacts
 func (s *AgentHubService) PublishTaskArtifact(ctx context.Context, req *pb.PublishTaskArtifactRequest) (*pb.PublishResponse, error) {
-	ctx, span := s.Server.TraceManager.StartPublishSpan(ctx, "task_artifact", req.GetArtifact().GetTaskId())
+	ctx, span := s.Server.TraceManager.StartPublishSpan(ctx, "broker", "task_artifact", req.GetArtifact().GetTaskId())
 	defer span.End()
 
 	artifact := req.GetArtifact()

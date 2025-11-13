@@ -41,12 +41,16 @@ func (tm *TraceManager) StartEventProcessingSpan(ctx context.Context, eventID, e
 	))
 }
 
-func (tm *TraceManager) StartPublishSpan(ctx context.Context, destination, eventType string) (context.Context, trace.Span) {
-	return tm.tracer.Start(ctx, "publish_event", trace.WithAttributes(
+// StartPublishSpan creates a span for publishing events
+// component should be the service name (e.g., "broker", "cortex", "echo_agent")
+func (tm *TraceManager) StartPublishSpan(ctx context.Context, component, destination, eventType string) (context.Context, trace.Span) {
+	spanName := fmt.Sprintf("%s.publish_event", component)
+	return tm.tracer.Start(ctx, spanName, trace.WithAttributes(
 		attribute.String("messaging.system", "grpc"),
 		attribute.String("messaging.destination", destination),
 		attribute.String("messaging.operation", "publish"),
 		attribute.String("event.type", eventType),
+		attribute.String("agenthub.component", component),
 	))
 }
 
@@ -186,11 +190,14 @@ func (tm *TraceManager) StartA2AMessageSpan(ctx context.Context, operationName, 
 }
 
 // StartA2AEventRouteSpan starts a span for A2A event routing
-func (tm *TraceManager) StartA2AEventRouteSpan(ctx context.Context, eventID, eventType string, subscriberCount int) (context.Context, trace.Span) {
-	return tm.tracer.Start(ctx, "a2a_route_event", trace.WithAttributes(
+// component should be the service name (e.g., "broker")
+func (tm *TraceManager) StartA2AEventRouteSpan(ctx context.Context, component, eventID, eventType string, subscriberCount int) (context.Context, trace.Span) {
+	spanName := fmt.Sprintf("%s.route_event", component)
+	return tm.tracer.Start(ctx, spanName, trace.WithAttributes(
 		attribute.String("a2a.event.id", eventID),
 		attribute.String("a2a.event.type", eventType),
 		attribute.Int("a2a.event.subscriber_count", subscriberCount),
 		attribute.String("messaging.operation", "route"),
+		attribute.String("agenthub.component", component),
 	))
 }

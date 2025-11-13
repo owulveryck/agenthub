@@ -38,9 +38,8 @@ type A2APublishTaskRequest struct {
 // PublishTask publishes an A2A task with automatic correlation ID generation and observability
 func (tp *A2ATaskPublisher) PublishTask(ctx context.Context, req *A2APublishTaskRequest) (*pb.Task, error) {
 	// Start tracing for task publishing
-	ctx, span := tp.TraceManager.StartPublishSpan(ctx, req.ResponderAgentID, req.TaskType)
+	ctx, span := tp.TraceManager.StartPublishSpan(ctx, tp.ComponentName, req.ResponderAgentID, req.TaskType)
 	defer span.End()
-	tp.TraceManager.AddComponentAttribute(span, tp.ComponentName)
 
 	// Start timing
 	timer := tp.MetricsManager.StartTimer()
