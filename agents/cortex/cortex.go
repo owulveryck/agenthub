@@ -123,18 +123,68 @@ func (c *Cortex) handleChatRequest(ctx context.Context, traceManager *observabil
 	llmCtx, llmSpan := traceManager.StartSpan(reqCtx, "cortex_llm_decide",
 		attribute.String("message_id", msg.GetMessageId()),
 		attribute.Int("available_agents", len(availableAgents)),
+		attribute.Int("conversation_history_length", len(conversationState.Messages)),
 	)
+
+	// Log LLM input details
+	traceManager.AddSpanEvent(llmSpan, "llm_input_prepared",
+		attribute.Int("history_messages", len(conversationState.Messages)),
+		attribute.Int("available_agents", len(availableAgents)),
+		attribute.String("new_message_role", msg.GetRole().String()),
+	)
+
+	// Add available agent names to trace
+	agentNames := make([]string, 0, len(availableAgents))
+	for _, agent := range availableAgents {
+		agentNames = append(agentNames, agent.GetName())
+	}
+	if len(agentNames) > 0 {
+		traceManager.AddSpanEvent(llmSpan, "available_agents_list",
+			attribute.StringSlice("agent_names", agentNames),
+			attribute.Int("count", len(agentNames)),
+		)
+	}
+
 	decision, err := c.llmClient.Decide(llmCtx, conversationState.Messages, availableAgents, msg)
 	if err != nil {
 		traceManager.RecordError(llmSpan, err)
 		traceManager.RecordError(reqSpan, err)
+		traceManager.AddSpanEvent(llmSpan, "llm_decision_failed",
+			attribute.String("error", err.Error()),
+		)
 		llmSpan.End()
 		return fmt.Errorf("LLM decision failed: %w", err)
 	}
+
+	// Log detailed LLM decision output
 	traceManager.SetSpanSuccess(llmSpan)
 	traceManager.AddSpanEvent(llmSpan, "llm_decision_made",
 		attribute.Int("action_count", len(decision.Actions)),
+		attribute.String("reasoning", decision.Reasoning),
 	)
+
+	// Log each action type decided by LLM
+	for i, action := range decision.Actions {
+		attrs := []attribute.KeyValue{
+			attribute.Int("action_index", i),
+			attribute.String("action_type", action.Type),
+		}
+
+		if action.Type == "chat.response" {
+			attrs = append(attrs,
+				attribute.Int("response_length", len(action.ResponseText)),
+				attribute.String("response_preview", truncateString(action.ResponseText, 100)),
+			)
+		} else if action.Type == "task.request" {
+			attrs = append(attrs,
+				attribute.String("task_type", action.TaskType),
+				attribute.String("target_agent", action.TargetAgent),
+			)
+		}
+
+		traceManager.AddSpanEvent(llmSpan, "llm_action_decided", attrs...)
+	}
+
 	llmSpan.End()
 
 	// Execute the decided actions
@@ -174,18 +224,69 @@ func (c *Cortex) handleTaskResult(ctx context.Context, traceManager *observabili
 	llmCtx, llmSpan := traceManager.StartSpan(resCtx, "cortex_llm_synthesize",
 		attribute.String("task_id", msg.GetTaskId()),
 		attribute.Int("available_agents", len(availableAgents)),
+		attribute.Int("conversation_history_length", len(conversationState.Messages)),
+		attribute.Int("remaining_pending_tasks", len(conversationState.PendingTasks)),
 	)
+
+	// Log LLM synthesis input details
+	traceManager.AddSpanEvent(llmSpan, "llm_synthesis_input_prepared",
+		attribute.String("task_id", msg.GetTaskId()),
+		attribute.Int("history_messages", len(conversationState.Messages)),
+		attribute.Int("remaining_tasks", len(conversationState.PendingTasks)),
+		attribute.String("result_role", msg.GetRole().String()),
+	)
+
+	// Add task result preview to trace
+	if len(msg.GetContent()) > 0 {
+		resultText := msg.GetContent()[0].GetText()
+		traceManager.AddSpanEvent(llmSpan, "task_result_content",
+			attribute.String("task_id", msg.GetTaskId()),
+			attribute.Int("content_length", len(resultText)),
+			attribute.String("content_preview", truncateString(resultText, 100)),
+		)
+	}
+
 	decision, err := c.llmClient.Decide(llmCtx, conversationState.Messages, availableAgents, msg)
 	if err != nil {
 		traceManager.RecordError(llmSpan, err)
 		traceManager.RecordError(resSpan, err)
+		traceManager.AddSpanEvent(llmSpan, "llm_synthesis_failed",
+			attribute.String("task_id", msg.GetTaskId()),
+			attribute.String("error", err.Error()),
+		)
 		llmSpan.End()
 		return fmt.Errorf("LLM decision failed: %w", err)
 	}
+
+	// Log detailed LLM synthesis output
 	traceManager.SetSpanSuccess(llmSpan)
 	traceManager.AddSpanEvent(llmSpan, "llm_synthesis_complete",
 		attribute.Int("action_count", len(decision.Actions)),
+		attribute.String("reasoning", decision.Reasoning),
 	)
+
+	// Log each action from synthesis
+	for i, action := range decision.Actions {
+		attrs := []attribute.KeyValue{
+			attribute.Int("action_index", i),
+			attribute.String("action_type", action.Type),
+		}
+
+		if action.Type == "chat.response" {
+			attrs = append(attrs,
+				attribute.Int("response_length", len(action.ResponseText)),
+				attribute.String("response_preview", truncateString(action.ResponseText, 100)),
+			)
+		} else if action.Type == "task.request" {
+			attrs = append(attrs,
+				attribute.String("task_type", action.TaskType),
+				attribute.String("target_agent", action.TargetAgent),
+			)
+		}
+
+		traceManager.AddSpanEvent(llmSpan, "llm_synthesis_action", attrs...)
+	}
+
 	llmSpan.End()
 
 	// Execute the decided actions
@@ -204,36 +305,92 @@ func (c *Cortex) executeActions(ctx context.Context, traceManager *observability
 	actCtx, actSpan := traceManager.StartSpan(ctx, "cortex_execute_actions",
 		attribute.Int("action_count", len(actions)),
 		attribute.String("session_id", conversationState.SessionID),
+		attribute.String("triggering_message_id", triggeringMsg.GetMessageId()),
+		attribute.Int("pending_tasks_count", len(conversationState.PendingTasks)),
 	)
 	defer actSpan.End()
 
 	traceManager.AddComponentAttribute(actSpan, "cortex_orchestrator")
 
+	// Log execution plan
+	traceManager.AddSpanEvent(actSpan, "execution_plan_started",
+		attribute.Int("total_actions", len(actions)),
+		attribute.Int("current_pending_tasks", len(conversationState.PendingTasks)),
+	)
+
 	for i, action := range actions {
-		traceManager.AddSpanEvent(actSpan, "executing_action",
+		// Detailed logging for each action before execution
+		actionAttrs := []attribute.KeyValue{
 			attribute.Int("action_index", i),
 			attribute.String("action_type", action.Type),
-		)
+		}
 
+		if action.Type == "chat.response" {
+			actionAttrs = append(actionAttrs,
+				attribute.Int("response_length", len(action.ResponseText)),
+				attribute.String("response_preview", truncateString(action.ResponseText, 100)),
+			)
+		} else if action.Type == "task.request" {
+			actionAttrs = append(actionAttrs,
+				attribute.String("task_type", action.TaskType),
+				attribute.String("target_agent", action.TargetAgent),
+			)
+		}
+
+		traceManager.AddSpanEvent(actSpan, "executing_action", actionAttrs...)
+
+		// Execute the action
 		switch action.Type {
 		case "chat.response":
 			if err := c.executeChatResponse(actCtx, traceManager, conversationState, action, triggeringMsg); err != nil {
 				traceManager.RecordError(actSpan, err)
+				traceManager.AddSpanEvent(actSpan, "action_execution_failed",
+					attribute.Int("action_index", i),
+					attribute.String("action_type", action.Type),
+					attribute.String("error", err.Error()),
+				)
 				return fmt.Errorf("failed to execute chat response: %w", err)
 			}
+			traceManager.AddSpanEvent(actSpan, "action_executed_successfully",
+				attribute.Int("action_index", i),
+				attribute.String("action_type", "chat.response"),
+			)
 
 		case "task.request":
 			if err := c.executeTaskRequest(actCtx, traceManager, conversationState, action, triggeringMsg); err != nil {
 				traceManager.RecordError(actSpan, err)
+				traceManager.AddSpanEvent(actSpan, "action_execution_failed",
+					attribute.Int("action_index", i),
+					attribute.String("action_type", action.Type),
+					attribute.String("task_type", action.TaskType),
+					attribute.String("target_agent", action.TargetAgent),
+					attribute.String("error", err.Error()),
+				)
 				return fmt.Errorf("failed to execute task request: %w", err)
 			}
+			traceManager.AddSpanEvent(actSpan, "action_executed_successfully",
+				attribute.Int("action_index", i),
+				attribute.String("action_type", "task.request"),
+				attribute.String("task_type", action.TaskType),
+				attribute.String("target_agent", action.TargetAgent),
+			)
 
 		default:
 			err := fmt.Errorf("unknown action type: %s", action.Type)
 			traceManager.RecordError(actSpan, err)
+			traceManager.AddSpanEvent(actSpan, "unknown_action_type",
+				attribute.Int("action_index", i),
+				attribute.String("action_type", action.Type),
+			)
 			return err
 		}
 	}
+
+	// Log execution completion
+	traceManager.AddSpanEvent(actSpan, "execution_plan_completed",
+		attribute.Int("actions_executed", len(actions)),
+		attribute.Int("final_pending_tasks", len(conversationState.PendingTasks)),
+	)
 
 	traceManager.SetSpanSuccess(actSpan)
 	return nil
@@ -369,4 +526,15 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, traceManager *observabi
 	)
 
 	return nil
+}
+
+// truncateString truncates a string to maxLen characters, adding "..." if truncated
+func truncateString(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	if maxLen <= 3 {
+		return s[:maxLen]
+	}
+	return s[:maxLen-3] + "..."
 }
