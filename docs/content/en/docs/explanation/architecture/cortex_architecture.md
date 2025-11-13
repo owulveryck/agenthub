@@ -98,6 +98,80 @@ And returns decisions:
 
 **Files**: `agents/cortex/llm/`
 
+#### IntelligentDecider: Context-Aware Orchestration
+
+The `IntelligentDecider` is a mock LLM implementation that demonstrates intelligent, intent-based task orchestration. Unlike simple dispatchers that route every message to agents, it analyzes user intent before deciding whether to orchestrate with specialized agents or respond directly.
+
+**Key Characteristics:**
+
+1. **Intent Detection**: Analyzes message content for keywords indicating specific needs
+   - Echo requests: "echo", "repeat", "say back"
+   - Future: "translate", "summarize", "transcribe", etc.
+
+2. **Conditional Orchestration**: Only dispatches to agents when user explicitly requests functionality
+   - User: "echo hello" → Dispatches to echo_agent
+   - User: "hello" → Responds directly (no agent needed)
+
+3. **Transparent Reasoning**: Always explains decision-making process
+   - All decisions include detailed reasoning visible in observability traces
+   - Users understand why Cortex chose specific actions
+
+**Example Flow:**
+
+```go
+// User message: "echo hello world"
+decision := IntelligentDecider()(ctx, history, agents, userMsg)
+
+// Returns:
+Decision{
+    Reasoning: "User message 'echo hello world' contains an explicit echo request (detected keywords: echo/repeat/say back). I'm dispatching this to the echo_agent which specializes in repeating messages back.",
+    Actions: [
+        {
+            Type: "chat.response",
+            ResponseText: "I detected you want me to echo something. I'm asking the echo agent to handle this for you.",
+        },
+        {
+            Type: "task.request",
+            TaskType: "echo",
+            TargetAgent: "agent_echo",
+            TaskPayload: {"input": "echo hello world"},
+        },
+    ],
+}
+```
+
+**Comparison to Simple Dispatchers:**
+
+| Approach | Every Message | Intent Detection | Explains Reasoning | Responds Directly |
+|----------|---------------|------------------|-------------------|-------------------|
+| TaskDispatcherDecider (deprecated) | Dispatches to agent | No | Minimal | No |
+| **IntelligentDecider** | **Analyzes first** | **Yes** | **Detailed** | **Yes** |
+
+**Design Benefits:**
+
+- **Reduced Latency**: Simple queries get immediate responses without agent roundtrip
+- **Resource Efficiency**: Agents only invoked when their specialized capabilities are needed
+- **Better UX**: Users understand what Cortex is doing and why
+- **Debuggability**: Reasoning in traces makes orchestration logic transparent
+- **Extensibility**: Easy to add new intent patterns for new agent types
+
+**Future Evolution:**
+
+In production, the IntelligentDecider pattern should be replaced with a real LLM that performs function calling:
+
+```go
+// Production LLM receives tools/functions
+tools := convertAgentCardsToTools(availableAgents)
+decision := realLLM.Decide(history, tools, newMsg)
+
+// LLM naturally decides:
+// - "hello" → No function call, direct response
+// - "echo hello" → Calls echo_agent function
+// - "translate this to French" → Calls translation_agent function
+```
+
+The IntelligentDecider serves as a working example of the decision patterns a real LLM would follow.
+
 ### 4. Message Publisher
 
 Interface for publishing messages to the Event Bus:
@@ -225,6 +299,8 @@ executeActions(decision.Actions)
 - Flexible - LLM adapts to context
 - Extensible - Add agents, LLM discovers them
 - Natural - Mimics human reasoning
+
+**Implementation**: The `IntelligentDecider` (see LLM Client section above) demonstrates this pattern by analyzing user intent and making intelligent routing decisions with transparent reasoning.
 
 ### 4. Message Self-Containment
 
@@ -388,12 +464,13 @@ Protected by:
 
 - Core orchestrator logic
 - In-memory state management
-- Mock LLM client
+- Mock LLM client with IntelligentDecider (intent-based routing)
 - Agent registration
 - Message routing
 - Task correlation
 - CLI interface
 - Echo agent (demo)
+- Distributed tracing with OpenTelemetry
 
 ### 🚧 Future Work
 
@@ -408,7 +485,7 @@ Protected by:
 
 ```
 agents/cortex/
-├── cortex.go              # Core orchestrator (209 lines)
+├── cortex.go              # Core orchestrator with full observability
 ├── cortex_test.go         # Core tests (4 tests)
 ├── state/
 │   ├── interface.go       # StateManager interface
@@ -416,13 +493,16 @@ agents/cortex/
 │   └── memory_test.go     # State tests (5 tests)
 ├── llm/
 │   ├── interface.go       # LLM Client interface
-│   ├── mock.go            # Mock implementation
+│   ├── mock.go            # Mock implementations
+│   │                      # - IntelligentDecider (intent-based)
+│   │                      # - TaskDispatcherDecider (deprecated)
+│   │                      # - SimpleEchoDecider
 │   └── mock_test.go       # LLM tests (4 tests)
 └── cmd/
     └── main.go            # Service entry point
 ```
 
-**Total**: ~1,000 lines of production code + 500 lines of tests
+**Total**: ~1,200 lines of production code + 500 lines of tests
 
 ## Testing Strategy
 
