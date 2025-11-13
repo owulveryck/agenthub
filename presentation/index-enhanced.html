@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent-to-Agent: L'Architecture Événementielle pour l'IA Générative</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+    <style>
+        /* OCTO Color Palette */
+        :root {
+            --octo-marine: #0E2356;
+            --octo-turquoise: #00D2DD;
+            --octo-white: #FFFFFF;
+            --octo-marine-90: #263967;
+            --octo-marine-80: #3E4F78;
+            --octo-marine-70: #586586;
+            --octo-marine-60: #6E7B9A;
+            --octo-marine-50: #8691AB;
+            --octo-marine-40: #9FA7BB;
+            --octo-marine-30: #B7BDCC;
+            --octo-marine-20: #CFD3DD;
+            --octo-marine-10: #E7E9EE;
+            --octo-turquoise-90: #3CD7E0;
+            --octo-turquoise-80: #5BDDE4;
+            --octo-turquoise-70: #72DFE7;
+            --octo-turquoise-60: #8AE4EB;
+            --octo-turquoise-50: #9EE9ED;
+            --octo-turquoise-40: #B2EEF2;
+            --octo-turquoise-30: #C6F1F5;
+            --octo-turquoise-20: #DAF6F9;
+            --octo-turquoise-10: #EBFAFB;
+        }
+
+        /* Base reveal.js overrides */
+        .reveal {
+            background-color: var(--octo-white);
+            color: var(--octo-marine);
+            font-size: 32px;
+        }
+
+        .reveal h1,
+        .reveal h2,
+        .reveal h3,
+        .reveal h4,
+        .reveal h5,
+        .reveal h6 {
+            color: var(--octo-marine);
+            text-transform: none;
+            font-weight: 600;
+        }
+
+        .reveal h1 {
+            font-size: 2.8em;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+
+        .reveal h2 {
+            font-size: 2em;
+            margin-bottom: 0.6em;
+        }
+
+        .reveal h3 {
+            font-size: 1.5em;
+        }
+
+        .reveal h4 {
+            font-size: 1.3em;
+            margin-top: 0.5em;
+        }
+
+        .reveal p,
+        .reveal li {
+            color: var(--octo-marine);
+            font-size: 1em;
+            line-height: 1.5;
+            margin: 0.4em 0;
+        }
+
+        .reveal strong {
+            color: var(--octo-marine);
+            font-weight: bold;
+        }
+
+        .reveal em {
+            color: var(--octo-marine-70);
+            font-style: italic;
+        }
+
+        .reveal a {
+            color: var(--octo-turquoise);
+        }
+
+        .reveal a:hover {
+            color: var(--octo-turquoise-70);
+        }
+
+        /* Code blocks */
+        .reveal pre {
+            width: 100%;
+            background-color: var(--octo-marine-10);
+            border-left: 4px solid var(--octo-turquoise);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 25px auto;
+            border-radius: 8px;
+        }
+
+        .reveal code {
+            color: var(--octo-marine);
+            background-color: var(--octo-marine-10);
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+        }
+
+        .reveal pre code {
+            background-color: transparent;
+            padding: 1.2em;
+            display: block;
+            font-size: 0.85em;
+            max-height: none;
+        }
+
+        /* Mermaid diagrams */
+        .mermaid {
+            background-color: transparent !important;
+            margin: 30px auto;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Comparison boxes */
+        .comparison {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 50px;
+            margin: 50px 0;
+        }
+
+        .comparison > div {
+            flex: 1;
+            padding: 35px;
+            background: linear-gradient(135deg, var(--octo-marine-10) 0%, var(--octo-marine-5) 100%);
+            border-radius: 16px;
+            border: 2px solid var(--octo-marine-20);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .comparison > div:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .comparison > div h4 {
+            color: var(--octo-marine);
+            margin-top: 0;
+            font-size: 1.4em;
+            border-bottom: 3px solid var(--octo-turquoise);
+            padding-bottom: 0.3em;
+            margin-bottom: 0.6em;
+        }
+
+        .comparison > div p,
+        .comparison > div li {
+            font-size: 1em;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            gap: 35px;
+            margin: 50px 0;
+        }
+
+        .timeline-item {
+            text-align: center;
+            flex: 1;
+            padding: 35px 25px;
+            background: linear-gradient(135deg, var(--octo-turquoise-10) 0%, var(--octo-white) 100%);
+            border-radius: 16px;
+            border: 2px solid var(--octo-turquoise-30);
+            box-shadow: 0 8px 16px rgba(0, 210, 221, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(0, 210, 221, 0.2);
+        }
+
+        .timeline-item h4 {
+            color: var(--octo-marine);
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .timeline-item h5 {
+            color: var(--octo-marine);
+            margin-top: 0;
+            font-size: 1.3em;
+        }
+
+        .timeline-item p {
+            font-size: 0.95em;
+        }
+
+        /* Emoji large */
+        .emoji-large {
+            font-size: 2em;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Title slide specific */
+        .reveal .slides > section:first-child {
+            background: linear-gradient(135deg, var(--octo-marine) 0%, var(--octo-marine-80) 100%);
+        }
+
+        .reveal .slides > section:first-child h1,
+        .reveal .slides > section:first-child h3,
+        .reveal .slides > section:first-child p {
+            color: var(--octo-white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Accent sections */
+        .reveal .slides section[data-background-color] h2,
+        .reveal .slides section[data-background-color] h3,
+        .reveal .slides section[data-background-color] h4,
+        .reveal .slides section[data-background-color] p,
+        .reveal .slides section[data-background-color] li {
+            color: var(--octo-white);
+        }
+
+        /* Lists */
+        .reveal ul,
+        .reveal ol {
+            margin: 25px 0;
+        }
+
+        .reveal li {
+            margin: 18px 0;
+        }
+
+        .reveal ul li::marker {
+            color: var(--octo-turquoise);
+        }
+
+        /* Highlight boxes */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--octo-turquoise-10) 0%, var(--octo-turquoise-5) 100%);
+            border-left: 6px solid var(--octo-turquoise);
+            padding: 35px;
+            margin: 35px 0;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 210, 221, 0.1);
+        }
+
+        /* Controls */
+        .reveal .controls {
+            color: var(--octo-turquoise);
+        }
+
+        .reveal .progress {
+            background: var(--octo-marine-20);
+            height: 4px;
+        }
+
+        .reveal .progress span {
+            background: var(--octo-turquoise);
+        }
+
+        .reveal .slide-number {
+            color: var(--octo-marine-60);
+            background-color: transparent;
+            font-size: 0.8em;
+        }
+
+        /* Slide padding */
+        .reveal .slides section {
+            padding: 30px;
+        }
+
+        /* Fragment animations */
+        .reveal .slides section .fragment.fade-in-then-semi-out {
+            opacity: 1;
+        }
+
+        .reveal .slides section .fragment.fade-in-then-semi-out.visible {
+            opacity: 1;
+        }
+
+        .reveal .slides section .fragment.fade-in-then-semi-out.current-fragment {
+            opacity: 1;
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.4em 0.8em;
+            background-color: var(--octo-turquoise);
+            color: var(--octo-white);
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin: 0 0.3em;
+        }
+
+        .badge.success {
+            background-color: #4CAF50;
+        }
+
+        .badge.error {
+            background-color: #f44336;
+        }
+
+        /* Icon styles */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            margin-right: 0.3em;
+        }
+
+        /* Step indicator */
+        .steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+        }
+
+        .step {
+            flex: 0 0 auto;
+            padding: 15px 30px;
+            background-color: var(--octo-marine-10);
+            border: 2px solid var(--octo-marine-30);
+            border-radius: 30px;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background-color: var(--octo-turquoise);
+            color: var(--octo-white);
+            border-color: var(--octo-turquoise);
+            transform: scale(1.1);
+        }
+
+        .step-arrow {
+            font-size: 1.5em;
+            color: var(--octo-marine-40);
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- Slide 1: Titre -->
+            <section>
+                <h1>SYSTÈMES MULTI-AGENTS</h1>
+                <h3>Appliquer les Fondamentaux du Logiciel à l'IA Générative</h3>
+                <p>Comment l'architecture événementielle et l'asynchronisme<br>transforment les assistants IA en systèmes intelligents</p>
+                <p><small>Olivier Wulveryck | 2025</small></p>
+            </section>
+
+            <!-- Slide 2: Démo Visuelle -->
+            <section>
+                <h2>La Démo : Sync vs Async <span class="emoji-large">⚡</span></h2>
+                <h4>Cas d'usage : Organiser un voyage d'affaires Paris-Tokyo</h4>
+                <div class="comparison">
+                    <div>
+                        <h4>Approche Synchrone ❌</h4>
+                        <div class="mermaid">
+                            sequenceDiagram
+                                participant U as 👤 Vous
+                                participant IA as 🤖 IA
+                                U->>IA: Vol Paris-Tokyo
+                                Note over IA: 30s...
+                                IA-->>U: 3 options
+                                U->>IA: Option 2 + Hôtel
+                                Note over IA: 20s...
+                                IA-->>U: 4 hôtels
+                                U->>IA: Réserve le 1er
+                                Note over IA: 10s...
+                                IA-->>U: ❌ Vol indisponible
+                        </div>
+                        <p><strong>⏱️ 5 minutes</strong> de va-et-vient</p>
+                        <p>Vous attendez à chaque étape 😤</p>
+                    </div>
+                    <div>
+                        <h4>Système Multi-Agents Async ✅</h4>
+                        <div class="mermaid">
+                            sequenceDiagram
+                                participant U as 👤 Vous
+                                participant S as 🧠 Système
+                                participant A1 as 🤖 Agent Vol
+                                participant A2 as 🤖 Agent Hôtel
+                                U->>S: Voyage Paris-Tokyo
+                                S->>A1: Chercher vols
+                                S->>A2: Chercher hôtels
+                                Note over A1,A2: Travail parallèle
+                                A1-->>S: Résultats
+                                A2-->>S: Résultats
+                                S-->>U: Proposition complète
+                        </div>
+                        <p><strong>⏱️ 10 secondes</strong> total</p>
+                        <p>Vous êtes libre ☕</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: Cas d'Usage Métier -->
+            <section>
+                <h2>Cas d'Usage : L'Assistant Voyage d'Affaires <span class="emoji-large">✈️</span></h2>
+                <div class="fragment">
+                    <h4>Besoin métier : Optimiser les déplacements professionnels</h4>
+                    <ul>
+                        <li><strong>Contraintes multiples :</strong> Budget, timing, préférences</li>
+                        <li><strong>Sources multiples :</strong> APIs vols, hôtels, trains, météo</li>
+                        <li><strong>Évolution temps réel :</strong> Disponibilités, prix, retards</li>
+                        <li><strong>Décision humaine finale :</strong> Validation des choix</li>
+                    </ul>
+                </div>
+                <div class="fragment">
+                    <h4>Problème avec approche synchrone</h4>
+                    <pre><code class="language-text">❌ 5 minutes d'attente pour une proposition
+❌ Données obsolètes (vol réservé entre-temps)
+❌ Pas d'alternatives présentées
+❌ Utilisateur bloqué pendant le traitement</code></pre>
+                </div>
+                <div class="fragment">
+                    <p><strong>ROI Business :</strong> Gain de temps × Nombre de voyages × Coût horaire</p>
+                </div>
+            </section>
+
+            <!-- Slide 4: Le Problème Fondamental avec Mermaid -->
+            <section>
+                <h2>Le Problème Fondamental</h2>
+                <div class="mermaid">
+                    graph TD
+                        H[👤 Humain] --> L1[🤖 LLM]
+                        L1 --> T[🔧 Outil]
+                        T --> L2[🤖 LLM]
+                        L2 --> H2[👤 Humain ATTEND]
+                        style H fill:#00D2DD,stroke:#0E2356,stroke-width:4px,color:#fff
+                        style H2 fill:#f44336,stroke:#0E2356,stroke-width:4px,color:#fff
+                        style L1 fill:#0E2356,stroke:#00D2DD,stroke-width:3px,color:#fff
+                        style L2 fill:#0E2356,stroke:#00D2DD,stroke-width:3px,color:#fff
+                        style T fill:#E7E9EE,stroke:#0E2356,stroke-width:2px
+                </div>
+                <div class="highlight-box fragment">
+                    <p><strong>❌ Bloquant</strong> · <strong>❌ Séquentiel</strong> · <strong>❌ L'humain DOIT attendre</strong></p>
+                </div>
+                <p class="fragment"><em>C'est comme rester au téléphone pendant qu'on cherche un dossier dans une archive</em></p>
+            </section>
+
+            <!-- Slide 5: Systèmes Multi-Agents avec Human-in-the-Loop -->
+            <section>
+                <h2>Systèmes Multi-Agents avec Human-in-the-Loop <span class="emoji-large">💡</span></h2>
+                <div class="comparison">
+                    <div class="fragment">
+                        <h4>LLM Unique</h4>
+                        <div class="mermaid">
+                            graph TD
+                                H[👤 Humain<br/>Canal unique] --> L[🤖 LLM Monolithique]
+                                L --> H
+                                style H fill:#f44336,stroke:#0E2356,stroke-width:3px,color:#fff
+                                style L fill:#0E2356,stroke:#00D2DD,stroke-width:3px,color:#fff
+                        </div>
+                        <p><small>Interactions bloquantes</small></p>
+                    </div>
+                    <div class="fragment">
+                        <h4>Système Multi-Agents</h4>
+                        <div class="mermaid">
+                            graph TD
+                                H[👤 Humain<br/>Human-in-the-Loop] --> C[🧠 Orchestrateur]
+                                S[📡 Data Sources] --> C
+                                A1[🤖 Agent 1] --> C
+                                A2[🤖 Agent 2] --> C
+                                C --> |Contexte unifié|H
+                                style C fill:#00D2DD,stroke:#0E2356,stroke-width:4px,color:#fff
+                                style H fill:#4CAF50,stroke:#0E2356,stroke-width:3px,color:#fff
+                                style S fill:#0E2356,stroke:#00D2DD,stroke-width:2px,color:#fff
+                                style A1 fill:#0E2356,stroke:#00D2DD,stroke-width:2px,color:#fff
+                                style A2 fill:#0E2356,stroke:#00D2DD,stroke-width:2px,color:#fff
+                        </div>
+                        <p><small>Agents spécialisés en parallèle</small></p>
+                    </div>
+                </div>
+                <p class="fragment"><strong>L'humain valide, les agents exécutent</strong></p>
+            </section>
+
+            <!-- Slide 6: Analogie du Cerveau -->
+            <section>
+                <h2>Votre cerveau ne vous dit pas tout</h2>
+                <p>Votre cerveau :</p>
+                <ul>
+                    <li class="fragment">🔍 Filtre les informations pertinentes</li>
+                    <li class="fragment">💤 Travaille en arrière-plan (consolidation pendant le sommeil)</li>
+                    <li class="fragment">💡 Peut vous interrompre ("Tiens, je viens de me souvenir de...")</li>
+                </ul>
+                <p class="fragment"><strong>Et si l'IA faisait pareil ?</strong></p>
+            </section>
+
+            <!-- Slide 7: Event-Driven Architecture avec Mermaid -->
+            <section data-background-color="#0E2356">
+                <h2>La Solution : Event-Driven Architecture <span class="emoji-large">🏗️</span></h2>
+                <div class="mermaid">
+                    graph TD
+                        EB[📨 Event Bus<br/>Message Broker]
+                        A1[📧 Agent Email] --> EB
+                        A2[✈️ Agent Vol] --> EB
+                        A3[🏨 Agent Hôtel] --> EB
+                        C[🧠 Cortex Brain] --> EB
+                        EB --> A1
+                        EB --> A2
+                        EB --> A3
+                        EB --> C
+                        style EB fill:#00D2DD,stroke:#fff,stroke-width:4px,color:#0E2356
+                        style A1 fill:#E7E9EE,stroke:#00D2DD,stroke-width:3px,color:#0E2356
+                        style A2 fill:#E7E9EE,stroke:#00D2DD,stroke-width:3px,color:#0E2356
+                        style A3 fill:#E7E9EE,stroke:#00D2DD,stroke-width:3px,color:#0E2356
+                        style C fill:#4CAF50,stroke:#fff,stroke-width:3px,color:#fff
+                </div>
+                <p class="fragment"><strong>Pas d'orchestration top-down, mais une CHORÉGRAPHIE</strong></p>
+            </section>
+
+            <!-- Slide 7bis: Message Clé Fondamentaux -->
+            <section>
+                <h2>Le Message Fondamental <span class="emoji-large">💡</span></h2>
+                <div class="highlight-box fragment">
+                    <p style="font-size: 1.4em; line-height: 1.6;">
+                        <strong>"Inspirez-vous des fondamentaux du génie logiciel<br>
+                        pour construire vos systèmes d'IA"</strong>
+                    </p>
+                </div>
+                <div class="fragment">
+                    <h4>Principes éprouvés depuis 20+ ans :</h4>
+                    <ul>
+                        <li><strong>Architecture événementielle</strong> → Découplage, scalabilité</li>
+                        <li><strong>Asynchronisme</strong> → Performance, réactivité</li>
+                        <li><strong>Chorégraphie vs Orchestration</strong> → Autonomie des agents</li>
+                        <li><strong>Separation of Concerns</strong> → Agents spécialisés</li>
+                        <li><strong>Human-in-the-Loop</strong> → Validation humaine</li>
+                    </ul>
+                </div>
+                <p class="fragment"><em>Ces patterns SOA/Microservices des années 2000-2010 trouvent une nouvelle vie dans l'IA !</em></p>
+            </section>
+
+            <!-- Slide 8: Orchestration vs Chorégraphie -->
+            <section>
+                <h2>De l'Orchestre à la Danse</h2>
+                <div class="comparison">
+                    <div class="fragment">
+                        <h4>Orchestration ❌</h4>
+                        <p>Chef d'orchestre contrôle tout</p>
+                        <p><em>"Violon, joue maintenant !"<br>"Trompette, à toi !"</em></p>
+                        <p>→ Goulot d'étranglement</p>
+                    </div>
+                    <div class="fragment">
+                        <h4>Chorégraphie ✅</h4>
+                        <p>Danseurs autonomes</p>
+                        <p><em>Chacun connaît son rôle<br>Chacun réagit aux autres</em></p>
+                        <p>→ Scalable</p>
+                    </div>
+                </div>
+                <p class="fragment"><small>Débat ancien dans les SOA (2005-2010), mais jamais appliqué aux IA !</small></p>
+            </section>
+
+            <!-- Slide 9: Matrice de Stacey avec Mermaid -->
+            <section>
+                <h2>Explorer l'Inconnu avec un Accord</h2>
+                <h4>Matrice de Stacey</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 40px auto; max-width: 900px;">
+                    <div style="padding: 30px; background: linear-gradient(135deg, var(--octo-marine-10) 0%, var(--octo-marine-5) 100%); border-radius: 12px; border: 2px solid var(--octo-marine-20);">
+                        <h4 style="margin-top: 0; font-size: 1.3em;">Simple</h4>
+                        <p style="font-size: 0.9em;">Certitude élevée<br/>Accord élevé</p>
+                    </div>
+                    <div style="padding: 30px; background: linear-gradient(135deg, var(--octo-marine-10) 0%, var(--octo-marine-5) 100%); border-radius: 12px; border: 2px solid var(--octo-marine-20);">
+                        <h4 style="margin-top: 0; font-size: 1.3em;">Compliqué</h4>
+                        <p style="font-size: 0.9em;">Certitude élevée<br/>Accord faible</p>
+                    </div>
+                    <div style="padding: 30px; background: linear-gradient(135deg, var(--octo-marine-10) 0%, var(--octo-marine-5) 100%); border-radius: 12px; border: 2px solid var(--octo-marine-20);">
+                        <h4 style="margin-top: 0; font-size: 1.3em;">Complexe</h4>
+                        <p style="font-size: 0.9em;">Certitude faible<br/>Accord élevé</p>
+                    </div>
+                    <div style="padding: 30px; background: linear-gradient(135deg, var(--octo-turquoise) 0%, var(--octo-turquoise-70) 100%); border-radius: 12px; border: 3px solid var(--octo-turquoise); box-shadow: 0 8px 16px rgba(0, 210, 221, 0.3);">
+                        <h4 style="margin-top: 0; font-size: 1.3em; color: var(--octo-white);">Chaos</h4>
+                        <p style="font-size: 0.9em; color: var(--octo-white);">Certitude faible<br/>Accord faible</p>
+                        <p style="font-size: 1.1em; margin-top: 15px; color: var(--octo-white);"><strong>🎯 NOUS SOMMES ICI</strong><br/><small>(avec un accord)</small></p>
+                    </div>
+                </div>
+                <p class="fragment"><strong>Solution :</strong> S'appuyer sur des standards émergents</p>
+            </section>
+
+            <!-- Slide 9bis: Méthodologie R&D -->
+            <section>
+                <h2>Notre Démarche R&D : Apprendre par l'Exploration <span class="emoji-large">🔬</span></h2>
+                <div class="fragment">
+                    <h4>Face au chaos technologique de l'IA générative :</h4>
+                    <div class="steps">
+                        <div class="step">1. Choisir un Standard</div>
+                        <div class="step-arrow">→</div>
+                        <div class="step">2. Construire un PoC</div>
+                        <div class="step-arrow">→</div>
+                        <div class="step active">3. Apprendre & Itérer</div>
+                    </div>
+                </div>
+                <div class="fragment">
+                    <h4>Pourquoi cette approche ?</h4>
+                    <ul>
+                        <li><strong>Ancrage sur du concret :</strong> A2A de Google (Vertex AI) comme fil conducteur</li>
+                        <li><strong>Apprentissage via la pratique :</strong> Comprendre moteurs d'inférence, LLMs, orchestration</li>
+                        <li><strong>PoC jetable :</strong> L'objectif n'est pas le produit final, mais la connaissance acquise</li>
+                        <li><strong>Extraction de patterns :</strong> Identifier les principes réutilisables au-delà du protocole</li>
+                    </ul>
+                </div>
+                <p class="fragment"><em>"Dans l'incertitude, s'appuyer sur les API des grands acteurs pour décoder les mécanismes"</em></p>
+            </section>
+
+            <!-- Slide 10: Protocole A2A -->
+            <section>
+                <h2>A2A : Le Standard Émergent de Google</h2>
+                <div class="fragment">
+                    <h4>1. Agent Card - Carte d'identité</h4>
+                    <pre><code class="language-json">{
+  "name": "Flight Booker",
+  "description": "Je réserve des vols",
+  "skills": ["search_flights", "book_flight", "cancel_flight"]
+}</code></pre>
+                </div>
+                <div class="fragment">
+                    <h4>2. Messages standardisés</h4>
+                    <pre><code class="language-protobuf">message Message {
+  string message_id = 1;
+  string context_id = 2;  // Conversation
+  Role role = 3;          // USER ou AGENT
+  repeated Part content = 4;
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 11: A2A Tasks avec Mermaid -->
+            <section>
+                <h2>Protocole A2A (suite)</h2>
+                <h4>3. Tasks & Results - États de tâches</h4>
+                <div class="mermaid">
+                    stateDiagram-v2
+                        [*] --> SUBMITTED
+                        SUBMITTED --> WORKING
+                        WORKING --> COMPLETED
+                        WORKING --> FAILED
+                        FAILED --> [*]
+                        COMPLETED --> [*]
+                </div>
+                <div class="fragment">
+                    <p><strong>Pourquoi A2A ?</strong></p>
+                    <ul>
+                        <li><span class="badge">Ouvert</span> Standard ouvert de Google</li>
+                        <li><span class="badge success">Interopérabilité</span> Agent créé une fois, utilisable partout</li>
+                        <li><span class="badge">Future-proof</span> Architecture reste, modèles évoluent</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 11bis: A2A vs MCP - Choix Technique -->
+            <section>
+                <h2>A2A vs MCP : Quel Protocole Choisir ?</h2>
+                <div class="comparison">
+                    <div class="fragment">
+                        <h4>MCP (Model Context Protocol)</h4>
+                        <ul>
+                            <li><strong>Focus :</strong> Connexion LLM ↔ Data Sources</li>
+                            <li><strong>Use Case :</strong> Enrichir un LLM unique</li>
+                            <li><strong>Exemple :</strong> Claude Desktop connecté à vos outils</li>
+                            <li><strong>Architecture :</strong> Client-serveur synchrone</li>
+                        </ul>
+                        <p><small>✅ Parfait pour augmenter un assistant unique</small></p>
+                    </div>
+                    <div class="fragment">
+                        <h4>A2A (Agent-to-Agent)</h4>
+                        <ul>
+                            <li><strong>Focus :</strong> Communication Agent ↔ Agent</li>
+                            <li><strong>Use Case :</strong> Systèmes multi-agents distribués</li>
+                            <li><strong>Exemple :</strong> Swarm d'agents collaboratifs</li>
+                            <li><strong>Architecture :</strong> Événementiel, asynchrone</li>
+                        </ul>
+                        <p><small>✅ Parfait pour orchestration complexe</small></p>
+                    </div>
+                </div>
+                <p class="fragment"><strong>Choix :</strong> A2A pour notre PoC car besoin d'asynchronisme et de chorégraphie</p>
+            </section>
+
+            <!-- Slide 12: Architecture Événementielle -->
+            <section data-background-color="#0E2356">
+                <h2>Architecture du Système Multi-Agents <span class="emoji-large">🎬</span></h2>
+                <div class="mermaid">
+                    graph LR
+                        U[👤 Interface<br/>Utilisateur] -->|Demandes| EB[📨 Event Bus<br/>Communication Asynchrone]
+                        EB -->|Notifications| U
+                        C[🧠 Orchestrateur<br/>Human-in-the-Loop] -.->|Délègue| EB
+                        EB -.->|Événements| C
+                        A[🤖 Agents Spécialisés<br/>Vol, Hôtel, Train...] -.->|Résultats| EB
+                        EB -.->|Tâches| A
+                        C -.->|Coordonne| A
+                        style U fill:#00D2DD,stroke:#fff,stroke-width:3px,color:#0E2356
+                        style EB fill:#4CAF50,stroke:#fff,stroke-width:4px,color:#fff
+                        style C fill:#E7E9EE,stroke:#00D2DD,stroke-width:3px,color:#0E2356
+                        style A fill:#E7E9EE,stroke:#00D2DD,stroke-width:3px,color:#0E2356
+                </div>
+                <p class="fragment"><strong>Principe clé :</strong> Communication événementielle, agents autonomes</p>
+            </section>
+
+            <!-- Slide 13: Comparaison Temps -->
+            <section>
+                <h2>30x Plus Rapide ET Vous Êtes Libre</h2>
+                <div class="comparison">
+                    <div class="fragment">
+                        <h4>Mode Sync ❌</h4>
+                        <p>Vous attendez chaque étape</p>
+                        <p><strong>5 minutes</strong></p>
+                        <p style="font-size: 3em;">😤</p>
+                        <p>Frustration</p>
+                    </div>
+                    <div class="fragment">
+                        <h4>Mode Async ✅</h4>
+                        <p>Agents travaillent en parallèle</p>
+                        <p><strong>10 secondes</strong></p>
+                        <p style="font-size: 3em;">☕</p>
+                        <p>Vous prenez un café</p>
+                    </div>
+                </div>
+                <p class="fragment"><em>Proposition complète : Vol + Hôtel + Alternatives</em></p>
+            </section>
+
+            <!-- Slide 14: Takeaway 1 -->
+            <section>
+                <h2>Takeaway #1 : Composition > Performance</h2>
+                <p class="fragment"><em>"Tout seul on va vite, ensemble on va loin"</em></p>
+                <div class="comparison fragment">
+                    <div>
+                        <h4>1 LLM géant</h4>
+                        <ul>
+                            <li>💸 Coûteux</li>
+                            <li>🐌 Lent</li>
+                            <li>🌐 Généraliste</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Swarm d'agents</h4>
+                        <ul>
+                            <li>💰 Économique</li>
+                            <li>⚡ Parallèle</li>
+                            <li>🎯 Spécialisé</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment"><strong>La vraie innovation n'est pas dans le modèle, mais dans la COMPOSITION</strong></p>
+            </section>
+
+            <!-- Slide 15: Takeaway 2 -->
+            <section>
+                <h2>Takeaway #2 : L'Architecture Détermine l'Usage</h2>
+                <div class="fragment">
+                    <div class="steps">
+                        <div class="step">Architecture synchrone</div>
+                        <div class="step-arrow">→</div>
+                        <div class="step active">Interface chat uniquement</div>
+                    </div>
+                    <div class="steps" style="margin-top: 30px;">
+                        <div class="step">Architecture async</div>
+                        <div class="step-arrow">→</div>
+                        <div class="step active">Notifications, interruptions, proactivité</div>
+                    </div>
+                </div>
+                <div class="fragment">
+                    <h4>Nouveaux use cases possibles :</h4>
+                    <ul>
+                        <li>🔔 Assistant proactif ("Ton train est retardé...")</li>
+                        <li>📊 Monitoring intelligent (alertes automatiques)</li>
+                        <li>🔍 Recherche parallélisée (10 agents en simultané)</li>
+                        <li>🤝 Collaboration multi-agents (workflow automatisé)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 16: Takeaway 3 -->
+            <section>
+                <h2>Takeaway #3 : Standards Ouverts = Interopérabilité</h2>
+                <div class="fragment">
+                    <h4>Pourquoi A2A de Google ?</h4>
+                    <ul>
+                        <li>🌍 <strong>Éviter la fragmentation</strong> - Standard ouvert = écosystème</li>
+                        <li>♻️ <strong>Réutilisabilité</strong> - Agent créé une fois, utilisable partout</li>
+                        <li>🔮 <strong>Future-proof</strong> - Architecture reste, modèles évoluent</li>
+                    </ul>
+                </div>
+                <p class="fragment"><strong>Analogie :</strong> HTTP pour le web, A2A pour les agents</p>
+            </section>
+
+            <!-- Slide 17: Takeaway 4 -->
+            <section>
+                <h2>Takeaway #4 : L'Humain au Centre</h2>
+                <div class="comparison">
+                    <div class="fragment">
+                        <h4>Danger ❌</h4>
+                        <p>Agents autonomes</p>
+                        <p>→ Perte de contrôle humain</p>
+                    </div>
+                    <div class="fragment">
+                        <h4>Bonne approche ✅</h4>
+                        <p>Méta-intelligence</p>
+                        <p>→ Filtre pour l'humain</p>
+                    </div>
+                </div>
+                <div class="fragment">
+                    <p><strong>Cortex comme assistant cognitif :</strong></p>
+                    <p><em>L'humain valide, l'IA exécute</em></p>
+                </div>
+            </section>
+
+            <!-- Slide 18: Takeaway 5 -->
+            <section>
+                <h2>Takeaway #5 : On Peut Commencer Aujourd'hui</h2>
+                <div class="fragment">
+                    <h4>POC fonctionnel :</h4>
+                    <ul>
+                        <li>✅ Event Bus (gRPC)</li>
+                        <li>✅ Cortex orchestrator</li>
+                        <li>✅ Agents A2A</li>
+                        <li>✅ 100% Open Source</li>
+                    </ul>
+                </div>
+                <div class="fragment timeline">
+                    <div class="timeline-item">
+                        <h5>1-3 mois</h5>
+                        <p><small>LLM réel<br>Agents métier<br>Web UI</small></p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5>3-6 mois</h5>
+                        <p><small>State persistant<br>Monitoring<br>Fault tolerance</small></p>
+                    </div>
+                    <div class="timeline-item">
+                        <h5>6-12 mois</h5>
+                        <p><small>Marketplace<br>Multi-tenancy<br>Learning agents</small></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 19: Conclusion -->
+            <section>
+                <h2>De ChatGPT aux Systèmes Multi-Agents</h2>
+                <div class="timeline fragment">
+                    <div class="timeline-item">
+                        <h4>2024</h4>
+                        <p>"Demande à ChatGPT"</p>
+                        <p><small>LLM monolithique</small></p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>2025</h4>
+                        <p>"Mes agents collaborent"</p>
+                        <p><small>Architecture distribuée</small></p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>2026</h4>
+                        <p>"Systèmes intelligents"</p>
+                        <p><small>Fondamentaux logiciels + IA</small></p>
+                    </div>
+                </div>
+                <p class="fragment" style="margin-top: 50px;"><strong>Le Message Clé :</strong></p>
+                <div class="highlight-box fragment">
+                    <p style="font-size: 1.3em;"><em>"L'avenir de l'IA n'est pas dans des modèles plus gros,<br>
+                    mais dans l'application des <strong>fondamentaux du génie logiciel</strong><br>
+                    aux systèmes intelligents"</em></p>
+                </div>
+            </section>
+
+            <!-- Slide 20: Vision Finale -->
+            <section data-background-color="#0E2356">
+                <h2>La Question Finale</h2>
+                <p style="font-size: 1.8em; margin: 80px 0; line-height: 1.6;">
+                    <em>"Et si la vraie révolution n'était pas l'IA qui pense mieux,<br>
+                    mais l'IA qui collabore mieux ?"</em>
+                </p>
+            </section>
+
+            <!-- Slide 21: Call to Action -->
+            <section>
+                <h2>Call to Action</h2>
+                <div style="text-align: left; max-width: 900px; margin: 0 auto;">
+                    <h4>Pour les développeurs :</h4>
+                    <ul>
+                        <li>GitHub : <code>github.com/owulveryck/agenthub</code></li>
+                        <li>Testez le POC</li>
+                        <li>Contribuez des agents</li>
+                    </ul>
+                    <h4>Pour les architectes :</h4>
+                    <ul>
+                        <li>Pensez événementiel</li>
+                        <li>Expérimentez A2A</li>
+                        <li>Partagez vos retours</li>
+                    </ul>
+                    <h4>Pour les décideurs :</h4>
+                    <ul>
+                        <li>L'IA générative est un commodity</li>
+                        <li>La valeur est dans l'architecture</li>
+                        <li>Investissez dans la composition, pas la puissance</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 22: Questions -->
+            <section>
+                <h1>Questions ?</h1>
+                <p style="margin-top: 100px; font-size: 1.3em;">
+                    <strong>GitHub:</strong> github.com/owulveryck/agenthub<br>
+                    <strong>Contact:</strong> Olivier Wulveryck
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#E7E9EE',
+                primaryTextColor: '#0E2356',
+                primaryBorderColor: '#00D2DD',
+                lineColor: '#00D2DD',
+                secondaryColor: '#00D2DD',
+                tertiaryColor: '#E7E9EE',
+                fontSize: '20px',
+                fontFamily: 'inherit'
+            }
+        });
+
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            width: 1280,
+            height: 720,
+            margin: 0.1,
+            plugins: [ RevealHighlight, RevealNotes ],
+            slideNumber: true,
+            controls: true,
+            progress: true,
+            center: true
+        });
+
+        Reveal.on('ready', event => {
+            mermaid.run({
+                querySelector: '.mermaid',
+            });
+        });
+
+        Reveal.on('slidechanged', event => {
+            const currentSlide = event.currentSlide;
+            const mermaidDivs = currentSlide.querySelectorAll('.mermaid:not([data-processed])');
+            if (mermaidDivs.length > 0) {
+                mermaid.run({
+                    nodes: mermaidDivs,
+                });
+            }
+        });
+    </script>
+</body>
+</html>
