@@ -698,11 +698,16 @@ func (s *AgentHubService) routeEvent(ctx context.Context, event *pb.AgentEvent) 
 	}
 
 	// Send to each subscriber
+	// Use background context for async delivery goroutines to prevent
+	// "Context cancelled" errors when request context is cancelled
+	// after the gRPC call returns but before delivery completes
+	deliveryCtx := context.Background()
+
 	for _, subChan := range targetChannels {
 		go func(ch chan *pb.AgentEvent, evt *pb.AgentEvent) {
 			defer func() {
 				if r := recover(); r != nil {
-					s.Server.Logger.ErrorContext(ctx, "Recovered from panic while sending event",
+					s.Server.Logger.ErrorContext(deliveryCtx, "Recovered from panic while sending event",
 						"event_id", evt.GetEventId(),
 						"panic", r,
 					)
@@ -712,12 +717,8 @@ func (s *AgentHubService) routeEvent(ctx context.Context, event *pb.AgentEvent) 
 			select {
 			case ch <- evt:
 				// Event sent successfully
-			case <-ctx.Done():
-				s.Server.Logger.InfoContext(ctx, "Context cancelled while sending event",
-					"event_id", evt.GetEventId(),
-				)
 			case <-time.After(5 * time.Second):
-				s.Server.Logger.InfoContext(ctx, "Timeout sending event",
+				s.Server.Logger.InfoContext(deliveryCtx, "Timeout sending event to subscriber",
 					"event_id", evt.GetEventId(),
 				)
 			}
