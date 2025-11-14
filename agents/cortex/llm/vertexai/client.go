@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -42,6 +43,7 @@ func getEnvOrDefault(key, defaultValue string) string {
 type Client struct {
 	config *Config
 	client *genai.Client
+	logger *slog.Logger
 }
 
 // NewClient creates a new VertexAI client for Cortex orchestration
@@ -59,9 +61,20 @@ func NewClient(ctx context.Context, config *Config) (*Client, error) {
 		return nil, fmt.Errorf("failed to create Vertex AI client: %w", err)
 	}
 
+	// Create logger for VertexAI client
+	// Use DEBUG level by default if LOG_LEVEL=DEBUG, otherwise INFO
+	logLevel := slog.LevelInfo
+	if strings.ToUpper(os.Getenv("LOG_LEVEL")) == "DEBUG" {
+		logLevel = slog.LevelDebug
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: logLevel,
+	}))
+
 	return &Client{
 		config: config,
 		client: genaiClient,
+		logger: logger,
 	}, nil
 }
 
@@ -83,15 +96,38 @@ func (c *Client) Decide(
 	// Build the orchestration prompt
 	prompt := c.buildOrchestrationPrompt(conversationHistory, availableAgents, newEvent)
 
+	// Log the prompt being sent to VertexAI
+	c.logger.DebugContext(ctx, "Sending prompt to VertexAI",
+		"model", c.config.Model,
+		"project", c.config.Project,
+		"prompt_length", len(prompt),
+	)
+	c.logger.DebugContext(ctx, "VertexAI prompt content",
+		"prompt", prompt,
+	)
+
 	// Query VertexAI for orchestration decision
 	response, err := c.queryVertexAI(ctx, prompt)
 	if err != nil {
+		c.logger.ErrorContext(ctx, "VertexAI query failed", "error", err)
 		return nil, fmt.Errorf("failed to query VertexAI: %w", err)
 	}
+
+	// Log the response from VertexAI
+	c.logger.DebugContext(ctx, "Received response from VertexAI",
+		"response_length", len(response),
+	)
+	c.logger.DebugContext(ctx, "VertexAI response content",
+		"response", response,
+	)
 
 	// Parse the response into a Decision
 	decision, err := c.parseDecision(response)
 	if err != nil {
+		c.logger.WarnContext(ctx, "Failed to parse VertexAI response",
+			"error", err,
+			"response", response,
+		)
 		// Fallback: return a simple acknowledgment if parsing fails
 		return &llm.Decision{
 			Reasoning: fmt.Sprintf("Failed to parse LLM response: %v. Providing default response.", err),
@@ -103,6 +139,12 @@ func (c *Client) Decide(
 			},
 		}, nil
 	}
+
+	// Log the parsed decision
+	c.logger.DebugContext(ctx, "Successfully parsed LLM decision",
+		"action_count", len(decision.Actions),
+		"reasoning", decision.Reasoning,
+	)
 
 	return decision, nil
 }
