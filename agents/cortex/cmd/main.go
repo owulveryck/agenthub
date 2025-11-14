@@ -11,6 +11,7 @@ import (
 
 	"github.com/owulveryck/agenthub/agents/cortex"
 	"github.com/owulveryck/agenthub/agents/cortex/llm"
+	"github.com/owulveryck/agenthub/agents/cortex/llm/vertexai"
 	"github.com/owulveryck/agenthub/agents/cortex/state"
 	pb "github.com/owulveryck/agenthub/events/a2a"
 	"github.com/owulveryck/agenthub/internal/agenthub"
@@ -75,9 +76,12 @@ func main() {
 	// Create state manager (in-memory for POC)
 	stateManager := state.NewInMemoryStateManager()
 
-	// Create LLM client (using mock for POC - replace with real LLM client)
-	// For production, use a real LLM client (Vertex AI, OpenAI, etc.)
-	llmClient := createLLMClient()
+	// Create LLM client (VertexAI or mock)
+	llmClient, err := createLLMClient(ctx)
+	if err != nil {
+		client.Logger.ErrorContext(ctx, "Failed to create LLM client", "error", err)
+		panic(fmt.Sprintf("Failed to create LLM client: %v", err))
+	}
 
 	// Create message publisher adapter
 	messagePublisher := &AgentHubMessagePublisher{client: client}
@@ -85,9 +89,14 @@ func main() {
 	// Create Cortex instance
 	cortexInstance := cortex.NewCortex(stateManager, llmClient, messagePublisher)
 
+	llmType := "mock"
+	if os.Getenv("GCP_PROJECT") != "" && os.Getenv("GCP_PROJECT") != "your-project" {
+		llmType = "vertexai"
+	}
+
 	client.Logger.InfoContext(ctx, "Cortex initialized",
 		"agent_id", cortexAgentID,
-		"llm_client", "mock",
+		"llm_client", llmType,
 		"state_manager", "in-memory",
 	)
 
@@ -228,18 +237,25 @@ func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, cortexI
 }
 
 // createLLMClient creates the LLM client based on configuration
-// For POC, we use a mock that dispatches tasks to echo_agent for proper orchestration
-// In production, replace with real LLM client (Vertex AI, OpenAI, etc.)
-func createLLMClient() llm.Client {
-	// Check if we should use a real LLM
-	if os.Getenv("CORTEX_LLM_MODEL") != "" {
-		// TODO: Create real LLM client based on CORTEX_LLM_MODEL
-		// For now, fall back to mock
-		fmt.Println("Warning: CORTEX_LLM_MODEL set but real LLM client not yet implemented, using mock")
+// Uses VertexAI when GCP_PROJECT is set, otherwise falls back to mock
+func createLLMClient(ctx context.Context) (llm.Client, error) {
+	// Check if VertexAI configuration is available
+	gcpProject := os.Getenv("GCP_PROJECT")
+	if gcpProject != "" && gcpProject != "your-project" {
+		// Create VertexAI client
+		config := vertexai.NewConfigFromEnv()
+		fmt.Printf("Initializing VertexAI client (project: %s, location: %s, model: %s)\n",
+			config.Project, config.Location, config.Model)
+
+		client, err := vertexai.NewClient(ctx, config)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create VertexAI client: %w", err)
+		}
+		fmt.Println("VertexAI client initialized successfully")
+		return client, nil
 	}
 
-	// Use intelligent mock that analyzes user intent
-	// This only dispatches to echo_agent when user explicitly requests an echo,
-	// otherwise responds directly. Always explains reasoning and decisions.
-	return llm.NewMockClientWithFunc(llm.IntelligentDecider())
+	// Fall back to mock for development
+	fmt.Println("Using mock LLM client (set GCP_PROJECT to use VertexAI)")
+	return llm.NewMockClientWithFunc(llm.IntelligentDecider()), nil
 }

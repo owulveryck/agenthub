@@ -8,6 +8,7 @@ import (
 	"github.com/owulveryck/agenthub/agents/cortex/llm"
 	"github.com/owulveryck/agenthub/agents/cortex/state"
 	pb "github.com/owulveryck/agenthub/events/a2a"
+	"github.com/owulveryck/agenthub/internal/observability"
 )
 
 // MockAgentHubClient is a mock of the AgentHub client for testing
@@ -91,7 +92,8 @@ func TestCortex_HandleChatRequest(t *testing.T) {
 	}
 
 	// Handle the chat request
-	err := cortex.HandleMessage(context.Background(), chatRequest)
+	traceManager := observability.NewTraceManager("cortex_test")
+	err := cortex.HandleMessage(context.Background(), traceManager, chatRequest)
 	if err != nil {
 		t.Fatalf("HandleMessage failed: %v", err)
 	}
@@ -181,7 +183,8 @@ func TestCortex_HandleTaskResult(t *testing.T) {
 	}
 
 	// Handle the task result
-	err := cortex.HandleMessage(context.Background(), taskResult)
+	traceManager := observability.NewTraceManager("cortex_test")
+	err := cortex.HandleMessage(context.Background(), traceManager, taskResult)
 	if err != nil {
 		t.Fatalf("HandleMessage failed: %v", err)
 	}

@@ -18,11 +18,14 @@ A2A_OUT_DIR := events/a2a
 OBSERVABILITY_OUT_DIR := internal/events/observability
 
 # Go build output names
-SERVER_BINARY := eventbus-server
+SERVER_BINARY := broker
 PUBLISHER_BINARY := publisher
 SUBSCRIBER_BINARY := subscriber
 CHAT_RESPONDER_BINARY := chat_responder
 CHAT_REPL_BINARY := chat_repl
+CHAT_CLI_BINARY := chat_cli
+ECHO_AGENT_BINARY := echo_agent
+CORTEX_BINARY := cortex
 
 # Go compiler flags
 GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller binaries
@@ -31,7 +34,7 @@ GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller bi
 # Targets
 # ==============================================================================
 
-.PHONY: all proto build run-server run-publisher run-subscriber run-chat-responder run-chat-repl clean help
+.PHONY: all proto build build-broker build-agents run-server run-publisher run-subscriber run-chat-responder run-chat-repl run-chat-cli run-echo-agent run-cortex clean help
 
 all: build
 
@@ -62,23 +65,48 @@ $(OBSERVABILITY_OUT_DIR)/events.pb.go: proto/events.proto
 
 
 # Target to build all binaries
-build: proto
-	@echo "Building A2A-compliant server binary..."
+build: build-broker build-agents
+	@echo "Build complete. All binaries are in the 'bin/' directory."
+
+# Target to build broker
+build-broker: proto
+	@echo "Building broker binary..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(SERVER_BINARY) broker/main.go
+	@echo "✓ Broker built: bin/$(SERVER_BINARY)"
 
-	@echo "Building A2A-compliant publisher binary..."
+# Target to build all agents
+build-agents: proto
+	@echo "Building all agent binaries..."
+
+	@echo "  Building publisher..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(PUBLISHER_BINARY) agents/publisher/main.go
+	@echo "  ✓ Publisher built: bin/$(PUBLISHER_BINARY)"
 
-	@echo "Building A2A-compliant subscriber binary..."
+	@echo "  Building subscriber..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(SUBSCRIBER_BINARY) agents/subscriber/main.go
+	@echo "  ✓ Subscriber built: bin/$(SUBSCRIBER_BINARY)"
 
-	@echo "Building A2A-compliant chat responder binary..."
+	@echo "  Building chat_responder..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(CHAT_RESPONDER_BINARY) agents/chat_responder/main.go
+	@echo "  ✓ Chat responder built: bin/$(CHAT_RESPONDER_BINARY)"
 
-	@echo "Building A2A-compliant chat REPL binary..."
+	@echo "  Building chat_repl..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(CHAT_REPL_BINARY) agents/chat_repl/main.go
+	@echo "  ✓ Chat REPL built: bin/$(CHAT_REPL_BINARY)"
 
-	@echo "Build complete. A2A-compliant binaries are in the 'bin/' directory."
+	@echo "  Building chat_cli..."
+	go build $(GO_BUILD_FLAGS) -o bin/$(CHAT_CLI_BINARY) agents/chat_cli/main.go
+	@echo "  ✓ Chat CLI built: bin/$(CHAT_CLI_BINARY)"
+
+	@echo "  Building echo_agent..."
+	go build $(GO_BUILD_FLAGS) -o bin/$(ECHO_AGENT_BINARY) agents/echo_agent/main.go
+	@echo "  ✓ Echo agent built: bin/$(ECHO_AGENT_BINARY)"
+
+	@echo "  Building cortex..."
+	go build $(GO_BUILD_FLAGS) -o bin/$(CORTEX_BINARY) agents/cortex/cmd/main.go
+	@echo "  ✓ Cortex built: bin/$(CORTEX_BINARY)"
+
+	@echo "All agents built successfully."
 
 # Target to run the event bus server
 run-server:
@@ -105,6 +133,21 @@ run-chat-repl:
 	@echo "Starting Chat REPL Agent..."
 	go run agents/chat_repl/main.go
 
+# Target to run the chat CLI agent
+run-chat-cli:
+	@echo "Starting Chat CLI Agent..."
+	go run agents/chat_cli/main.go
+
+# Target to run the echo agent
+run-echo-agent:
+	@echo "Starting Echo Agent..."
+	go run agents/echo_agent/main.go
+
+# Target to run the cortex orchestrator
+run-cortex:
+	@echo "Starting Cortex Orchestrator..."
+	go run agents/cortex/cmd/main.go
+
 # Target to clean up generated files and binaries
 clean:
 	@echo "Cleaning up generated files and binaries..."
@@ -116,28 +159,39 @@ clean:
 
 # Target to display help
 help:
-	@echo "Makefile for gRPC Event Bus"
+	@echo "Makefile for AgentHub - A2A Agent Orchestration Platform"
 	@echo ""
 	@echo "Usage:"
 	@echo "  make <target>"
 	@echo ""
-	@echo "Targets:"
+	@echo "Build Targets:"
 	@echo "  all                  Builds all binaries (default)."
 	@echo "  proto                Generates Go code from .proto files."
-	@echo "  build                Builds all binaries (server, agents)."
-	@echo "  run-server           Runs the event bus gRPC server."
-	@echo "  run-publisher        Runs the publisher client."
-	@echo "  run-subscriber       Runs the subscriber client."
-	@echo "  run-chat-responder   Runs the chat responder agent (requires Vertex AI config)."
+	@echo "  build                Builds all binaries (broker + all agents)."
+	@echo "  build-broker         Builds only the broker binary."
+	@echo "  build-agents         Builds all agent binaries."
+	@echo ""
+	@echo "Run Targets:"
+	@echo "  run-server           Runs the event bus broker."
+	@echo "  run-publisher        Runs the publisher agent."
+	@echo "  run-subscriber       Runs the subscriber agent."
+	@echo "  run-chat-responder   Runs the chat responder agent (requires Vertex AI)."
 	@echo "  run-chat-repl        Runs the chat REPL agent."
+	@echo "  run-chat-cli         Runs the chat CLI agent."
+	@echo "  run-echo-agent       Runs the echo agent."
+	@echo "  run-cortex           Runs the Cortex orchestrator (uses VertexAI if configured)."
+	@echo ""
+	@echo "Utility Targets:"
 	@echo "  clean                Removes generated Go files and build artifacts."
 	@echo "  help                 Displays this help message."
 	@echo ""
 	@echo "Configuration:"
-	@echo "  MODULE_PATH      Your Go module path (e.g., github.com/user/repo)."
-	@echo "                   Ensure this matches your go.mod file."
+	@echo "  MODULE_PATH      Your Go module path (matches go.mod)."
 	@echo ""
-	@echo "Environment Variables for Chat Responder:"
+	@echo "Environment Variables for AI-powered Agents:"
 	@echo "  GCP_PROJECT      Your Google Cloud Project ID"
 	@echo "  GCP_LOCATION     GCP region (default: us-central1)"
 	@echo "  VERTEX_AI_MODEL  Model name (default: gemini-2.0-flash)"
+	@echo ""
+	@echo "  Note: chat_responder and cortex use VertexAI when GCP_PROJECT is set,"
+	@echo "        otherwise they fall back to mock/echo behavior."
