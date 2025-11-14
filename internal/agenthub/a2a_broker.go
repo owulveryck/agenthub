@@ -77,6 +77,16 @@ func (s *AgentHubService) PublishMessage(ctx context.Context, req *pb.PublishMes
 		return nil, err
 	}
 
+	// Log message receipt
+	s.Server.Logger.DebugContext(ctx, "Broker received message",
+		"message_id", message.GetMessageId(),
+		"context_id", message.GetContextId(),
+		"role", message.GetRole().String(),
+		"task_id", message.GetTaskId(),
+		"from_agent", req.GetRouting().GetFromAgentId(),
+		"to_agent", req.GetRouting().GetToAgentId(),
+	)
+
 	// Add comprehensive A2A message attributes to span
 	taskType := ""
 	if message.Metadata != nil && message.Metadata.Fields != nil {
@@ -173,6 +183,13 @@ func (s *AgentHubService) PublishMessage(ctx context.Context, req *pb.PublishMes
 		return &pb.PublishResponse{Success: false, Error: err.Error()}, nil
 	}
 	s.Server.TraceManager.SetSpanSuccess(routeSpan)
+
+	// Log successful routing
+	s.Server.Logger.DebugContext(ctx, "Message routed successfully",
+		"message_id", message.GetMessageId(),
+		"event_id", eventID,
+		"subscriber_count", s.getSubscriberCount("message", messageEvent.GetRouting()),
+	)
 
 	// If this was a task message, also publish a task event
 	if task != nil {
@@ -314,7 +331,13 @@ func (s *AgentHubService) SubscribeToMessages(req *pb.SubscribeToMessagesRequest
 
 	s.agentMu.Lock()
 	s.messageSubscribers[agentID] = append(s.messageSubscribers[agentID], subChan)
+	subscriberCount := len(s.messageSubscribers[agentID])
 	s.agentMu.Unlock()
+
+	s.Server.Logger.InfoContext(ctx, "Agent subscribed to messages",
+		"agent_id", agentID,
+		"subscriber_count", subscriberCount,
+	)
 
 	defer func() {
 		s.agentMu.Lock()
@@ -689,13 +712,22 @@ func (s *AgentHubService) routeEvent(ctx context.Context, event *pb.AgentEvent) 
 	}
 
 	if len(targetChannels) == 0 {
-		s.Server.Logger.InfoContext(ctx, "No subscribers for event",
+		s.Server.Logger.DebugContext(ctx, "No subscribers for event",
 			"event_id", event.GetEventId(),
 			"event_type", routing.GetEventType(),
 			"target_agent", targetAgent,
 		)
 		return nil
 	}
+
+	// Log routing details
+	s.Server.Logger.DebugContext(ctx, "Routing event to subscribers",
+		"event_id", event.GetEventId(),
+		"event_type", routing.GetEventType(),
+		"from_agent", routing.GetFromAgentId(),
+		"to_agent", targetAgent,
+		"subscriber_count", len(targetChannels),
+	)
 
 	// Send to each subscriber
 	// Use background context for async delivery goroutines to prevent
@@ -717,8 +749,11 @@ func (s *AgentHubService) routeEvent(ctx context.Context, event *pb.AgentEvent) 
 			select {
 			case ch <- evt:
 				// Event sent successfully
+				s.Server.Logger.DebugContext(deliveryCtx, "Event delivered to subscriber",
+					"event_id", evt.GetEventId(),
+				)
 			case <-time.After(5 * time.Second):
-				s.Server.Logger.InfoContext(deliveryCtx, "Timeout sending event to subscriber",
+				s.Server.Logger.WarnContext(deliveryCtx, "Timeout sending event to subscriber",
 					"event_id", evt.GetEventId(),
 				)
 			}
