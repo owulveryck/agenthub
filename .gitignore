@@ -14,7 +14,7 @@ docs/node_modules
 !*.proto
 !*.pb
 !*.yml
-!test-demo.sh
+!*.sh
 !docs/
 !docs/package.json
 !docs/package-lock.json
