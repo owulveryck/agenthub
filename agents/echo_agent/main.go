@@ -194,11 +194,12 @@ func main() {
 	client.Logger.InfoContext(ctx, "Starting Echo Agent")
 	client.Logger.InfoContext(ctx, "Subscribing to Echo Messages tasks")
 
-	// Start task subscription
-	if err := taskSubscriber.SubscribeToTasks(ctx); err != nil {
-		client.Logger.ErrorContext(ctx, "Failed to subscribe to tasks", "error", err)
-		panic(err)
-	}
+	// Start task subscription in a goroutine
+	go func() {
+		if err := taskSubscriber.SubscribeToTasks(ctx); err != nil {
+			client.Logger.ErrorContext(ctx, "Task subscription ended", "error", err)
+		}
+	}()
 
 	// Keep the service running
 	select {
