@@ -13,7 +13,18 @@ import (
 	"github.com/owulveryck/agenthub/internal/agenthub"
 )
 
-// SubAgent encapsulates the common functionality for building agents
+// SubAgent encapsulates the common functionality for building A2A-compliant agents.
+//
+// It handles all infrastructure concerns including client setup, registration,
+// task subscription, observability, and lifecycle management. Developers only
+// need to implement business logic in handler functions.
+//
+// A SubAgent is created with New(), skills are registered with AddSkill() or
+// MustAddSkill(), and then Run() is called to start the agent. All setup,
+// registration, and cleanup is handled automatically.
+//
+// SubAgent is not thread-safe during configuration (before Run()) but is safe
+// for concurrent task processing after Run() is called.
 type SubAgent struct {
 	config         *Config
 	client         *agenthub.AgentHubClient
@@ -23,7 +34,24 @@ type SubAgent struct {
 	running        bool
 }
 
-// New creates a new SubAgent with the given configuration
+// New creates a new SubAgent with the given configuration.
+//
+// The configuration is validated and defaults are applied for optional fields.
+// Required configuration fields are: AgentID, Name, and Description.
+//
+// Returns an error if configuration is invalid (missing required fields).
+//
+// Example:
+//
+//	config := &subagent.Config{
+//	    AgentID:     "my_agent",
+//	    Name:        "My Agent",
+//	    Description: "Does something useful",
+//	}
+//	agent, err := subagent.New(config)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
 func New(config *Config) (*SubAgent, error) {
 	// Apply defaults and validate
 	config = config.WithDefaults()
@@ -37,7 +65,28 @@ func New(config *Config) (*SubAgent, error) {
 	}, nil
 }
 
-// AddSkill registers a new skill with the agent
+// AddSkill registers a new skill with the agent.
+//
+// Skills define capabilities that the agent provides. Each skill has a name,
+// description, and handler function. The name is used for task routing and
+// should be unique within the agent. The description helps LLMs understand
+// when to delegate tasks to this agent.
+//
+// Returns ErrDuplicateSkill if a skill with the same name is already registered.
+//
+// Skills must be registered before calling Run(). Attempting to add skills
+// after Run() has been called will result in undefined behavior.
+//
+// Example:
+//
+//	err := agent.AddSkill(
+//	    "Language Translation",
+//	    "Translates text from one language to another",
+//	    translateHandler,
+//	)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
 func (s *SubAgent) AddSkill(name, description string, handler TaskHandler) error {
 	if _, exists := s.skills[name]; exists {
 		return fmt.Errorf("%w: %s", ErrDuplicateSkill, name)
@@ -52,15 +101,55 @@ func (s *SubAgent) AddSkill(name, description string, handler TaskHandler) error
 	return nil
 }
 
-// MustAddSkill is like AddSkill but panics on error (for cleaner initialization code)
+// MustAddSkill is like AddSkill but panics on error.
+//
+// This is useful for cleaner initialization code when you want the program to
+// fail fast during setup rather than handling errors. Suitable for agent main
+// functions where skill registration errors are unrecoverable.
+//
+// Panics if a skill with the same name is already registered.
+//
+// Example:
+//
+//	agent.MustAddSkill("Echo", "Echoes messages", echoHandler)
+//	agent.MustAddSkill("Translate", "Translates text", translateHandler)
+//	agent.Run(ctx) // Will fail fast if skills couldn't be added
 func (s *SubAgent) MustAddSkill(name, description string, handler TaskHandler) {
 	if err := s.AddSkill(name, description, handler); err != nil {
 		panic(err)
 	}
 }
 
-// Run starts the agent and blocks until the context is cancelled
-// It handles the full lifecycle: setup, registration, subscription, and graceful shutdown
+// Run starts the agent and blocks until shutdown.
+//
+// This method handles the complete agent lifecycle:
+//  1. Setup: Validates configuration, connects to broker
+//  2. Registration: Creates and registers A2A-compliant AgentCard
+//  3. Subscription: Subscribes to tasks from broker
+//  4. Processing: Routes tasks to skill handlers with automatic observability
+//  5. Shutdown: Handles SIGINT/SIGTERM, waits for in-flight tasks, cleanup
+//
+// Run blocks until:
+//   - The context is cancelled
+//   - A SIGINT or SIGTERM signal is received
+//   - A fatal error occurs during initialization
+//
+// Returns an error if:
+//   - Agent is already running (ErrAgentAlreadyRunning)
+//   - No skills have been registered (ErrNoSkills)
+//   - Initialization fails (client setup, registration, subscription)
+//
+// All resources are automatically cleaned up on shutdown, including:
+//   - Broker connection closed
+//   - Health check server stopped
+//   - Task subscriptions cancelled
+//
+// Example:
+//
+//	agent := setupAgent() // Create and configure agent
+//	if err := agent.Run(context.Background()); err != nil {
+//	    log.Fatalf("Agent failed: %v", err)
+//	}
 func (s *SubAgent) Run(ctx context.Context) error {
 	if s.running {
 		return ErrAgentAlreadyRunning
@@ -293,7 +382,19 @@ func (s *SubAgent) wrapHandlerWithObservability(skillName string, handler TaskHa
 	}
 }
 
-// GetLogger returns the agent's logger for custom logging needs
+// GetLogger returns the agent's structured logger for custom logging.
+//
+// The logger is configured with the agent's component name and provides
+// structured logging using log/slog. Use this for custom log messages in
+// your handler functions.
+//
+// Returns slog.Default() if called before Run() (client not yet initialized).
+//
+// Example:
+//
+//	logger := agent.GetLogger()
+//	logger.InfoContext(ctx, "Processing started", "input_size", len(data))
+//	logger.ErrorContext(ctx, "Processing failed", "error", err)
 func (s *SubAgent) GetLogger() *slog.Logger {
 	if s.client == nil {
 		return slog.Default()
@@ -301,12 +402,35 @@ func (s *SubAgent) GetLogger() *slog.Logger {
 	return s.client.Logger
 }
 
-// GetClient returns the underlying AgentHub client for advanced use cases
+// GetClient returns the underlying AgentHub client for advanced use cases.
+//
+// This provides access to the low-level AgentHub client for operations not
+// covered by the SubAgent abstraction, such as:
+//   - Custom message publishing
+//   - Direct task management
+//   - Advanced tracing and metrics
+//
+// Returns nil if called before Run() (client not yet initialized).
+//
+// Example:
+//
+//	client := agent.GetClient()
+//	_, err := client.Client.PublishMessage(ctx, customMsg, routing)
 func (s *SubAgent) GetClient() *agenthub.AgentHubClient {
 	return s.client
 }
 
-// GetConfig returns the agent configuration
+// GetConfig returns the agent's configuration.
+//
+// The returned configuration includes all defaults that were applied during
+// initialization. Modifying the returned Config will not affect the running
+// agent.
+//
+// Example:
+//
+//	config := agent.GetConfig()
+//	fmt.Printf("Agent ID: %s\n", config.AgentID)
+//	fmt.Printf("Health Port: %s\n", config.HealthPort)
 func (s *SubAgent) GetConfig() *Config {
 	return s.config
 }
