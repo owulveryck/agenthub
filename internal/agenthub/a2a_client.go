@@ -258,16 +258,17 @@ func (ts *A2ATaskSubscriber) processTask(ctx context.Context, task *pb.Task) {
 	}
 
 	// Get the initial message from history
+	// Accept messages from both users and agents (e.g., Cortex orchestrator)
 	var initialMessage *pb.Message
 	for _, msg := range task.History {
-		if msg.Role == pb.Role_ROLE_USER && msg.TaskId == task.Id {
+		if (msg.Role == pb.Role_ROLE_USER || msg.Role == pb.Role_ROLE_AGENT) && msg.TaskId == task.Id {
 			initialMessage = msg
 			break
 		}
 	}
 
 	if initialMessage == nil {
-		ts.Client.Logger.ErrorContext(ctx, "No user message found in task history",
+		ts.Client.Logger.ErrorContext(ctx, "No message found in task history",
 			"task_id", task.GetId(),
 		)
 		return
