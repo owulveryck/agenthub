@@ -3,6 +3,7 @@ package cortex
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -552,6 +553,9 @@ func (c *Cortex) HandleTaskCompletion(ctx context.Context, taskID, contextID str
 
 // HandleTaskArtifact processes task artifact notifications from delegated agents
 func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID string, artifact *pb.Artifact) {
+	var shouldRespond bool
+	var responseText string
+
 	// Use WithLock to ensure thread-safe state access
 	_ = c.stateManager.WithLock(contextID, func(conversationState *state.ConversationState) error {
 		// Check if this task is pending
@@ -567,8 +571,65 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 		}
 		taskContext.Artifacts = append(taskContext.Artifacts, artifact)
 
+		// Extract text content from artifact for response
+		var textParts []string
+		for _, part := range artifact.GetParts() {
+			if textPart := part.GetText(); textPart != "" {
+				textParts = append(textParts, textPart)
+			}
+		}
+
+		// By default, send artifact results back to the user
+		if len(textParts) > 0 {
+			shouldRespond = true
+			if artifact.GetName() != "" && artifact.GetDescription() != "" {
+				responseText = fmt.Sprintf("%s: %s", artifact.GetName(), strings.Join(textParts, "\n"))
+			} else {
+				responseText = strings.Join(textParts, "\n")
+			}
+		}
+
 		return nil
 	})
+
+	// Send response to user if we have content
+	if shouldRespond && responseText != "" {
+		c.sendTaskResultToUser(ctx, contextID, taskID, responseText)
+	}
+}
+
+// sendTaskResultToUser sends task results back to the user
+func (c *Cortex) sendTaskResultToUser(ctx context.Context, contextID, taskID, resultText string) {
+	responseMsg := &pb.Message{
+		MessageId: fmt.Sprintf("cortex_task_result_%d", time.Now().UnixNano()),
+		ContextId: contextID,
+		Role:      pb.Role_ROLE_AGENT,
+		Content: []*pb.Part{
+			{Part: &pb.Part_Text{Text: resultText}},
+		},
+		Metadata: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"task_type":  structpb.NewStringValue("task_result"),
+				"from_agent": structpb.NewStringValue(CortexAgentID),
+				"task_id":    structpb.NewStringValue(taskID),
+			},
+		},
+	}
+
+	// Update conversation state with the response
+	_ = c.stateManager.WithLock(contextID, func(conversationState *state.ConversationState) error {
+		conversationState.Messages = append(conversationState.Messages, responseMsg)
+		return nil
+	})
+
+	// Publish the response
+	routing := &pb.AgentEventMetadata{
+		FromAgentId: CortexAgentID,
+		EventType:   "a2a.message.task_result",
+		Priority:    pb.Priority_PRIORITY_MEDIUM,
+	}
+
+	_ = c.messagePublisher.PublishMessage(ctx, responseMsg, routing)
 }
 
 // truncateString truncates a string to maxLen characters, adding "..." if truncated
