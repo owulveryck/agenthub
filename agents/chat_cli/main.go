@@ -20,6 +20,12 @@ const (
 	cliAgentID = "agent_chat_cli"
 )
 
+// ANSI color codes for terminal output
+const (
+	colorCyan  = "\033[36m" // Cyan color for task results
+	colorReset = "\033[0m"  // Reset to default color
+)
+
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -94,12 +100,22 @@ func main() {
 
 			// Process message events
 			if messageEvent := event.GetMessage(); messageEvent != nil {
-				// Only show messages for our session
-				if messageEvent.ContextId == sessionID && messageEvent.Role == pb.Role_ROLE_AGENT {
-					// Check if this is a chat response
+				// Only show messages for our session (or task results from any session)
+				isTaskResult := false
+				if messageEvent.Metadata != nil && messageEvent.Metadata.Fields != nil {
+					if taskType, exists := messageEvent.Metadata.Fields["task_type"]; exists {
+						if taskType.GetStringValue() == "task_result" {
+							isTaskResult = true
+						}
+					}
+				}
+
+				if (messageEvent.ContextId == sessionID || isTaskResult) && messageEvent.Role == pb.Role_ROLE_AGENT {
+					// Check if this is a chat response or task result
 					if messageEvent.Metadata != nil {
 						if taskType, exists := messageEvent.Metadata.Fields["task_type"]; exists {
-							if taskType.GetStringValue() == "chat_response" {
+							taskTypeValue := taskType.GetStringValue()
+							if taskTypeValue == "chat_response" || taskTypeValue == "task_result" {
 								responseChan <- messageEvent
 							}
 						}
@@ -116,7 +132,23 @@ func main() {
 			case msg := <-responseChan:
 				if len(msg.Content) > 0 {
 					responseText := msg.Content[0].GetText()
-					fmt.Printf("\n🤖 Cortex: %s\n\n> ", responseText)
+
+					// Check if this is a task result message
+					isTaskResult := false
+					if msg.Metadata != nil && msg.Metadata.Fields != nil {
+						if taskType, exists := msg.Metadata.Fields["task_type"]; exists {
+							if taskType.GetStringValue() == "task_result" {
+								isTaskResult = true
+							}
+						}
+					}
+
+					// Display task results in cyan color
+					if isTaskResult {
+						fmt.Printf("\n%s🤖 [Task Result] %s%s\n\n> ", colorCyan, responseText, colorReset)
+					} else {
+						fmt.Printf("\n🤖 Cortex: %s\n\n> ", responseText)
+					}
 				}
 			case <-ctx.Done():
 				return
