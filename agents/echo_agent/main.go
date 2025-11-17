@@ -105,21 +105,26 @@ func main() {
 	// Register handler for Echo Messages tasks
 	taskSubscriber.RegisterTaskHandler("Echo Messages", func(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Artifact, pb.TaskState, string) {
 		// Start tracing for task processing
-		taskCtx, taskSpan := client.TraceManager.StartA2ATaskSpan(
+		taskCtx, taskSpan := client.TraceManager.StartSpan(
 			ctx,
 			"echo_agent.process_task",
-			task.GetId(),
-			"Echo Messages",
 		)
 		defer taskSpan.End()
+
+		// Get task state for tracing
+		taskState := "UNKNOWN"
+		if task.Status != nil {
+			taskState = task.Status.State.String()
+		}
 
 		// Add comprehensive A2A task attributes
 		client.TraceManager.AddA2ATaskAttributes(
 			taskSpan,
 			task.GetId(),
+			taskState,
 			task.GetContextId(),
-			"Echo Messages",
-			task.GetState().String(),
+			len(task.GetHistory()),
+			len(task.GetArtifacts()),
 		)
 		client.TraceManager.AddComponentAttribute(taskSpan, "echo_agent")
 
@@ -157,10 +162,18 @@ func main() {
 
 		// Create artifact with the echo response
 		artifact := &pb.Artifact{
-			Type: pb.ArtifactType_ARTIFACT_TYPE_TEXT,
-			Data: &structpb.Struct{
+			ArtifactId:  fmt.Sprintf("echo_%s_%d", task.GetId(), time.Now().Unix()),
+			Name:        "echo_response",
+			Description: "Echo response with input text prefix",
+			Parts: []*pb.Part{
+				{
+					Part: &pb.Part_Text{
+						Text: echoText,
+					},
+				},
+			},
+			Metadata: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
-					"text":       structpb.NewStringValue(echoText),
 					"input":      structpb.NewStringValue(inputText),
 					"agent_id":   structpb.NewStringValue(echoAgentID),
 					"created_at": structpb.NewStringValue(time.Now().Format(time.RFC3339)),
@@ -171,7 +184,7 @@ func main() {
 		// Mark span as successful
 		client.TraceManager.SetSpanSuccess(taskSpan)
 		client.TraceManager.AddSpanEvent(taskSpan, "task_completed",
-			attribute.String("artifact_type", artifact.GetType().String()),
+			attribute.String("artifact_id", artifact.GetArtifactId()),
 			attribute.String("echo_text", echoText),
 		)
 
