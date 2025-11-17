@@ -553,6 +553,9 @@ func (c *Cortex) HandleTaskCompletion(ctx context.Context, taskID, contextID str
 
 // HandleTaskArtifact processes task artifact notifications from delegated agents
 func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID string, artifact *pb.Artifact) {
+	fmt.Printf("DEBUG: HandleTaskArtifact called - taskID=%s, contextID=%s, artifactID=%s\n",
+		taskID, contextID, artifact.GetArtifactId())
+
 	var shouldRespond bool
 	var responseText string
 
@@ -561,6 +564,7 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 		// Check if this task is pending
 		taskContext, pending := conversationState.PendingTasks[taskID]
 		if !pending {
+			fmt.Printf("DEBUG: Task %s not found in pending tasks\n", taskID)
 			// Task not found or already processed
 			return nil
 		}
@@ -579,6 +583,8 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 			}
 		}
 
+		fmt.Printf("DEBUG: Extracted %d text parts from artifact\n", len(textParts))
+
 		// By default, send artifact results back to the user
 		if len(textParts) > 0 {
 			shouldRespond = true
@@ -587,6 +593,7 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 			} else {
 				responseText = strings.Join(textParts, "\n")
 			}
+			fmt.Printf("DEBUG: Will send response: %s\n", responseText)
 		}
 
 		return nil
@@ -594,14 +601,22 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 
 	// Send response to user if we have content
 	if shouldRespond && responseText != "" {
+		fmt.Printf("DEBUG: Calling sendTaskResultToUser with contextID=%s\n", contextID)
 		c.sendTaskResultToUser(ctx, contextID, taskID, responseText)
+	} else {
+		fmt.Printf("DEBUG: NOT sending response - shouldRespond=%v, hasText=%v\n", shouldRespond, responseText != "")
 	}
 }
 
 // sendTaskResultToUser sends task results back to the user
 func (c *Cortex) sendTaskResultToUser(ctx context.Context, contextID, taskID, resultText string) {
+	messageID := fmt.Sprintf("cortex_task_result_%d", time.Now().UnixNano())
+
+	fmt.Printf("DEBUG: sendTaskResultToUser - messageID=%s, contextID=%s, taskID=%s\n", messageID, contextID, taskID)
+	fmt.Printf("DEBUG: Response text: %s\n", resultText)
+
 	responseMsg := &pb.Message{
-		MessageId: fmt.Sprintf("cortex_task_result_%d", time.Now().UnixNano()),
+		MessageId: messageID,
 		ContextId: contextID,
 		Role:      pb.Role_ROLE_AGENT,
 		Content: []*pb.Part{
@@ -619,17 +634,28 @@ func (c *Cortex) sendTaskResultToUser(ctx context.Context, contextID, taskID, re
 	// Update conversation state with the response
 	_ = c.stateManager.WithLock(contextID, func(conversationState *state.ConversationState) error {
 		conversationState.Messages = append(conversationState.Messages, responseMsg)
+		fmt.Printf("DEBUG: Added response to conversation history (total messages: %d)\n", len(conversationState.Messages))
 		return nil
 	})
 
-	// Publish the response
+	// Publish the response - broadcast to all message subscribers (including REPL)
 	routing := &pb.AgentEventMetadata{
 		FromAgentId: CortexAgentID,
-		EventType:   "a2a.message.task_result",
-		Priority:    pb.Priority_PRIORITY_MEDIUM,
+		// No ToAgentId - broadcast to all
+		EventType: "a2a.message.task_result",
+		Priority:  pb.Priority_PRIORITY_MEDIUM,
 	}
 
-	_ = c.messagePublisher.PublishMessage(ctx, responseMsg, routing)
+	fmt.Printf("DEBUG: Publishing message with routing: fromAgent=%s, eventType=%s\n",
+		routing.FromAgentId, routing.EventType)
+
+	err := c.messagePublisher.PublishMessage(ctx, responseMsg, routing)
+	if err != nil {
+		// Log error but don't fail - this is fire-and-forget
+		fmt.Printf("ERROR: Failed to publish task result to user: %v\n", err)
+	} else {
+		fmt.Printf("DEBUG: Successfully published task result message\n")
+	}
 }
 
 // truncateString truncates a string to maxLen characters, adding "..." if truncated
