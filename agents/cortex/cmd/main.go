@@ -87,7 +87,7 @@ func main() {
 	messagePublisher := &AgentHubMessagePublisher{client: client}
 
 	// Create Cortex instance
-	cortexInstance := cortex.NewCortex(stateManager, llmClient, messagePublisher)
+	cortexInstance := cortex.NewCortex(stateManager, llmClient, messagePublisher, client.Logger)
 
 	llmType := "mock"
 	if os.Getenv("GCP_PROJECT") != "" && os.Getenv("GCP_PROJECT") != "your-project" {
