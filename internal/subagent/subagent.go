@@ -111,8 +111,8 @@ func (s *SubAgent) Run(ctx context.Context) error {
 
 // initialize sets up the AgentHub client, registers the agent card, and starts task subscription
 func (s *SubAgent) initialize(ctx context.Context) error {
-	// Create gRPC configuration
-	grpcConfig := agenthub.NewGRPCConfig(s.config.AgentID)
+	// Create gRPC configuration using ServiceName (defaults to AgentID)
+	grpcConfig := agenthub.NewGRPCConfig(s.config.ServiceName)
 	grpcConfig.HealthPort = s.config.HealthPort
 
 	if s.config.BrokerAddr != "" {
@@ -156,19 +156,30 @@ func (s *SubAgent) initialize(ctx context.Context) error {
 func (s *SubAgent) buildAndRegisterAgentCard(ctx context.Context) error {
 	// Build skills for agent card
 	cardSkills := make([]*pb.AgentSkill, 0, len(s.skills))
-	for _, skill := range s.skills {
+	skillIndex := 0
+	for skillName, skill := range s.skills {
 		cardSkills = append(cardSkills, &pb.AgentSkill{
+			Id:          fmt.Sprintf("skill_%d", skillIndex),
 			Name:        skill.Name,
 			Description: skill.Description,
+			Tags:        []string{skillName}, // Use skill name as tag for routing
+			InputModes:  []string{"text/plain"},
+			OutputModes: []string{"text/plain"},
 		})
+		skillIndex++
 	}
 
-	// Create agent card
+	// Create agent card with required A2A fields
 	s.agentCard = &pb.AgentCard{
-		Name:        s.config.Name,
-		Description: s.config.Description,
-		Version:     s.config.Version,
-		Skills:      cardSkills,
+		ProtocolVersion: "0.2.9",
+		Name:            s.config.AgentID,
+		Description:     s.config.Description,
+		Version:         s.config.Version,
+		Skills:          cardSkills,
+		Capabilities: &pb.AgentCapabilities{
+			Streaming:         false,
+			PushNotifications: false,
+		},
 	}
 
 	// Register agent card with broker
@@ -182,6 +193,7 @@ func (s *SubAgent) buildAndRegisterAgentCard(ctx context.Context) error {
 
 	s.client.Logger.InfoContext(ctx, "Agent card registered",
 		"agent_id", s.config.AgentID,
+		"name", s.config.Name,
 		"skills", len(cardSkills),
 	)
 

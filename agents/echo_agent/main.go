@@ -15,6 +15,7 @@ func main() {
 	// Create agent configuration
 	config := &subagent.Config{
 		AgentID:     "agent_echo",
+		ServiceName: "echo_agent",
 		Name:        "Echo Agent",
 		Description: "A simple agent that echoes messages back to demonstrate task delegation",
 		Version:     "1.0.0",

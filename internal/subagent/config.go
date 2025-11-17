@@ -5,6 +5,9 @@ type Config struct {
 	// AgentID is the unique identifier for this agent
 	AgentID string
 
+	// ServiceName is the component name for gRPC config (optional, defaults to AgentID)
+	ServiceName string
+
 	// Name is the human-readable name of the agent
 	Name string
 
@@ -27,6 +30,10 @@ type Config struct {
 // WithDefaults returns a new Config with default values applied for optional fields
 func (c *Config) WithDefaults() *Config {
 	config := *c
+
+	if config.ServiceName == "" {
+		config.ServiceName = config.AgentID
+	}
 
 	if config.Version == "" {
 		config.Version = "1.0.0"
