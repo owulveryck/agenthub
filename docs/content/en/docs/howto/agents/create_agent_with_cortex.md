@@ -1,26 +1,26 @@
 # How to Create an Agent with Cortex Auto-Discovery
 
-This guide shows you how to create an agent that automatically registers itself with the Cortex orchestrator, enabling dynamic discovery and LLM-based task delegation.
+This guide shows you how to create an agent using the **SubAgent library**, which handles all the boilerplate and lets you focus on your agent's business logic.
 
 ## What You'll Build
 
 An agent that:
-- Registers itself with the broker on startup
-- Sends a detailed AgentCard with skills and examples
-- Gets automatically discovered by Cortex
-- Becomes available for LLM-based task delegation
+- Automatically registers with the broker on startup
+- Gets discovered by Cortex for LLM-based task delegation
 - Processes delegated tasks and returns results
+- Has built-in observability (tracing, logging, metrics)
+- Handles graceful shutdown
+
+All with **~50 lines of code** instead of 500+.
 
 ## Prerequisites
 
 - AgentHub broker running
 - Cortex orchestrator running
-- Basic understanding of Go and gRPC
-- Familiarity with the A2A protocol
+- Basic understanding of Go
+- Familiarity with the A2A protocol (helpful but not required)
 
-## Step 1: Set Up the Agent Structure
-
-Create your agent's main file:
+## Step 1: Import the SubAgent Library
 
 ```go
 package main
@@ -28,249 +28,83 @@ package main
 import (
     "context"
     "fmt"
-    "io"
-    "os"
-    "os/signal"
-    "syscall"
+    "log"
     "time"
 
     pb "github.com/owulveryck/agenthub/events/a2a"
-    "github.com/owulveryck/agenthub/internal/agenthub"
+    "github.com/owulveryck/agenthub/internal/subagent"
     "google.golang.org/protobuf/types/known/structpb"
 )
+```
 
-const (
-    myAgentID = "agent_myservice"
-)
+## Step 2: Define Your Agent Configuration
 
+```go
 func main() {
-    ctx, cancel := context.WithCancel(context.Background())
-    defer cancel()
+    // Configure your agent with required fields
+    config := &subagent.Config{
+        AgentID:     "agent_translator",     // Unique agent identifier
+        ServiceName: "translator_service",    // Optional gRPC service name
+        Name:        "Translation Agent",     // Human-readable name
+        Description: "Translates text between languages using AI models",
+        Version:     "1.0.0",                // Optional, defaults to 1.0.0
+        HealthPort:  "8087",                 // Optional, defaults to 8080
+    }
 
-    // Handle graceful shutdown
-    sigChan := make(chan os.Signal, 1)
-    signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-
-    go func() {
-        <-sigChan
-        fmt.Println("Shutting down agent...")
-        cancel()
-    }()
-
-    // Create gRPC configuration
-    config := agenthub.NewGRPCConfig("myservice")
-    config.HealthPort = "8087" // Unique health check port
-
-    // Create AgentHub client
-    client, err := agenthub.NewAgentHubClient(config)
+    // Create the subagent
+    agent, err := subagent.New(config)
     if err != nil {
-        panic(fmt.Sprintf("Failed to create AgentHub client: %v", err))
+        log.Fatal(err)
     }
-
-    defer func() {
-        shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
-        defer shutdownCancel()
-        if err := client.Shutdown(shutdownCtx); err != nil {
-            client.Logger.ErrorContext(shutdownCtx, "Error during shutdown", "error", err)
-        }
-    }()
-
-    // Start the client
-    if err := client.Start(ctx); err != nil {
-        client.Logger.ErrorContext(ctx, "Failed to start client", "error", err)
-        panic(err)
-    }
-
-    // Register with Cortex (Step 2)
-    registerAgent(ctx, client)
-
-    // Subscribe to messages (Step 3)
-    go subscribeToMessages(ctx, client)
-
-    client.Logger.InfoContext(ctx, "Agent ready and registered with Cortex")
-
-    // Keep the service running
-    select {
-    case <-ctx.Done():
-        // Context cancelled, exit gracefully
-    }
-
-    client.Logger.InfoContext(ctx, "Agent shutting down")
-}
 ```
 
-## Step 2: Design Your AgentCard
+## Step 3: Register Your Skills
 
-The AgentCard is crucial - it tells Cortex what your agent can do. Design it carefully:
+Skills are capabilities your agent provides. Each skill needs a handler function:
 
 ```go
-func registerAgent(ctx context.Context, client *agenthub.AgentHubClient) {
-    agentCard := &pb.AgentCard{
-        // A2A protocol version
-        ProtocolVersion: "0.2.9",
-
-        // Unique identifier (must match myAgentID)
-        Name: myAgentID,
-
-        // Clear, concise description
-        Description: "A service that translates text between languages using AI models",
-
-        // Agent version
-        Version: "1.0.0",
-
-        // Capabilities
-        Capabilities: &pb.AgentCapabilities{
-            Streaming:         false,
-            PushNotifications: false,
-        },
-
-        // Skills - THIS IS KEY for Cortex/LLM integration
-        Skills: []*pb.AgentSkill{
-            {
-                Id:   "translate",
-                Name: "Language Translation",
-                Description: "Translates text from one language to another using advanced AI models. " +
-                    "Supports major languages including English, Spanish, French, German, Japanese, and Chinese.",
-                Tags: []string{"translation", "language", "nlp", "ai"},
-
-                // Examples help the LLM recognize when to use this agent
-                Examples: []string{
-                    "Translate this text to Spanish",
-                    "Can you translate 'hello world' to French?",
-                    "I need this paragraph translated to Japanese",
-                    "Convert this English text to German",
-                    "Translate from Spanish to English",
-                },
-
-                InputModes:  []string{"text/plain"},
-                OutputModes: []string{"text/plain"},
-            },
-        },
-    }
-
-    // Register with broker - this triggers Cortex auto-discovery
-    _, err := client.Client.RegisterAgent(ctx, &pb.RegisterAgentRequest{
-        AgentCard:     agentCard,
-        Subscriptions: []string{"translation_request"}, // Topic-based routing
-    })
-
-    if err != nil {
-        client.Logger.ErrorContext(ctx, "Failed to register agent", "error", err)
-        panic(err)
-    }
-
-    client.Logger.InfoContext(ctx, "Agent registered successfully",
-        "agent_id", myAgentID,
-        "skills", len(agentCard.Skills),
+    // Add a translation skill
+    agent.MustAddSkill(
+        "Language Translation",                    // Skill name (shown to LLM)
+        "Translates text from one language to another", // Description
+        translateHandler,                          // Your handler function
     )
-}
+
+    // You can add multiple skills
+    agent.MustAddSkill(
+        "Language Detection",
+        "Detects the language of input text",
+        detectLanguageHandler,
+    )
 ```
 
-### Key AgentCard Design Principles
+### Best Practices for Skill Definition
 
-1. **Clear Description**: Write what the agent does in plain language
-2. **Detailed Skills**: Each skill should have:
-   - A clear name and description
-   - Relevant tags for categorization
-   - **Multiple examples** showing different ways users might ask for this capability
-   - Input/output modes
-3. **Good Examples**: The LLM uses these to match user requests to your agent
-   - Include variations (questions, commands, formal, informal)
-   - Cover different use cases
-   - Be specific about what the agent can do
+1. **Clear Names**: Use descriptive skill names that the LLM can understand
+2. **Specific Descriptions**: Explain what the skill does and when to use it
+3. **Multiple Skills**: An agent can have multiple related skills
 
-## Step 3: Subscribe to Messages
+## Step 4: Implement Your Handler Functions
 
-Set up message subscription to receive tasks from Cortex:
+A handler function receives a task and returns a result:
 
 ```go
-func subscribeToMessages(ctx context.Context, client *agenthub.AgentHubClient) {
-    stream, err := client.Client.SubscribeToMessages(ctx, &pb.SubscribeToMessagesRequest{
-        AgentId: myAgentID,
-    })
-
-    if err != nil {
-        client.Logger.ErrorContext(ctx, "Failed to subscribe to messages", "error", err)
-        return
-    }
-
-    client.Logger.InfoContext(ctx, "Subscribed to messages")
-
-    for {
-        event, err := stream.Recv()
-        if err != nil {
-            if err == io.EOF {
-                client.Logger.InfoContext(ctx, "Message stream ended")
-                break
-            }
-            client.Logger.ErrorContext(ctx, "Error receiving message", "error", err)
+// Handler signature: (ctx, task, message) -> (artifact, state, errorMessage)
+func translateHandler(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Artifact, pb.TaskState, string) {
+    // 1. Extract input from the message
+    var inputText string
+    for _, part := range message.Content {
+        if text := part.GetText(); text != "" {
+            inputText = text
             break
         }
-
-        // Process message events
-        if messageEvent := event.GetMessage(); messageEvent != nil {
-            // Extract trace context for distributed tracing
-            eventCtx := ctx
-            if event.GetTraceId() != "" && event.GetSpanId() != "" {
-                headers := map[string]string{
-                    "traceparent": fmt.Sprintf("00-%s-%s-01",
-                        event.GetTraceId(), event.GetSpanId()),
-                }
-                eventCtx = client.TraceManager.ExtractTraceContext(ctx, headers)
-            }
-
-            // Check if this message is for us
-            if shouldProcessMessage(messageEvent) {
-                handleMessage(eventCtx, client, messageEvent)
-            }
-        }
-    }
-}
-
-func shouldProcessMessage(message *pb.Message) bool {
-    // Check metadata for task type
-    if message.Metadata != nil && message.Metadata.Fields != nil {
-        if taskType, exists := message.Metadata.Fields["task_type"]; exists {
-            taskTypeStr := taskType.GetStringValue()
-            // Accept our specific task types
-            return taskTypeStr == "translation_request" ||
-                   taskTypeStr == "translate"
-        }
-    }
-    return false
-}
-```
-
-## Step 4: Implement Message Handler
-
-Process incoming messages and return results:
-
-```go
-func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, message *pb.Message) {
-    // Start tracing
-    reqCtx, reqSpan := client.TraceManager.StartA2AMessageSpan(
-        ctx,
-        "myagent.handle_request",
-        message.GetMessageId(),
-        message.GetRole().String(),
-    )
-    defer reqSpan.End()
-
-    client.TraceManager.AddComponentAttribute(reqSpan, "myagent")
-
-    client.Logger.InfoContext(reqCtx, "Received translation request",
-        "message_id", message.GetMessageId(),
-        "context_id", message.GetContextId(),
-        "task_id", message.GetTaskId(),
-    )
-
-    // Extract input text
-    var inputText string
-    if len(message.Content) > 0 {
-        inputText = message.Content[0].GetText()
     }
 
-    // Extract translation parameters from metadata
+    if inputText == "" {
+        return nil, pb.TaskState_TASK_STATE_FAILED, "No input text provided"
+    }
+
+    // 2. Extract parameters from metadata (optional)
     targetLang := "en" // default
     if message.Metadata != nil && message.Metadata.Fields != nil {
         if lang, exists := message.Metadata.Fields["target_language"]; exists {
@@ -278,23 +112,35 @@ func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, message
         }
     }
 
-    client.Logger.InfoContext(reqCtx, "Processing translation",
-        "input_length", len(inputText),
-        "target_language", targetLang,
-    )
-
-    // Perform the actual work (translation)
-    translatedText, err := performTranslation(reqCtx, inputText, targetLang)
+    // 3. Perform your business logic
+    translatedText, err := performTranslation(ctx, inputText, targetLang)
     if err != nil {
-        client.TraceManager.RecordError(reqSpan, err)
-        client.Logger.ErrorContext(reqCtx, "Translation failed", "error", err)
-        return
+        return nil, pb.TaskState_TASK_STATE_FAILED, fmt.Sprintf("Translation failed: %v", err)
     }
 
-    // Create and send response
-    sendResponse(reqCtx, client, message, translatedText, targetLang)
+    // 4. Create an artifact with your result
+    artifact := &pb.Artifact{
+        ArtifactId:  fmt.Sprintf("translation_%s_%d", task.GetId(), time.Now().Unix()),
+        Name:        "translation_result",
+        Description: fmt.Sprintf("Translation to %s", targetLang),
+        Parts: []*pb.Part{
+            {
+                Part: &pb.Part_Text{
+                    Text: translatedText,
+                },
+            },
+        },
+        Metadata: &structpb.Struct{
+            Fields: map[string]*structpb.Value{
+                "original_text":   structpb.NewStringValue(inputText),
+                "target_language": structpb.NewStringValue(targetLang),
+                "translated_at":   structpb.NewStringValue(time.Now().Format(time.RFC3339)),
+            },
+        },
+    }
 
-    client.TraceManager.SetSpanSuccess(reqSpan)
+    // 5. Return success
+    return artifact, pb.TaskState_TASK_STATE_COMPLETED, ""
 }
 
 func performTranslation(ctx context.Context, text, targetLang string) (string, error) {
@@ -304,72 +150,136 @@ func performTranslation(ctx context.Context, text, targetLang string) (string, e
     // Example placeholder:
     return fmt.Sprintf("[Translated to %s]: %s", targetLang, text), nil
 }
+```
 
-func sendResponse(ctx context.Context, client *agenthub.AgentHubClient,
-                  originalMsg *pb.Message, translatedText, targetLang string) {
+### Handler Return Values
 
-    responseMessage := &pb.Message{
-        MessageId: fmt.Sprintf("msg_%s_response_%d", myAgentID, time.Now().Unix()),
-        ContextId: originalMsg.GetContextId(), // Maintain conversation context
-        TaskId:    originalMsg.GetTaskId(),    // Maintain task correlation
-        Role:      pb.Role_ROLE_AGENT,
-        Content: []*pb.Part{
-            {
-                Part: &pb.Part_Text{
-                    Text: translatedText,
-                },
-            },
-        },
-        Metadata: &structpb.Struct{
-            Fields: map[string]*structpb.Value{
-                "task_type":           structpb.NewStringValue("translation_result"),
-                "agent_id":            structpb.NewStringValue(myAgentID),
-                "target_language":     structpb.NewStringValue(targetLang),
-                "original_message_id": structpb.NewStringValue(originalMsg.GetMessageId()),
-                "created_at":          structpb.NewStringValue(time.Now().Format(time.RFC3339)),
-            },
-        },
+Your handler returns three values:
+
+1. **`*pb.Artifact`**: The result data (or `nil` if failed)
+2. **`pb.TaskState`**: Status code (`TASK_STATE_COMPLETED`, `TASK_STATE_FAILED`, etc.)
+3. **`string`**: Error message (empty string if successful)
+
+## Step 5: Run Your Agent
+
+```go
+    // Run the agent (blocks until shutdown signal)
+    if err := agent.Run(context.Background()); err != nil {
+        log.Fatal(err)
     }
-
-    // Publish response
-    _, err := client.Client.PublishMessage(ctx, &pb.PublishMessageRequest{
-        Message: responseMessage,
-        Routing: &pb.AgentEventMetadata{
-            FromAgentId: myAgentID,
-            ToAgentId:   "", // Broadcast for correlation matching
-            EventType:   "a2a.message.translation_response",
-            Priority:    pb.Priority_PRIORITY_MEDIUM,
-        },
-    })
-
-    if err != nil {
-        client.Logger.ErrorContext(ctx, "Failed to publish response", "error", err)
-        return
-    }
-
-    client.Logger.InfoContext(ctx, "Published translation response",
-        "message_id", responseMessage.GetMessageId(),
-        "context_id", responseMessage.GetContextId(),
-    )
 }
 ```
 
-## Step 5: Test Your Agent
+That's it! The SubAgent library handles:
+- ✅ gRPC client setup and connection
+- ✅ Agent card creation with A2A-compliant structure
+- ✅ Broker registration and auto-discovery by Cortex
+- ✅ Task subscription and routing
+- ✅ Distributed tracing (automatic span creation)
+- ✅ Structured logging (all operations logged)
+- ✅ Graceful shutdown (SIGINT/SIGTERM handling)
+- ✅ Health checks
+- ✅ Error handling
 
-### Build and Run
+## Complete Example
+
+Here's a full working agent in ~80 lines:
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "time"
+
+    pb "github.com/owulveryck/agenthub/events/a2a"
+    "github.com/owulveryck/agenthub/internal/subagent"
+    "google.golang.org/protobuf/types/known/structpb"
+)
+
+func main() {
+    config := &subagent.Config{
+        AgentID:     "agent_translator",
+        ServiceName: "translator_service",
+        Name:        "Translation Agent",
+        Description: "Translates text between languages using AI models",
+        Version:     "1.0.0",
+        HealthPort:  "8087",
+    }
+
+    agent, err := subagent.New(config)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    agent.MustAddSkill(
+        "Language Translation",
+        "Translates text from one language to another. Supports major languages including English, Spanish, French, German, Japanese, and Chinese",
+        translateHandler,
+    )
+
+    if err := agent.Run(context.Background()); err != nil {
+        log.Fatal(err)
+    }
+}
+
+func translateHandler(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Artifact, pb.TaskState, string) {
+    var inputText string
+    for _, part := range message.Content {
+        if text := part.GetText(); text != "" {
+            inputText = text
+            break
+        }
+    }
+
+    if inputText == "" {
+        return nil, pb.TaskState_TASK_STATE_FAILED, "No input text provided"
+    }
+
+    targetLang := "en"
+    if message.Metadata != nil && message.Metadata.Fields != nil {
+        if lang, exists := message.Metadata.Fields["target_language"]; exists {
+            targetLang = lang.GetStringValue()
+        }
+    }
+
+    translatedText := fmt.Sprintf("[Translated to %s]: %s", targetLang, inputText)
+
+    artifact := &pb.Artifact{
+        ArtifactId:  fmt.Sprintf("translation_%s_%d", task.GetId(), time.Now().Unix()),
+        Name:        "translation_result",
+        Description: fmt.Sprintf("Translation to %s", targetLang),
+        Parts: []*pb.Part{
+            {Part: &pb.Part_Text{Text: translatedText}},
+        },
+        Metadata: &structpb.Struct{
+            Fields: map[string]*structpb.Value{
+                "original_text":   structpb.NewStringValue(inputText),
+                "target_language": structpb.NewStringValue(targetLang),
+            },
+        },
+    }
+
+    return artifact, pb.TaskState_TASK_STATE_COMPLETED, ""
+}
+```
+
+## Build and Test
 
 ```bash
 # Build your agent
-go build -o bin/myagent ./agents/myagent
+go build -o bin/translator ./agents/translator
 
-# Start broker (if not already running)
+# Start broker (if not running)
 ./bin/broker &
 
-# Start Cortex (if not already running)
+# Start Cortex (if not running)
 ./bin/cortex &
 
 # Start your agent
-./bin/myagent
+./bin/translator
 ```
 
 ### Verify Registration
@@ -378,193 +288,206 @@ Check the logs:
 
 ```bash
 # Your agent logs should show:
-# INFO msg="Agent registered successfully" agent_id=agent_myservice skills=1
+time=... level=INFO msg="Agent card registered" agent_id=agent_translator skills=1
+time=... level=INFO msg="Agent started successfully" agent_id=agent_translator name="Translation Agent" skills=1
 
 # Cortex logs should show:
-# INFO msg="Received agent card event" agent_id=agent_myservice event_type=registered
-# INFO msg="Agent skills registered" agent_id=agent_myservice skills="[Language Translation: ...]"
-# INFO msg="Agent registered with Cortex orchestrator" agent_id=agent_myservice total_agents=N
+time=... level=INFO msg="Received agent card event" agent_id=agent_translator event_type=registered
+time=... level=INFO msg="Agent registered with Cortex orchestrator" agent_id=agent_translator total_agents=N
 ```
 
 ### Test with Chat CLI
 
 ```bash
-# In another terminal, use the chat CLI
 ./bin/chat_cli
 
 # Try these prompts (if using VertexAI LLM):
 > Can you translate "hello world" to Spanish?
-> I need this text translated to French
-> Translate "good morning" to Japanese
+> Translate "good morning" to French
 ```
 
-## Complete Workflow
-
-Here's what happens when everything is connected:
+## How It Works
 
 ```mermaid
 sequenceDiagram
     participant A as Your Agent
+    participant SL as SubAgent Library
     participant B as Broker
     participant C as Cortex
-    participant L as VertexAI LLM
+    participant L as LLM
     participant U as User
 
-    Note over A: Startup
-    A->>B: RegisterAgent(AgentCard with skills)
-    B->>B: Store agent card
-    B->>C: Broadcast AgentCardEvent
-    C->>C: RegisterAgent(id, card)
-    Note over C: Agent now available to LLM
+    Note over A: agent.Run() called
+    A->>SL: Initialize
+    SL->>B: RegisterAgent(AgentCard)
+    B->>C: AgentCardEvent
+    C->>C: Register agent
+    Note over C: Agent now available
 
     U->>C: "Translate this to Spanish"
-    C->>L: Decide(history, availableAgents, message)
-    Note over L: Sees your agent:<br/>"Language Translation"<br/>Examples match request
-    L-->>C: Decision{delegate to agent_myservice}
-    C->>B: PublishMessage(task_type: "translate")
-    B->>A: Route message to agent
+    C->>L: Decide(history, agents, message)
+    L-->>C: Delegate to translator
+    C->>B: Publish task
+    B->>SL: Route to agent
+    SL->>SL: Start tracing span
+    SL->>SL: Log task receipt
+    SL->>A: Call your handler
     A->>A: Process translation
-    A->>B: PublishMessage(result)
-    B->>C: Route response
-    C->>L: Synthesize result
-    L-->>C: User-friendly response
-    C->>U: "Here's the Spanish translation: ..."
+    A-->>SL: Return artifact
+    SL->>SL: Log completion
+    SL->>SL: End tracing span
+    SL->>B: Publish result
+    B->>C: Route result
+    C->>U: "Aquí está: Hola mundo"
 ```
 
-## Best Practices
+## Advanced Usage
 
-### 1. AgentCard Design
-- **Be specific**: Clear descriptions help the LLM make better decisions
-- **Provide examples**: Include 5-10 varied examples of how users might request this service
-- **Use tags**: Categorize your agent for better discovery
-- **Version your agent**: Use semantic versioning
+### Accessing the Client
 
-### 2. Message Processing
-- **Check task_type**: Always verify the message is intended for your agent
-- **Validate input**: Don't assume message content is in the expected format
-- **Handle errors gracefully**: Return meaningful error messages
-- **Maintain context**: Always preserve ContextId and TaskId in responses
-
-### 3. Observability
-- **Use tracing**: The AgentHubClient provides built-in tracing
-- **Log important events**: Registration, message receipt, processing, responses
-- **Add custom attributes**: Use TraceManager to add relevant metadata
-
-### 4. Testing
-- **Unit test**: Test message handlers independently
-- **Integration test**: Test with broker and Cortex
-- **E2E test**: Test the complete flow with the LLM
-
-## Advanced Topics
-
-### Multi-Skill Agents
-
-An agent can have multiple skills:
+If you need access to the underlying AgentHub client:
 
 ```go
-Skills: []*pb.AgentSkill{
-    {
-        Id:   "translate",
-        Name: "Language Translation",
-        // ...
-    },
-    {
-        Id:   "detect_language",
-        Name: "Language Detection",
-        Description: "Automatically detects the language of input text",
-        Examples: []string{
-            "What language is this?",
-            "Detect the language of this text",
-        },
-        // ...
-    },
-},
+client := agent.GetClient()
+logger := agent.GetLogger()
+config := agent.GetConfig()
 ```
 
-Handle different skills in your message handler:
+### Custom Configuration
 
 ```go
-func shouldProcessMessage(message *pb.Message) bool {
-    if message.Metadata != nil && message.Metadata.Fields != nil {
-        if taskType, exists := message.Metadata.Fields["task_type"]; exists {
-            taskTypeStr := taskType.GetStringValue()
-            switch taskTypeStr {
-            case "translate", "translation_request":
-                return true
-            case "detect_language", "language_detection":
-                return true
-            }
-        }
-    }
-    return false
+config := &subagent.Config{
+    AgentID:     "my_agent",
+    ServiceName: "custom_service_name",  // Optional
+    Name:        "My Agent",
+    Description: "Does amazing things",
+    Version:     "2.0.0",
+    HealthPort:  "9000",
+    BrokerAddr:  "broker.example.com",   // Optional
+    BrokerPort:  "50051",                // Optional
 }
 ```
 
-### Async Long-Running Tasks
-
-For operations that take time, consider task-based workflows instead of message-based:
+### Multiple Skills Example
 
 ```go
-// Subscribe to tasks instead of messages
-stream, err := client.Client.SubscribeToTasks(ctx, &pb.SubscribeToTasksRequest{
-    AgentId: myAgentID,
-})
+agent.MustAddSkill("Skill A", "Description A", handlerA)
+agent.MustAddSkill("Skill B", "Description B", handlerB)
+agent.MustAddSkill("Skill C", "Description C", handlerC)
 
-// Send progress updates
-client.Client.PublishTaskUpdate(ctx, &pb.PublishTaskUpdateRequest{
-    Update: &pb.TaskStatusUpdateEvent{
-        TaskId: taskId,
-        Status: &pb.TaskStatus{
-            State: pb.TaskState_TASK_STATE_WORKING,
-            Update: progressMessage,
-        },
-    },
-})
+// Each skill gets its own handler function
+// The SubAgent library routes tasks to the correct handler based on task type
 ```
 
-### Health Checks
-
-Implement health checks for production deployments:
+### Error Handling in Handlers
 
 ```go
-// The AgentHubClient automatically sets up health checks on the specified port
-config := agenthub.NewGRPCConfig("myservice")
-config.HealthPort = "8087"
+func myHandler(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Artifact, pb.TaskState, string) {
+    result, err := doWork(ctx, message)
+    if err != nil {
+        // Return failure with error message
+        return nil, pb.TaskState_TASK_STATE_FAILED, err.Error()
+    }
 
-// Health endpoint will be available at http://localhost:8087/health
+    // Return success with result
+    artifact := createArtifact(result)
+    return artifact, pb.TaskState_TASK_STATE_COMPLETED, ""
+}
 ```
+
+## What the SubAgent Library Provides
+
+### Automatic Setup
+- gRPC client connection to broker
+- Health check endpoint
+- Signal handling for graceful shutdown
+- Configuration validation with defaults
+
+### A2A-Compliant AgentCard
+- Correct protocol version (0.2.9)
+- Proper capabilities structure
+- Complete skill definitions with all required fields
+- Automatic skill ID generation and tagging
+
+### Observability
+- **Tracing**: Automatic span creation for each task with attributes
+- **Logging**: Structured logging for all operations (registration, task receipt, completion, errors)
+- **Metrics**: Built-in metrics collection (via AgentHub client)
+
+### Task Management
+- Automatic task subscription
+- Skill-based handler routing
+- Error handling and reporting
+- Result publishing
+
+### Developer Experience
+- Simple 3-step API: `New()` → `AddSkill()` → `Run()`
+- Clear error messages
+- Type-safe handler functions
+- Automatic resource cleanup
+
+## Best Practices
+
+### 1. Skill Design
+- **Be specific**: Clear descriptions help the LLM delegate correctly
+- **Single responsibility**: Each skill should do one thing well
+- **Related skills**: Group related capabilities in one agent
+
+### 2. Handler Implementation
+- **Validate input**: Always check that required data is present
+- **Handle errors gracefully**: Return meaningful error messages
+- **Include metadata**: Add useful context to your artifacts
+- **Keep it focused**: Handlers should do one thing
+
+### 3. Configuration
+- **Unique ports**: Each agent needs a unique health port
+- **Meaningful names**: Use descriptive agent IDs and names
+- **Version appropriately**: Use semantic versioning
+
+### 4. Testing
+- **Unit test handlers**: Test business logic independently
+- **Integration test**: Verify agent works with broker and Cortex
+- **E2E test**: Test the complete flow with the LLM
 
 ## Troubleshooting
 
-### Agent not showing in Cortex
+### Build Errors
+
+**Import issues:**
+```bash
+go mod tidy
+go mod download
+```
+
+### Agent Not Registering
 
 **Check:**
-1. Broker logs for `agent_registered` events
-2. Cortex logs for `Received agent card event`
-3. Ensure Cortex started before your agent (or wait a few seconds)
-4. Verify AgentCard.Name matches your agent ID
+1. Broker is running and accessible
+2. Config has all required fields (AgentID, Name, Description)
+3. Health port is not in use by another service
+4. Logs for specific error messages
 
-### LLM not delegating to your agent
-
-**Check:**
-1. AgentCard has clear, detailed skill descriptions
-2. Examples cover the types of requests users make
-3. VertexAI is configured (not using mock LLM)
-4. User requests actually match your agent's capabilities
-
-### Messages not being received
+### Tasks Not Reaching Agent
 
 **Check:**
-1. SubscribeToMessages is called with correct agent ID
-2. Message metadata includes expected `task_type`
-3. shouldProcessMessage() logic is correct
-4. Check broker logs for routing events
+1. Cortex is running and has discovered your agent
+2. Skill names and descriptions match what users are asking for
+3. LLM is configured (not using mock LLM for delegation)
+4. Check broker and Cortex logs for routing events
+
+### Handler Errors
+
+**Check:**
+1. Handler function signature matches `TaskHandler` type
+2. Input validation is working correctly
+3. Error messages are being returned properly
+4. Logs show task receipt and processing
 
 ## Next Steps
 
-- Read [Designing Effective Agent Cards](design_agent_cards.md)
-- See [Working with A2A Messages](../a2a_protocol/work_with_a2a_messages.md)
-- Explore [Distributed Tracing](../observability/add_observability.md)
-- Review the [Echo Agent Example](../../agents/echo_agent/main.go)
+- See the [Echo Agent Example](../../agents/echo_agent/main.go) for a minimal working agent
+- Read [Designing Effective Agent Cards](design_agent_cards.md) for skill design guidance
+- Explore [SubAgent Library Reference](../reference/subagent_library_api.md) for advanced features
+- Check [Distributed Tracing](../observability/add_observability.md) to understand built-in tracing
 
-Your agent is now fully integrated with Cortex and ready for dynamic, LLM-driven task delegation!
+With the SubAgent library, creating production-ready agents is now as simple as defining your configuration, implementing your business logic, and calling `Run()`!
