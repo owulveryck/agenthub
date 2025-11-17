@@ -23,6 +23,12 @@ const (
 	chatAgentID = "agent_chat_responder"
 )
 
+// ANSI color codes for terminal output
+const (
+	colorCyan  = "\033[36m" // Cyan color for task results
+	colorReset = "\033[0m"  // Reset to default color
+)
+
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -239,18 +245,37 @@ func main() {
 				)
 				client.TraceManager.AddComponentAttribute(respSpan, "chat_repl")
 
-				// Check if this response matches our context
-				if response.ContextId == contextID {
+				// Check if this is a task result message
+				isTaskResult := false
+				if response.Metadata != nil && response.Metadata.Fields != nil {
+					if taskType, exists := response.Metadata.Fields["task_type"]; exists {
+						if taskType.GetStringValue() == "task_result" {
+							isTaskResult = true
+						}
+					}
+				}
+
+				// Check if this response matches our context, or is a task result
+				if response.ContextId == contextID || isTaskResult {
 					client.TraceManager.AddSpanEvent(respSpan, "context_matched",
 						attribute.String("expected_context", contextID),
 						attribute.String("received_context", response.ContextId),
+						attribute.Bool("is_task_result", isTaskResult),
 					)
 					fmt.Print("\r")
 					if len(response.Content) > 0 && response.Content[0].GetText() != "" {
-						fmt.Printf("< %s\n\n", response.Content[0].GetText())
-						client.TraceManager.AddSpanEvent(respSpan, "response_displayed",
-							attribute.String("response_text", response.Content[0].GetText()),
-						)
+						// Display task results in cyan color
+						if isTaskResult {
+							fmt.Printf("%s< [Task Result] %s%s\n\n", colorCyan, response.Content[0].GetText(), colorReset)
+							client.TraceManager.AddSpanEvent(respSpan, "task_result_displayed",
+								attribute.String("response_text", response.Content[0].GetText()),
+							)
+						} else {
+							fmt.Printf("< %s\n\n", response.Content[0].GetText())
+							client.TraceManager.AddSpanEvent(respSpan, "response_displayed",
+								attribute.String("response_text", response.Content[0].GetText()),
+							)
+						}
 					} else {
 						fmt.Printf("< [Empty response]\n\n")
 						client.TraceManager.AddSpanEvent(respSpan, "empty_response_received")
@@ -259,6 +284,7 @@ func main() {
 					client.Logger.InfoContext(respCtx, "Processed chat response",
 						"response_message_id", response.GetMessageId(),
 						"context_id", response.GetContextId(),
+						"is_task_result", isTaskResult,
 						"trace_id", respSpan.SpanContext().TraceID().String(),
 					)
 				} else {
