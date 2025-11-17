@@ -528,6 +528,49 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, traceManager *observabi
 	return nil
 }
 
+// HandleTaskCompletion processes task completion notifications from delegated agents
+func (c *Cortex) HandleTaskCompletion(ctx context.Context, taskID, contextID string, status *pb.TaskStatus) {
+	// Use WithLock to ensure thread-safe state access
+	_ = c.stateManager.WithLock(contextID, func(conversationState *state.ConversationState) error {
+		// Check if this task is pending
+		taskContext, pending := conversationState.PendingTasks[taskID]
+		if !pending {
+			// Task not found or already processed
+			return nil
+		}
+
+		// Store the task result and update completion time
+		taskContext.CompletedAt = time.Now().Unix()
+		taskContext.Result = status
+
+		// Note: We don't delete from PendingTasks yet - keep it for potential
+		// use in responding to the user with the task results
+
+		return nil
+	})
+}
+
+// HandleTaskArtifact processes task artifact notifications from delegated agents
+func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID string, artifact *pb.Artifact) {
+	// Use WithLock to ensure thread-safe state access
+	_ = c.stateManager.WithLock(contextID, func(conversationState *state.ConversationState) error {
+		// Check if this task is pending
+		taskContext, pending := conversationState.PendingTasks[taskID]
+		if !pending {
+			// Task not found or already processed
+			return nil
+		}
+
+		// Store the artifact with the task context
+		if taskContext.Artifacts == nil {
+			taskContext.Artifacts = make([]*pb.Artifact, 0)
+		}
+		taskContext.Artifacts = append(taskContext.Artifacts, artifact)
+
+		return nil
+	})
+}
+
 // truncateString truncates a string to maxLen characters, adding "..." if truncated
 func truncateString(s string, maxLen int) string {
 	if len(s) <= maxLen {

@@ -18,8 +18,11 @@ type TaskContext struct {
 	TaskID        string
 	TaskType      string
 	RequestedAt   int64 // Unix timestamp
+	CompletedAt   int64 // Unix timestamp
 	OriginalInput *pb.Message
-	UserNotified  bool // Did we send "I'm working on it" acknowledgment?
+	UserNotified  bool           // Did we send "I'm working on it" acknowledgment?
+	Result        *pb.TaskStatus // Task completion status
+	Artifacts     []*pb.Artifact // Task artifacts/results
 }
 
 // StateManager defines the interface for persisting conversation state.

@@ -182,6 +182,50 @@ func main() {
 		}
 	}()
 
+	// Subscribe to task updates to receive completions from delegated agents
+	go func() {
+		stream, err := client.Client.SubscribeToTasks(ctx, &pb.SubscribeToTasksRequest{
+			AgentId: cortexAgentID,
+		})
+
+		if err != nil {
+			client.Logger.ErrorContext(ctx, "Failed to subscribe to tasks", "error", err)
+			return
+		}
+
+		client.Logger.InfoContext(ctx, "Subscribed to task updates")
+
+		for {
+			event, err := stream.Recv()
+			if err != nil {
+				if err == io.EOF {
+					client.Logger.InfoContext(ctx, "Task event stream ended")
+					break
+				}
+				client.Logger.ErrorContext(ctx, "Error receiving task event", "error", err)
+				break
+			}
+
+			// Extract trace context from event
+			eventCtx := ctx
+			if event.GetTraceId() != "" && event.GetSpanId() != "" {
+				headers := map[string]string{
+					"traceparent": fmt.Sprintf("00-%s-%s-01", event.GetTraceId(), event.GetSpanId()),
+				}
+				eventCtx = client.TraceManager.ExtractTraceContext(ctx, headers)
+			}
+
+			// Process task completion events
+			if statusUpdate := event.GetStatusUpdate(); statusUpdate != nil {
+				handleTaskStatusUpdate(eventCtx, client, cortexInstance, statusUpdate)
+			}
+
+			if artifactUpdate := event.GetArtifactUpdate(); artifactUpdate != nil {
+				handleTaskArtifactUpdate(eventCtx, client, cortexInstance, artifactUpdate)
+			}
+		}
+	}()
+
 	client.Logger.InfoContext(ctx, "Starting Cortex Orchestrator")
 	client.Logger.InfoContext(ctx, "Cortex is ready to orchestrate conversations and tasks")
 
@@ -299,6 +343,42 @@ func handleAgentCardEvent(ctx context.Context, client *agenthub.AgentHubClient, 
 		"agent_id", agentID,
 		"total_agents", len(cortexInstance.GetAvailableAgents()),
 	)
+}
+
+// handleTaskStatusUpdate processes task status completion events
+func handleTaskStatusUpdate(ctx context.Context, client *agenthub.AgentHubClient, cortexInstance *cortex.Cortex, statusUpdate *pb.TaskStatusUpdateEvent) {
+	taskID := statusUpdate.GetTaskId()
+	contextID := statusUpdate.GetContextId()
+	status := statusUpdate.GetStatus()
+
+	client.Logger.InfoContext(ctx, "Received task status update",
+		"task_id", taskID,
+		"context_id", contextID,
+		"state", status.GetState().String(),
+		"final", statusUpdate.GetFinal(),
+	)
+
+	// Notify Cortex about the task completion
+	if statusUpdate.GetFinal() {
+		cortexInstance.HandleTaskCompletion(ctx, taskID, contextID, status)
+	}
+}
+
+// handleTaskArtifactUpdate processes task artifact events
+func handleTaskArtifactUpdate(ctx context.Context, client *agenthub.AgentHubClient, cortexInstance *cortex.Cortex, artifactUpdate *pb.TaskArtifactUpdateEvent) {
+	taskID := artifactUpdate.GetTaskId()
+	contextID := artifactUpdate.GetContextId()
+	artifact := artifactUpdate.GetArtifact()
+
+	client.Logger.InfoContext(ctx, "Received task artifact",
+		"task_id", taskID,
+		"context_id", contextID,
+		"artifact_id", artifact.GetArtifactId(),
+		"artifact_name", artifact.GetName(),
+	)
+
+	// Notify Cortex about the artifact
+	cortexInstance.HandleTaskArtifact(ctx, taskID, contextID, artifact)
 }
 
 // createLLMClient creates the LLM client based on configuration
