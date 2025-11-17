@@ -150,9 +150,37 @@ func main() {
 		}
 	}()
 
-	// Subscribe to agent registrations
-	// Note: In a full implementation, we'd have a separate stream for agent cards
-	// For now, we'll manually register known agents or use a discovery mechanism
+	// Subscribe to agent events (including agent card registrations)
+	go func() {
+		stream, err := client.Client.SubscribeToAgentEvents(ctx, &pb.SubscribeToAgentEventsRequest{
+			AgentId:    cortexAgentID,
+			EventTypes: []string{"agent.registered", "agent.updated"},
+		})
+
+		if err != nil {
+			client.Logger.ErrorContext(ctx, "Failed to subscribe to agent events", "error", err)
+			return
+		}
+
+		client.Logger.InfoContext(ctx, "Subscribed to agent registration events")
+
+		for {
+			event, err := stream.Recv()
+			if err != nil {
+				if err == io.EOF {
+					client.Logger.InfoContext(ctx, "Agent event stream ended")
+					break
+				}
+				client.Logger.ErrorContext(ctx, "Error receiving agent event", "error", err)
+				break
+			}
+
+			// Process agent card events
+			if agentCardEvent := event.GetAgentCard(); agentCardEvent != nil {
+				handleAgentCardEvent(ctx, client, cortexInstance, agentCardEvent)
+			}
+		}
+	}()
 
 	client.Logger.InfoContext(ctx, "Starting Cortex Orchestrator")
 	client.Logger.InfoContext(ctx, "Cortex is ready to orchestrate conversations and tasks")
@@ -233,6 +261,43 @@ func handleMessage(ctx context.Context, client *agenthub.AgentHubClient, cortexI
 		"message_id", message.GetMessageId(),
 		"context_id", message.GetContextId(),
 		"trace_id", handlerSpan.SpanContext().TraceID().String(),
+	)
+}
+
+// handleAgentCardEvent processes agent registration/update events
+func handleAgentCardEvent(ctx context.Context, client *agenthub.AgentHubClient, cortexInstance *cortex.Cortex, cardEvent *pb.AgentCardEvent) {
+	agentID := cardEvent.GetAgentId()
+	agentCard := cardEvent.GetAgentCard()
+	eventType := cardEvent.GetEventType()
+
+	client.Logger.InfoContext(ctx, "Received agent card event",
+		"agent_id", agentID,
+		"event_type", eventType,
+		"agent_name", agentCard.GetName(),
+		"agent_description", agentCard.GetDescription(),
+		"skills_count", len(agentCard.GetSkills()),
+	)
+
+	// Register the agent with Cortex
+	cortexInstance.RegisterAgent(agentID, agentCard)
+
+	// Log the skills for visibility
+	if len(agentCard.GetSkills()) > 0 {
+		client.Logger.InfoContext(ctx, "Agent skills registered",
+			"agent_id", agentID,
+			"skills", func() []string {
+				skills := make([]string, 0, len(agentCard.GetSkills()))
+				for _, skill := range agentCard.GetSkills() {
+					skills = append(skills, fmt.Sprintf("%s: %s", skill.GetName(), skill.GetDescription()))
+				}
+				return skills
+			}(),
+		)
+	}
+
+	client.Logger.InfoContext(ctx, "Agent registered with Cortex orchestrator",
+		"agent_id", agentID,
+		"total_agents", len(cortexInstance.GetAvailableAgents()),
 	)
 }
 

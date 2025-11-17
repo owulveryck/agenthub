@@ -108,6 +108,62 @@ When you run the demo, you'll see:
                     └─────────────────┘
 ```
 
+## 🤖 AI-Powered Orchestration with Cortex
+
+AgentHub now includes **Cortex**, an intelligent orchestrator that uses LLMs (Large Language Models) for dynamic agent discovery and task delegation:
+
+### ✨ Key Features
+
+- **🔍 Auto-Discovery**: Agents register themselves with detailed capability descriptions
+- **🧠 LLM-Based Routing**: VertexAI intelligently decides which agent handles each task
+- **🎯 Zero Configuration**: No hardcoded routing rules or static configurations
+- **📝 Self-Documenting**: Agents describe their skills with examples
+- **⚡ Hot-Plugging**: Add/remove agents without restarting the system
+
+### Quick Start with Cortex
+
+```bash
+# Set up VertexAI credentials
+export GCP_PROJECT=your-project
+export GCP_LOCATION=us-central1
+export VERTEX_AI_MODEL=gemini-2.0-flash
+
+# Run the interactive demo
+./demo_cortex.sh
+
+# In the chat CLI, try:
+> Can you echo hello world?
+> Translate this to Spanish
+```
+
+### How It Works
+
+```mermaid
+sequenceDiagram
+    participant A as Your Agent
+    participant B as Broker
+    participant C as Cortex
+    participant L as VertexAI
+    participant U as User
+
+    A->>B: RegisterAgent(AgentCard with skills)
+    B->>C: AgentCardEvent
+    C->>C: Agent discovered
+
+    U->>C: "Echo hello world"
+    C->>L: Which agent for this?
+    L-->>C: Use agent_echo
+    C->>A: Delegate task
+    A-->>C: Result
+    C->>U: Response
+```
+
+**Learn More:**
+- [Create Agent with Cortex](documentation/howto/create_agent_with_cortex.md) - Build auto-discoverable agents
+- [Design Agent Cards](documentation/howto/design_agent_cards.md) - Write effective capability descriptions
+- [Agent Discovery Workflow](documentation/explanation/agent_discovery_workflow.md) - Understanding the discovery process
+- [Complete Specification](AGENT_DECIDE.md) - Technical specification and implementation details
+
 ## 📚 Documentation
 
 Our documentation follows the [Diátaxis framework](https://diataxis.fr/) for different learning needs:
@@ -118,19 +174,26 @@ Our documentation follows the [Diátaxis framework](https://diataxis.fr/) for di
 - **[🔧 Running the Basic Demo](documentation/tutorials/run_demo.md)** - Basic AgentHub functionality without observability
 
 ### 🛠️ [How-to Guides](documentation/howto/) - *Practical Solutions*
+
+**Agent Development:**
+- **[🤖 Create Agent with Cortex](documentation/howto/create_agent_with_cortex.md)** - Build agents with auto-discovery and LLM orchestration
+- **[🎯 Design Effective Agent Cards](documentation/howto/design_agent_cards.md)** - Write AgentCards for optimal LLM matching
+- **[📝 Create a Publisher](documentation/howto/create_publisher.md)** - Build task-delegating agents
+- **[📥 Create a Subscriber](documentation/howto/create_subscriber.md)** - Build task-processing agents
+
+**Observability:**
 - **[📈 Add Observability to Your Agent](documentation/howto/add_observability.md)** - Step-by-step guide to instrument your agents
 - **[📊 Use Grafana Dashboards](documentation/howto/use_dashboards.md)** - Master the observability dashboards
 - **[🔍 Debug with Distributed Tracing](documentation/howto/debug_with_tracing.md)** - Troubleshoot issues using Jaeger
 - **[⚠️ Configure Alerts](documentation/howto/configure_alerts.md)** - Setup monitoring and alerting
-- **[📝 Create a Publisher](documentation/howto/create_publisher.md)** - Build task-delegating agents
-- **[📥 Create a Subscriber](documentation/howto/create_subscriber.md)** - Build task-processing agents
 
 ### 🧠 [Explanations](documentation/explanation/) - *Understanding the Why*
+- **[🔄 Agent Discovery Workflow](documentation/explanation/agent_discovery_workflow.md)** - How dynamic agent discovery works
+- **[🤝 The Agent2Agent Principle](documentation/explanation/the_agent_to_agent_principle.md)** - Core communication patterns
+- **[📋 Understanding Tasks](documentation/explanation/the_tasks.md)** - Task semantics and lifecycle
 - **[🔍 Distributed Tracing & OpenTelemetry](documentation/explanation/distributed_tracing.md)** - Deep dive into observability concepts
 - **[🏗️ Go Build Tags](documentation/explanation/go_build_tags.md)** - How AgentHub uses conditional compilation for flexible deployments
 - **[🏗️ Observability Architecture](documentation/explanation/observability_architecture.md)** - How the monitoring stack works
-- **[🤝 The Agent2Agent Principle](documentation/explanation/the_agent_to_agent_principle.md)** - Core communication patterns
-- **[📋 Understanding Tasks](documentation/explanation/the_tasks.md)** - Task semantics and lifecycle
 
 ### 📖 [Reference](documentation/reference/) - *Technical Specifications*
 - **[🏗️ Unified Abstraction API](documentation/reference/unified_abstraction_api.md)** - Complete API reference for the unified abstraction library

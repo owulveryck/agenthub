@@ -63,6 +63,7 @@ func main() {
 		ProtocolVersion: "0.2.9",
 		Name:            echoAgentID,
 		Description:     "A simple echo agent that repeats back messages for testing purposes",
+		Version:         "1.0.0",
 		Capabilities: &pb.AgentCapabilities{
 			Streaming:         false,
 			PushNotifications: false,
@@ -70,9 +71,17 @@ func main() {
 		Skills: []*pb.AgentSkill{
 			{
 				Id:          "echo",
-				Name:        "Echo",
-				Description: "Echoes back the input message",
-				Tags:        []string{"testing", "echo"},
+				Name:        "Echo Messages",
+				Description: "Echoes back any text message with an 'Echo: ' prefix for testing and verification",
+				Tags:        []string{"testing", "echo", "debug", "verification"},
+				Examples: []string{
+					"Echo this message",
+					"Repeat what I say",
+					"Can you echo hello world?",
+					"Test the echo functionality",
+				},
+				InputModes:  []string{"text/plain"},
+				OutputModes: []string{"text/plain"},
 			},
 		},
 	}

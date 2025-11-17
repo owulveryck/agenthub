@@ -30,6 +30,7 @@ message AgentEvent {
     a2a.Task task = 11;                    // A2A Task for work coordination
     TaskStatusUpdateEvent status_update = 12; // Task lifecycle state changes
     TaskArtifactUpdateEvent artifact_update = 13; // Task output artifacts
+    AgentCardEvent agent_card = 14;        // Agent registration/discovery event
   }
 
   // EDA routing metadata for event distribution
@@ -71,6 +72,15 @@ message TaskArtifactUpdateEvent {
   bool append = 4;                        // True to append to existing artifact, false to replace
   bool last_chunk = 5;                    // True if this completes a streaming artifact
   google.protobuf.Struct metadata = 6;    // Delivery metadata (chunk info, compression, etc.)
+}
+
+// AgentCardEvent notifies subscribers about agent registration and capability updates.
+// This event is published when an agent registers or updates its capabilities.
+message AgentCardEvent {
+  string agent_id = 1;                    // Unique agent identifier
+  a2a.AgentCard agent_card = 2;           // The agent's A2A card with capabilities
+  string event_type = 3;                  // Event type: "registered", "updated", "unregistered"
+  google.protobuf.Struct metadata = 4;    // Additional metadata (registration time, etc.)
 }
 
 // Priority levels for event processing and delivery ordering.

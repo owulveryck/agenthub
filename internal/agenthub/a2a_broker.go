@@ -657,6 +657,36 @@ func (s *AgentHubService) RegisterAgent(ctx context.Context, req *pb.RegisterAge
 		"subscriptions", req.GetSubscriptions(),
 	)
 
+	// Publish agent registration event for discovery
+	agentCardEvent := &pb.AgentCardEvent{
+		AgentId:   agentID,
+		AgentCard: req.GetAgentCard(),
+		EventType: "registered",
+	}
+
+	event := &pb.AgentEvent{
+		EventId:   fmt.Sprintf("agent_registered_%s_%d", agentID, time.Now().UnixNano()),
+		Timestamp: timestamppb.Now(),
+		Payload: &pb.AgentEvent_AgentCard{
+			AgentCard: agentCardEvent,
+		},
+		Routing: &pb.AgentEventMetadata{
+			FromAgentId: agentID,
+			ToAgentId:   "", // Broadcast to all subscribers
+			EventType:   "agent.registered",
+			Priority:    pb.Priority_PRIORITY_HIGH,
+		},
+	}
+
+	// Route the event to all subscribers
+	if err := s.routeEvent(ctx, event); err != nil {
+		s.Server.Logger.WarnContext(ctx, "Failed to route agent registration event",
+			"agent_id", agentID,
+			"error", err,
+		)
+		// Don't fail the registration if event routing fails
+	}
+
 	return &pb.RegisterAgentResponse{
 		Success: true,
 		AgentId: agentID,
@@ -690,6 +720,11 @@ func (s *AgentHubService) routeEvent(ctx context.Context, event *pb.AgentEvent) 
 			if subs, ok := s.taskSubscribers[targetAgent]; ok {
 				targetChannels = append(targetChannels, subs...)
 			}
+		case *pb.AgentEvent_AgentCard:
+			// Agent card events are typically broadcast, but can be targeted
+			if subs, ok := s.eventSubscribers[targetAgent]; ok {
+				targetChannels = append(targetChannels, subs...)
+			}
 		}
 		if subs, ok := s.eventSubscribers[targetAgent]; ok {
 			targetChannels = append(targetChannels, subs...)
@@ -703,6 +738,11 @@ func (s *AgentHubService) routeEvent(ctx context.Context, event *pb.AgentEvent) 
 			}
 		case *pb.AgentEvent_Task, *pb.AgentEvent_StatusUpdate, *pb.AgentEvent_ArtifactUpdate:
 			for _, subs := range s.taskSubscribers {
+				targetChannels = append(targetChannels, subs...)
+			}
+		case *pb.AgentEvent_AgentCard:
+			// Broadcast agent card events to all event subscribers
+			for _, subs := range s.eventSubscribers {
 				targetChannels = append(targetChannels, subs...)
 			}
 		}
