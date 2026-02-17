@@ -1,0 +1,931 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head><script src="/agenthub/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=agenthub/livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/agenthub/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/agenthub/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-192x192.png" sizes="192x192">
+
+<title>Task Reference | AgentHub</title>
+<meta name="description" content="Comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation.">
+<meta property="og:url" content="http://localhost:1313/agenthub/docs/reference/the_tasks/">
+  <meta property="og:site_name" content="AgentHub">
+  <meta property="og:title" content="Task Reference">
+  <meta property="og:description" content="Comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:modified_time" content="2025-09-29T10:11:33+02:00">
+
+  <meta itemprop="name" content="Task Reference">
+  <meta itemprop="description" content="Comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation.">
+  <meta itemprop="dateModified" content="2025-09-29T10:11:33+02:00">
+  <meta itemprop="wordCount" content="1452">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Task Reference">
+  <meta name="twitter:description" content="Comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation.">
+<link href="/agenthub/scss/main.css" rel="stylesheet">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/agenthub/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">AgentHub</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="/agenthub/docs/"><span>Documentation</span></a>
+      </li>
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/agenthub/fr/">Français</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/agenthub/fr/">Français</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-agenthubdocs-li">
+  <a href="/agenthub/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-agenthubdocs"><span class="">Documentation</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocstutorials-li">
+  <a href="/agenthub/docs/tutorials/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocstutorials"><span class="">Tutorials</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsbuilding_multi_agent_workflows-li">
+  <a href="/agenthub/docs/tutorials/building_multi_agent_workflows/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsbuilding_multi_agent_workflows"><span class="">Building Multi-Agent Workflows</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsinstallation_and_setup-li">
+  <a href="/agenthub/docs/tutorials/installation_and_setup/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsinstallation_and_setup"><span class="">Installation and Setup Tutorial</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsdashboard_tour-li">
+  <a href="/agenthub/docs/tutorials/dashboard_tour/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsdashboard_tour"><span class="">Interactive Dashboard Tour</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsobservability_demo-li">
+  <a href="/agenthub/docs/tutorials/observability_demo/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsobservability_demo"><span class="">AgentHub Observability Demo Tutorial</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsrun_demo-li">
+  <a href="/agenthub/docs/tutorials/run_demo/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsrun_demo"><span class="">Running the AgentHub Broker Demo</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocshowto-li">
+  <a href="/agenthub/docs/howto/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocshowto"><span class="">How-To Guides</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoadd_observability-li">
+  <a href="/agenthub/docs/howto/add_observability/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoadd_observability"><span class="">How to Add Observability to Your Agent</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtocreate_publisher-li">
+  <a href="/agenthub/docs/howto/create_publisher/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtocreate_publisher"><span class="">How to Create a Task Publisher</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtocreate_subscriber-li">
+  <a href="/agenthub/docs/howto/create_subscriber/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtocreate_subscriber"><span class="">How to Create a Task Subscriber (Agent)</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtodebugging_agent_issues-li">
+  <a href="/agenthub/docs/howto/debugging_agent_issues/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtodebugging_agent_issues"><span class="">How to Debug Agent Issues</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtouse_dashboards-li">
+  <a href="/agenthub/docs/howto/use_dashboards/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtouse_dashboards"><span class="">How to Use Grafana Dashboards</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-agenthubdocsreference-li">
+  <a href="/agenthub/docs/reference/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsreference"><span class="">Reference</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceapi_reference-li">
+  <a href="/agenthub/docs/reference/api_reference/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceapi_reference"><span class="">AgentHub API Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceconfiguration_reference-li">
+  <a href="/agenthub/docs/reference/configuration_reference/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceconfiguration_reference"><span class="">Configuration Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferencehealth_endpoints-li">
+  <a href="/agenthub/docs/reference/health_endpoints/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferencehealth_endpoints"><span class="">AgentHub Health Endpoints Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceobservability_metrics-li">
+  <a href="/agenthub/docs/reference/observability_metrics/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceobservability_metrics"><span class="">AgentHub Observability Metrics Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-agenthubdocsreferencethe_tasks-li">
+  <a href="/agenthub/docs/reference/the_tasks/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferencethe_tasks"><span class="td-sidebar-nav-active-item">Task Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferencetracing_api-li">
+  <a href="/agenthub/docs/reference/tracing_api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferencetracing_api"><span class="">AgentHub Tracing API Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceunified_abstraction_api-li">
+  <a href="/agenthub/docs/reference/unified_abstraction_api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceunified_abstraction_api"><span class="">Unified Abstraction Library API Reference</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsexplanation-li">
+  <a href="/agenthub/docs/explanation/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsexplanation"><span class="">Explanations</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationthe_agent_to_agent_principle-li">
+  <a href="/agenthub/docs/explanation/the_agent_to_agent_principle/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationthe_agent_to_agent_principle"><span class="">The Agent2Agent Principle</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationbroker_architecture-li">
+  <a href="/agenthub/docs/explanation/broker_architecture/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationbroker_architecture"><span class="">Broker Architecture</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationdistributed_tracing-li">
+  <a href="/agenthub/docs/explanation/distributed_tracing/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationdistributed_tracing"><span class="">Distributed Tracing &amp; OpenTelemetry</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationgo_build_tags-li">
+  <a href="/agenthub/docs/explanation/go_build_tags/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationgo_build_tags"><span class="">Go Build Tags in AgentHub</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationperformance_and_scaling-li">
+  <a href="/agenthub/docs/explanation/performance_and_scaling/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationperformance_and_scaling"><span class="">Performance and Scaling Considerations</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationthe_tasks-li">
+  <a href="/agenthub/docs/explanation/the_tasks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationthe_tasks"><span class="">Understanding Tasks in Agent2Agent Communication</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationunified_abstraction_library-li">
+  <a href="/agenthub/docs/explanation/unified_abstraction_library/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationunified_abstraction_library"><span class="">The Unified Abstraction Library</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/owulveryck/agenthub/tree/main/content/en/docs/reference/the_tasks.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> View page source</a>
+  <a href="https://github.com/owulveryck/agenthub/edit/main/content/en/docs/reference/the_tasks.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Edit this page</a>
+  <a href="https://github.com/owulveryck/agenthub/new/main/content/en/docs/reference?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Create child page</a>
+  <a href="https://github.com/owulveryck/agenthub/issues/new?title=Task%20Reference" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> Create documentation issue</a>
+  <a href="https://github.com/owulveryck/agenthub/issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> Create project issue</a>
+  <a id="print" href="/agenthub/docs/reference/_print/"><i class="fa-solid fa-print fa-fw"></i> Print entire section</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#core-task-messages">Core Task Messages</a>
+      <ul>
+        <li><a href="#taskmessage">TaskMessage</a></li>
+        <li><a href="#taskresult">TaskResult</a></li>
+        <li><a href="#taskprogress">TaskProgress</a></li>
+      </ul>
+    </li>
+    <li><a href="#enumerations">Enumerations</a>
+      <ul>
+        <li><a href="#priority">Priority</a></li>
+        <li><a href="#taskstatus">TaskStatus</a></li>
+      </ul>
+    </li>
+    <li><a href="#requestresponse-messages">Request/Response Messages</a>
+      <ul>
+        <li><a href="#publishtaskrequest">PublishTaskRequest</a></li>
+        <li><a href="#publishtaskresultrequest">PublishTaskResultRequest</a></li>
+        <li><a href="#publishtaskprogressrequest">PublishTaskProgressRequest</a></li>
+        <li><a href="#subscribetotasksrequest">SubscribeToTasksRequest</a></li>
+        <li><a href="#subscribetotaskresultsrequest">SubscribeToTaskResultsRequest</a></li>
+      </ul>
+    </li>
+    <li><a href="#rpc-service-methods">RPC Service Methods</a>
+      <ul>
+        <li><a href="#task-publishing-methods">Task Publishing Methods</a></li>
+        <li><a href="#task-subscription-methods">Task Subscription Methods</a></li>
+      </ul>
+    </li>
+    <li><a href="#common-task-types-reference">Common Task Types Reference</a>
+      <ul>
+        <li><a href="#data-processing-tasks">Data Processing Tasks</a></li>
+        <li><a href="#image-processing-tasks">Image Processing Tasks</a></li>
+        <li><a href="#mathematical-tasks">Mathematical Tasks</a></li>
+        <li><a href="#communication-tasks">Communication Tasks</a></li>
+      </ul>
+    </li>
+    <li><a href="#error-handling-reference">Error Handling Reference</a>
+      <ul>
+        <li><a href="#common-error-codes">Common Error Codes</a></li>
+        <li><a href="#error-handling-best-practices">Error Handling Best Practices</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+    
+            
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/agenthub/docs/">Documentation</a></li>
+  <li class="breadcrumb-item">
+    <a href="/agenthub/docs/reference/">Reference</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Task Reference</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>Task Reference</h1>
+	<div class="lead">Comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation.</div>
+	<header class="article-meta">
+		
+  </header>
+	<h1 id="task-reference">Task Reference<a class="td-heading-self-link" href="#task-reference" aria-label="Heading self-link"></a></h1>
+<p>This document provides a comprehensive reference for all task-related message types and operations in the Agent2Agent protocol implementation.</p>
+<h2 id="core-task-messages">Core Task Messages<a class="td-heading-self-link" href="#core-task-messages" aria-label="Heading self-link"></a></h2>
+<h3 id="taskmessage">TaskMessage<a class="td-heading-self-link" href="#taskmessage" aria-label="Heading self-link"></a></h3>
+<p>The primary message type for requesting work from other agents.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">TaskMessage</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">task_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>                                    <span style="color:#8f5902;font-style:italic">// Unique identifier
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">task_type</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>                                  <span style="color:#8f5902;font-style:italic">// Type of task
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Struct</span> <span style="color:#000">parameters</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">;</span>                <span style="color:#8f5902;font-style:italic">// Task parameters
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">requester_agent_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">;</span>                        <span style="color:#8f5902;font-style:italic">// ID of requesting agent
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">responder_agent_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">;</span>                        <span style="color:#8f5902;font-style:italic">// ID of target agent (optional)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Timestamp</span> <span style="color:#000">deadline</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">6</span><span style="color:#000;font-weight:bold">;</span>               <span style="color:#8f5902;font-style:italic">// Optional deadline
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">Priority</span> <span style="color:#000">priority</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">7</span><span style="color:#000;font-weight:bold">;</span>                                <span style="color:#8f5902;font-style:italic">// Task priority
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Struct</span> <span style="color:#000">metadata</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">8</span><span style="color:#000;font-weight:bold">;</span>                  <span style="color:#8f5902;font-style:italic">// Optional metadata
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Timestamp</span> <span style="color:#000">created_at</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">9</span><span style="color:#000;font-weight:bold">;</span>             <span style="color:#8f5902;font-style:italic">// Creation timestamp
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h4 id="field-reference">Field Reference<a class="td-heading-self-link" href="#field-reference" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>task_id</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Globally unique identifier for the task</td>
+      </tr>
+      <tr>
+          <td><code>task_type</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Semantic classification of the work to be done</td>
+      </tr>
+      <tr>
+          <td><code>parameters</code></td>
+          <td>Struct</td>
+          <td>No</td>
+          <td>Task-specific input parameters</td>
+      </tr>
+      <tr>
+          <td><code>requester_agent_id</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Agent ID that initiated the task</td>
+      </tr>
+      <tr>
+          <td><code>responder_agent_id</code></td>
+          <td>string</td>
+          <td>No</td>
+          <td>Specific agent to handle task (blank = broadcast)</td>
+      </tr>
+      <tr>
+          <td><code>deadline</code></td>
+          <td>Timestamp</td>
+          <td>No</td>
+          <td>Latest acceptable completion time</td>
+      </tr>
+      <tr>
+          <td><code>priority</code></td>
+          <td>Priority</td>
+          <td>No</td>
+          <td>Urgency level (default: PRIORITY_MEDIUM)</td>
+      </tr>
+      <tr>
+          <td><code>metadata</code></td>
+          <td>Struct</td>
+          <td>No</td>
+          <td>Additional context information</td>
+      </tr>
+      <tr>
+          <td><code>created_at</code></td>
+          <td>Timestamp</td>
+          <td>Yes</td>
+          <td>When the task was created</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="task-id-format">Task ID Format<a class="td-heading-self-link" href="#task-id-format" aria-label="Heading self-link"></a></h4>
+<p>Task IDs should be globally unique and meaningful for debugging:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Recommended formats:
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">taskID</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Sprintf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;task_%s_%d&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">taskType</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Now</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">Unix</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">taskID</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Sprintf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;task_%s_%s&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">taskType</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">uuid</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">New</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">String</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">taskID</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Sprintf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;%s_%s_%d&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">requesterID</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">taskType</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">sequence</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h4 id="task-type-conventions">Task Type Conventions<a class="td-heading-self-link" href="#task-type-conventions" aria-label="Heading self-link"></a></h4>
+<p>Use hierarchical naming for task types:</p>
+<pre tabindex="0"><code>domain.operation[.variant]
+
+Examples:
+- data.analysis
+- data.analysis.trend
+- image.generation
+- image.generation.portrait
+- notification.email
+- notification.email.marketing
+</code></pre><h3 id="taskresult">TaskResult<a class="td-heading-self-link" href="#taskresult" aria-label="Heading self-link"></a></h3>
+<p>Response message containing task execution results.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">TaskResult</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">task_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>                                    <span style="color:#8f5902;font-style:italic">// Reference to original task
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">TaskStatus</span> <span style="color:#000">status</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>                                 <span style="color:#8f5902;font-style:italic">// Final status
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Struct</span> <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">;</span>                    <span style="color:#8f5902;font-style:italic">// Task results
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">error_message</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">;</span>                             <span style="color:#8f5902;font-style:italic">// Error details if failed
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">executor_agent_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">;</span>                         <span style="color:#8f5902;font-style:italic">// ID of executing agent
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Timestamp</span> <span style="color:#000">completed_at</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">6</span><span style="color:#000;font-weight:bold">;</span>           <span style="color:#8f5902;font-style:italic">// Completion timestamp
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Struct</span> <span style="color:#000">execution_metadata</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">7</span><span style="color:#000;font-weight:bold">;</span>        <span style="color:#8f5902;font-style:italic">// Optional execution details
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h4 id="field-reference-1">Field Reference<a class="td-heading-self-link" href="#field-reference-1" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>task_id</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Must match original TaskMessage.task_id</td>
+      </tr>
+      <tr>
+          <td><code>status</code></td>
+          <td>TaskStatus</td>
+          <td>Yes</td>
+          <td>Final execution status</td>
+      </tr>
+      <tr>
+          <td><code>result</code></td>
+          <td>Struct</td>
+          <td>No</td>
+          <td>Structured result data (null if failed)</td>
+      </tr>
+      <tr>
+          <td><code>error_message</code></td>
+          <td>string</td>
+          <td>No</td>
+          <td>Human-readable error description</td>
+      </tr>
+      <tr>
+          <td><code>executor_agent_id</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Agent that executed the task</td>
+      </tr>
+      <tr>
+          <td><code>completed_at</code></td>
+          <td>Timestamp</td>
+          <td>Yes</td>
+          <td>When execution finished</td>
+      </tr>
+      <tr>
+          <td><code>execution_metadata</code></td>
+          <td>Struct</td>
+          <td>No</td>
+          <td>Additional execution context</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="result-data-patterns">Result Data Patterns<a class="td-heading-self-link" href="#result-data-patterns" aria-label="Heading self-link"></a></h4>
+<p>Structure result data for easy consumption:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Simple scalar result
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">result</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">structpb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewStruct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;value&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">42.0</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;unit&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;seconds&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Complex structured result
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">result</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">structpb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewStruct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;analysis&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#34;total_records&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1500</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#34;mean_value&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">42.7</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#34;trends&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[]</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">{</span><span style="color:#4e9a06">&#34;increasing&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;seasonal&#34;</span><span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;metadata&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#34;processing_time&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;2.3s&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#34;data_quality&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;high&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// File-based result
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">result</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">structpb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewStruct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;output_file&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;/tmp/results/analysis_20240115.json&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;file_size&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2048576</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;format&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;json&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;checksum&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;sha256:abc123...&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span></code></pre></div><h3 id="taskprogress">TaskProgress<a class="td-heading-self-link" href="#taskprogress" aria-label="Heading self-link"></a></h3>
+<p>Intermediate progress updates during task execution.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">TaskProgress</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">task_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>                                    <span style="color:#8f5902;font-style:italic">// Reference to original task
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">TaskStatus</span> <span style="color:#000">status</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>                                 <span style="color:#8f5902;font-style:italic">// Current status
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">progress_message</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">;</span>                           <span style="color:#8f5902;font-style:italic">// Human-readable description
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">int32</span> <span style="color:#000">progress_percentage</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">;</span>                         <span style="color:#8f5902;font-style:italic">// Progress as percentage (0-100)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Struct</span> <span style="color:#000">progress_data</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">;</span>             <span style="color:#8f5902;font-style:italic">// Optional structured progress
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">executor_agent_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">6</span><span style="color:#000;font-weight:bold">;</span>                         <span style="color:#8f5902;font-style:italic">// ID of executing agent
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">google.protobuf.Timestamp</span> <span style="color:#000">updated_at</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">7</span><span style="color:#000;font-weight:bold">;</span>             <span style="color:#8f5902;font-style:italic">// When this progress was reported
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h4 id="field-reference-2">Field Reference<a class="td-heading-self-link" href="#field-reference-2" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>task_id</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Must match original TaskMessage.task_id</td>
+      </tr>
+      <tr>
+          <td><code>status</code></td>
+          <td>TaskStatus</td>
+          <td>Yes</td>
+          <td>Current execution status (typically IN_PROGRESS)</td>
+      </tr>
+      <tr>
+          <td><code>progress_message</code></td>
+          <td>string</td>
+          <td>No</td>
+          <td>Human-readable progress description</td>
+      </tr>
+      <tr>
+          <td><code>progress_percentage</code></td>
+          <td>int32</td>
+          <td>No</td>
+          <td>Completion percentage (0-100)</td>
+      </tr>
+      <tr>
+          <td><code>progress_data</code></td>
+          <td>Struct</td>
+          <td>No</td>
+          <td>Structured progress information</td>
+      </tr>
+      <tr>
+          <td><code>executor_agent_id</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>Agent reporting the progress</td>
+      </tr>
+      <tr>
+          <td><code>updated_at</code></td>
+          <td>Timestamp</td>
+          <td>Yes</td>
+          <td>When this update was generated</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="progress-reporting-patterns">Progress Reporting Patterns<a class="td-heading-self-link" href="#progress-reporting-patterns" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Simple percentage progress
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">progress</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskProgress</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskId</span><span style="color:#000;font-weight:bold">:</span>             <span style="color:#000">taskID</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Status</span><span style="color:#000;font-weight:bold">:</span>             <span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskStatus_TASK_STATUS_IN_PROGRESS</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ProgressMessage</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#4e9a06">&#34;Processing data&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ProgressPercentage</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">45</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ExecutorAgentId</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#000">agentID</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">UpdatedAt</span><span style="color:#000;font-weight:bold">:</span>          <span style="color:#000">timestamppb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Now</span><span style="color:#000;font-weight:bold">(),</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Detailed progress with structured data
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">progressData</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">structpb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewStruct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;phase&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;data_analysis&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;records_processed&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">750</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;total_records&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1500</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;current_operation&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;correlation_analysis&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;estimated_remaining&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;2m30s&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">progress</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskProgress</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskId</span><span style="color:#000;font-weight:bold">:</span>           <span style="color:#000">taskID</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Status</span><span style="color:#000;font-weight:bold">:</span>           <span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskStatus_TASK_STATUS_IN_PROGRESS</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ProgressMessage</span><span style="color:#000;font-weight:bold">:</span>  <span style="color:#4e9a06">&#34;Analyzing correlations&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ProgressPercentage</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">50</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ProgressData</span><span style="color:#000;font-weight:bold">:</span>     <span style="color:#000">progressData</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ExecutorAgentId</span><span style="color:#000;font-weight:bold">:</span>  <span style="color:#000">agentID</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">UpdatedAt</span><span style="color:#000;font-weight:bold">:</span>        <span style="color:#000">timestamppb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Now</span><span style="color:#000;font-weight:bold">(),</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="enumerations">Enumerations<a class="td-heading-self-link" href="#enumerations" aria-label="Heading self-link"></a></h2>
+<h3 id="priority">Priority<a class="td-heading-self-link" href="#priority" aria-label="Heading self-link"></a></h3>
+<p>Task priority levels for scheduling and resource allocation.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">enum</span> <span style="color:#000">Priority</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#000">PRIORITY_UNSPECIFIED</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>  <span style="color:#8f5902;font-style:italic">// Default value, treated as MEDIUM
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">PRIORITY_LOW</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>          <span style="color:#8f5902;font-style:italic">// Low priority, can be delayed
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">PRIORITY_MEDIUM</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>       <span style="color:#8f5902;font-style:italic">// Normal priority
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">PRIORITY_HIGH</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">;</span>         <span style="color:#8f5902;font-style:italic">// High priority, expedited processing
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">PRIORITY_CRITICAL</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">;</span>     <span style="color:#8f5902;font-style:italic">// Critical priority, immediate processing
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h4 id="priority-usage-guidelines">Priority Usage Guidelines<a class="td-heading-self-link" href="#priority-usage-guidelines" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Priority</th>
+          <th>Use Cases</th>
+          <th>SLA Expectations</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>LOW</code></td>
+          <td>Background jobs, cleanup tasks, analytics</td>
+          <td>Hours to days</td>
+      </tr>
+      <tr>
+          <td><code>MEDIUM</code></td>
+          <td>Standard user requests, routine processing</td>
+          <td>Minutes to hours</td>
+      </tr>
+      <tr>
+          <td><code>HIGH</code></td>
+          <td>User-visible operations, time-sensitive tasks</td>
+          <td>Seconds to minutes</td>
+      </tr>
+      <tr>
+          <td><code>CRITICAL</code></td>
+          <td>Emergency operations, system health tasks</td>
+          <td>Immediate</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="taskstatus">TaskStatus<a class="td-heading-self-link" href="#taskstatus" aria-label="Heading self-link"></a></h3>
+<p>Current state of task execution.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">enum</span> <span style="color:#000">TaskStatus</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#000">TASK_STATUS_UNSPECIFIED</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span>  <span style="color:#8f5902;font-style:italic">// Invalid/unknown status
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">TASK_STATUS_PENDING</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>      <span style="color:#8f5902;font-style:italic">// Waiting to be processed
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">TASK_STATUS_IN_PROGRESS</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>  <span style="color:#8f5902;font-style:italic">// Currently being executed
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">TASK_STATUS_COMPLETED</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">;</span>    <span style="color:#8f5902;font-style:italic">// Successfully completed
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">TASK_STATUS_FAILED</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">;</span>       <span style="color:#8f5902;font-style:italic">// Failed during execution
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#000">TASK_STATUS_CANCELLED</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">;</span>    <span style="color:#8f5902;font-style:italic">// Cancelled before/during execution
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h4 id="status-transition-rules">Status Transition Rules<a class="td-heading-self-link" href="#status-transition-rules" aria-label="Heading self-link"></a></h4>
+<p>Valid status transitions:</p>
+<pre tabindex="0"><code>PENDING → IN_PROGRESS → COMPLETED
+PENDING → IN_PROGRESS → FAILED
+PENDING → IN_PROGRESS → CANCELLED
+PENDING → CANCELLED (before execution starts)
+</code></pre><p>Invalid transitions:</p>
+<ul>
+<li>Any status → PENDING</li>
+<li>COMPLETED → any other status</li>
+<li>FAILED → any other status (except for retry scenarios)</li>
+</ul>
+<h2 id="requestresponse-messages">Request/Response Messages<a class="td-heading-self-link" href="#requestresponse-messages" aria-label="Heading self-link"></a></h2>
+<h3 id="publishtaskrequest">PublishTaskRequest<a class="td-heading-self-link" href="#publishtaskrequest" aria-label="Heading self-link"></a></h3>
+<p>Request to publish a task to the broker.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">PublishTaskRequest</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#000">TaskMessage</span> <span style="color:#000">task</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h3 id="publishtaskresultrequest">PublishTaskResultRequest<a class="td-heading-self-link" href="#publishtaskresultrequest" aria-label="Heading self-link"></a></h3>
+<p>Request to publish a task result.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">PublishTaskResultRequest</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#000">TaskResult</span> <span style="color:#000">result</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h3 id="publishtaskprogressrequest">PublishTaskProgressRequest<a class="td-heading-self-link" href="#publishtaskprogressrequest" aria-label="Heading self-link"></a></h3>
+<p>Request to publish task progress.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">PublishTaskProgressRequest</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#000">TaskProgress</span> <span style="color:#000">progress</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h3 id="subscribetotasksrequest">SubscribeToTasksRequest<a class="td-heading-self-link" href="#subscribetotasksrequest" aria-label="Heading self-link"></a></h3>
+<p>Request to subscribe to tasks for a specific agent.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">SubscribeToTasksRequest</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">agent_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>                   <span style="color:#8f5902;font-style:italic">// Agent ID to receive tasks for
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">repeated</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">task_types</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>        <span style="color:#8f5902;font-style:italic">// Optional: filter by task types
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h4 id="usage-examples">Usage Examples<a class="td-heading-self-link" href="#usage-examples" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Subscribe to all tasks for this agent
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">req</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SubscribeToTasksRequest</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">AgentId</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;data_processor_01&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Subscribe only to specific task types
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">req</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SubscribeToTasksRequest</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">AgentId</span><span style="color:#000;font-weight:bold">:</span>   <span style="color:#4e9a06">&#34;image_processor&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskTypes</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[]</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">{</span><span style="color:#4e9a06">&#34;image.generation&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;image.enhancement&#34;</span><span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="subscribetotaskresultsrequest">SubscribeToTaskResultsRequest<a class="td-heading-self-link" href="#subscribetotaskresultsrequest" aria-label="Heading self-link"></a></h3>
+<p>Request to subscribe to task results.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-protobuf" data-lang="protobuf"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">message</span> <span style="color:#000">SubscribeToTaskResultsRequest</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">
+</span></span></span><span style="display:flex;"><span><span style="color:#a40000"></span>  <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">requester_agent_id</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">;</span>         <span style="color:#8f5902;font-style:italic">// Agent ID that requested tasks
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:bold">repeated</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">task_ids</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">;</span>          <span style="color:#8f5902;font-style:italic">// Optional: filter by specific task IDs
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span><span style="color:#a40000">
+</span></span></span></code></pre></div><h4 id="usage-examples-1">Usage Examples<a class="td-heading-self-link" href="#usage-examples-1" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Subscribe to all results for tasks this agent requested
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">req</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SubscribeToTaskResultsRequest</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">RequesterAgentId</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;workflow_orchestrator&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Subscribe only to specific task results
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">req</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SubscribeToTaskResultsRequest</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">RequesterAgentId</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;workflow_orchestrator&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskIds</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[]</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">{</span><span style="color:#4e9a06">&#34;task_analysis_123&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;task_report_456&#34;</span><span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="rpc-service-methods">RPC Service Methods<a class="td-heading-self-link" href="#rpc-service-methods" aria-label="Heading self-link"></a></h2>
+<h3 id="task-publishing-methods">Task Publishing Methods<a class="td-heading-self-link" href="#task-publishing-methods" aria-label="Heading self-link"></a></h3>
+<h4 id="publishtask">PublishTask<a class="td-heading-self-link" href="#publishtask" aria-label="Heading self-link"></a></h4>
+<p>Publishes a task request to the broker.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">rpc</span> <span style="color:#000">PublishTask</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">PublishTaskRequest</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">returns</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">PublishResponse</span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><p><strong>Parameters:</strong></p>
+<ul>
+<li><code>PublishTaskRequest</code> containing the <code>TaskMessage</code></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li><code>PublishResponse</code> with success status and optional error message</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">task</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskMessage</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskId</span><span style="color:#000;font-weight:bold">:</span>           <span style="color:#4e9a06">&#34;task_analysis_123&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskType</span><span style="color:#000;font-weight:bold">:</span>         <span style="color:#4e9a06">&#34;data.analysis&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">RequesterAgentId</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;orchestrator&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// ... other fields
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">req</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PublishTaskRequest</span><span style="color:#000;font-weight:bold">{</span><span style="color:#000">Task</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">task</span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">res</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PublishTask</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">req</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h4 id="publishtaskresult">PublishTaskResult<a class="td-heading-self-link" href="#publishtaskresult" aria-label="Heading self-link"></a></h4>
+<p>Publishes a task completion result.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">rpc</span> <span style="color:#000">PublishTaskResult</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">PublishTaskResultRequest</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">returns</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">PublishResponse</span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><h4 id="publishtaskprogress">PublishTaskProgress<a class="td-heading-self-link" href="#publishtaskprogress" aria-label="Heading self-link"></a></h4>
+<p>Publishes a task progress update.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">rpc</span> <span style="color:#000">PublishTaskProgress</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">PublishTaskProgressRequest</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">returns</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">PublishResponse</span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><h3 id="task-subscription-methods">Task Subscription Methods<a class="td-heading-self-link" href="#task-subscription-methods" aria-label="Heading self-link"></a></h3>
+<h4 id="subscribetotasks">SubscribeToTasks<a class="td-heading-self-link" href="#subscribetotasks" aria-label="Heading self-link"></a></h4>
+<p>Subscribes to receive tasks assigned to a specific agent.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">rpc</span> <span style="color:#000">SubscribeToTasks</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">SubscribeToTasksRequest</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">returns</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">stream</span> <span style="color:#000">TaskMessage</span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><p><strong>Returns:</strong> Stream of <code>TaskMessage</code> objects</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">req</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SubscribeToTasksRequest</span><span style="color:#000;font-weight:bold">{</span><span style="color:#000">AgentId</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;processor_01&#34;</span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">stream</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SubscribeToTasks</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">req</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">task</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">stream</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Recv</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">go</span> <span style="color:#000">processTask</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">task</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h4 id="subscribetotaskresults">SubscribeToTaskResults<a class="td-heading-self-link" href="#subscribetotaskresults" aria-label="Heading self-link"></a></h4>
+<p>Subscribes to receive results for tasks requested by an agent.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">rpc</span> <span style="color:#000">SubscribeToTaskResults</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">SubscribeToTaskResultsRequest</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">returns</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">stream</span> <span style="color:#000">TaskResult</span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><h4 id="subscribetotaskprogress">SubscribeToTaskProgress<a class="td-heading-self-link" href="#subscribetotaskprogress" aria-label="Heading self-link"></a></h4>
+<p>Subscribes to receive progress updates for tasks requested by an agent.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">rpc</span> <span style="color:#000">SubscribeToTaskProgress</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">SubscribeToTaskResultsRequest</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">returns</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">stream</span> <span style="color:#000">TaskProgress</span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><h2 id="common-task-types-reference">Common Task Types Reference<a class="td-heading-self-link" href="#common-task-types-reference" aria-label="Heading self-link"></a></h2>
+<h3 id="data-processing-tasks">Data Processing Tasks<a class="td-heading-self-link" href="#data-processing-tasks" aria-label="Heading self-link"></a></h3>
+<h4 id="dataanalysis">data.analysis<a class="td-heading-self-link" href="#dataanalysis" aria-label="Heading self-link"></a></h4>
+<p>Analyzes datasets and produces statistical results.</p>
+<p><strong>Parameters:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;dataset_path&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;/data/sales_2024.csv&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;analysis_type&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;summary_statistics|trend_analysis|correlation&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;time_period&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;daily|weekly|monthly|quarterly&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;output_format&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;json|csv|html&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p><strong>Result:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;analysis_type&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;summary_statistics&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;total_records&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">1500</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;metrics&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;mean&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">42.7</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;median&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">41.2</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;std_dev&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">8.3</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;charts&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;/tmp/chart1.png&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;/tmp/chart2.png&#34;</span><span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h4 id="datatransformation">data.transformation<a class="td-heading-self-link" href="#datatransformation" aria-label="Heading self-link"></a></h4>
+<p>Transforms data between formats or structures.</p>
+<p><strong>Parameters:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;input_path&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;/data/input.csv&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;output_path&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;/data/output.json&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;transformation_rules&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;format&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;csv_to_json&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;schema_mapping&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#a40000">...</span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="image-processing-tasks">Image Processing Tasks<a class="td-heading-self-link" href="#image-processing-tasks" aria-label="Heading self-link"></a></h3>
+<h4 id="imagegeneration">image.generation<a class="td-heading-self-link" href="#imagegeneration" aria-label="Heading self-link"></a></h4>
+<p>Generates images based on text prompts or parameters.</p>
+<p><strong>Parameters:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;prompt&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;A futuristic cityscape at sunset&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;style&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;photorealistic|artistic|cartoon&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;resolution&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;1920x1080&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;quality&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;low|medium|high&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p><strong>Result:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;image_path&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;/tmp/generated_image.png&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;resolution&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;1920x1080&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;file_size&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2048576</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;generation_time&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;15.2s&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="mathematical-tasks">Mathematical Tasks<a class="td-heading-self-link" href="#mathematical-tasks" aria-label="Heading self-link"></a></h3>
+<h4 id="mathcalculation">math.calculation<a class="td-heading-self-link" href="#mathcalculation" aria-label="Heading self-link"></a></h4>
+<p>Performs mathematical operations.</p>
+<p><strong>Parameters:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;operation&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;add|subtract|multiply|divide|power&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;operands&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">42.0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">58.0</span><span style="color:#000;font-weight:bold">],</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;precision&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p><strong>Result:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;operation&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;add&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;operands&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">42.0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">58.0</span><span style="color:#000;font-weight:bold">],</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;result&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">100.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="communication-tasks">Communication Tasks<a class="td-heading-self-link" href="#communication-tasks" aria-label="Heading self-link"></a></h3>
+<h4 id="notificationemail">notification.email<a class="td-heading-self-link" href="#notificationemail" aria-label="Heading self-link"></a></h4>
+<p>Sends email notifications.</p>
+<p><strong>Parameters:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;to&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;user@example.com&#34;</span><span style="color:#000;font-weight:bold">],</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;subject&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Task Completed&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;body&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Your analysis task has completed successfully.&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;template&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;task_completion&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;attachments&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;/tmp/report.pdf&#34;</span><span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="error-handling-reference">Error Handling Reference<a class="td-heading-self-link" href="#error-handling-reference" aria-label="Heading self-link"></a></h2>
+<h3 id="common-error-codes">Common Error Codes<a class="td-heading-self-link" href="#common-error-codes" aria-label="Heading self-link"></a></h3>
+<p>Task execution may fail with these common error patterns:</p>
+<h4 id="parameter-validation-errors">Parameter Validation Errors<a class="td-heading-self-link" href="#parameter-validation-errors" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;error_code&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;INVALID_PARAMETERS&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;error_message&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Required parameter &#39;dataset_path&#39; is missing&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;details&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;missing_parameters&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;dataset_path&#34;</span><span style="color:#000;font-weight:bold">],</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;invalid_parameters&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#204a87;font-weight:bold">&#34;timeout&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;must be positive integer&#34;</span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h4 id="resource-errors">Resource Errors<a class="td-heading-self-link" href="#resource-errors" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;error_code&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;RESOURCE_UNAVAILABLE&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;error_message&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Cannot access dataset file&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;details&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;resource_type&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;file&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;resource_path&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;/data/sales_2024.csv&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;error_details&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;File not found&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h4 id="timeout-errors">Timeout Errors<a class="td-heading-self-link" href="#timeout-errors" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;error_code&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;DEADLINE_EXCEEDED&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;error_message&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Task deadline exceeded during processing&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;details&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;deadline&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;2024-01-15T11:00:00Z&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;actual_completion&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;2024-01-15T11:05:00Z&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;phase&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;data_analysis&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="error-handling-best-practices">Error Handling Best Practices<a class="td-heading-self-link" href="#error-handling-best-practices" aria-label="Heading self-link"></a></h3>
+<ol>
+<li><strong>Provide specific error codes</strong> for programmatic handling</li>
+<li><strong>Include actionable error messages</strong> for human operators</li>
+<li><strong>Add structured details</strong> for debugging and retry logic</li>
+<li><strong>Log errors appropriately</strong> based on severity</li>
+<li><strong>Consider partial results</strong> for partially successful operations</li>
+</ol>
+<p>This reference provides the complete specification for task-related messages and operations in the Agent2Agent protocol, enabling robust distributed task coordination and execution.</p>
+
+	<style>
+  .feedback--answer {
+    display: inline-block;
+  }
+  .feedback--answer-no {
+    margin-left: 1em;
+  }
+  .feedback--response {
+    display: none;
+    margin-top: 1em;
+  }
+  .feedback--response__visible {
+    display: block;
+  }
+</style>
+<div class="d-print-none">
+<h2 class="feedback--title">Feedback</h2>
+<p class="feedback--question">Was this page helpful?</p>
+<button class="btn btn-primary mb-4 feedback--answer feedback--answer-yes">Yes</button>
+<button class="btn btn-primary mb-4 feedback--answer feedback--answer-no">No</button>
+<p class="feedback--response feedback--response-yes">
+  Glad to hear it! Please <a href="https://github.com/owulveryck/agenthub/issues/new">tell us how we can improve</a>.
+</p>
+<p class="feedback--response feedback--response-no">
+  Sorry to hear that. Please <a href="https://github.com/owulveryck/agenthub/issues/new">tell us how we can improve</a>.
+</p>
+</div>
+<script>
+  const yesButton = document.querySelector('.feedback--answer-yes');
+  const noButton = document.querySelector('.feedback--answer-no');
+  const yesResponse = document.querySelector('.feedback--response-yes');
+  const noResponse = document.querySelector('.feedback--response-no');
+  const disableButtons = () => {
+    yesButton.disabled = true;
+    noButton.disabled = true;
+  };
+  const sendFeedback = (value) => {
+    if (typeof gtag !== 'function') return;
+    gtag('event', 'page_helpful', {
+      'event_category': 'Helpful',
+      'event_label': window.location.pathname,
+      'value': value
+    });
+  };
+  yesButton.addEventListener('click', () => {
+    yesResponse.classList.add('feedback--response__visible');
+    disableButtons();
+    sendFeedback( 100 );
+  });
+  noButton.addEventListener('click', () => {
+    noResponse.classList.add('feedback--response__visible');
+    disableButtons();
+    sendFeedback(0);
+  });
+</script>
+<br />
+<div class="td-page-meta__lastmod">
+  Last modified September 29, 2025: <a href="https://github.com/owulveryck/agenthub/commit/c3d9d3106870bc8e49de8eed4255a91a203037b6">Moved to docs for Github pages compatibility (c3d9d31)</a>
+</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub Issues" aria-label="GitHub Issues">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub/issues" aria-label="GitHub Issues">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2023&ndash;2025
+    <span class="td-footer__authors">Olivier Wulveryck | <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> |</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/agenthub/js/main.js"></script>
+<script defer src="/agenthub/js/click-to-copy.js" crossorigin="anonymous"></script>
+<script src='/agenthub/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

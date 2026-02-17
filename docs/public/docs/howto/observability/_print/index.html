@@ -1,0 +1,1016 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head><script src="/agenthub/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=agenthub/livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="canonical" type="text/html" href="http://localhost:1313/agenthub/docs/howto/observability/">
+<link rel="alternate" type="application/rss&#43;xml" href="http://localhost:1313/agenthub/docs/howto/observability/index.xml">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/agenthub/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/agenthub/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-192x192.png" sizes="192x192">
+
+<title>Observability | AgentHub</title>
+<meta name="description" content="Practical guides for monitoring and observability setup">
+<meta property="og:url" content="http://localhost:1313/agenthub/docs/howto/observability/">
+  <meta property="og:site_name" content="AgentHub">
+  <meta property="og:title" content="Observability">
+  <meta property="og:description" content="Practical guides for monitoring and observability setup">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="Observability">
+  <meta itemprop="description" content="Practical guides for monitoring and observability setup">
+  <meta itemprop="dateModified" content="2025-09-29T11:46:06+02:00">
+  <meta itemprop="wordCount" content="38">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Observability">
+  <meta name="twitter:description" content="Practical guides for monitoring and observability setup">
+<link href="/agenthub/scss/main.css" rel="stylesheet">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+  </head>
+  <body class="td-section">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/agenthub/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">AgentHub</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="/agenthub/docs/"><span>Documentation</span></a>
+      </li>
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/agenthub/fr/">Français</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+
+
+
+
+<div class="td-content">
+<div class="pageinfo pageinfo-primary d-print-none">
+<p>
+This is the multi-page printable view of this section.
+<a href="#" onclick="print();return false;">Click here to print</a>.
+</p><p>
+<a href="/agenthub/docs/howto/observability/">Return to the regular view of this page</a>.
+</p>
+</div>
+
+
+
+<h1 class="title">Observability</h1>
+<div class="lead">Practical guides for monitoring and observability setup</div>
+
+
+
+
+    <ul>
+    
+  
+  
+  
+  
+
+  
+    
+    
+	
+<li>1: <a href="#pg-47e8a0c22c12b8bf388e06f98dbea307">How to Add Observability to Your Agent</a></li>
+
+
+    
+  
+    
+    
+	
+<li>2: <a href="#pg-7cc42cec1fbf6d7b5e36697d76c93dde">How to Use Grafana Dashboards</a></li>
+
+
+    
+  
+
+    </ul>
+
+
+<div class="content">
+      <h1 id="observability-how-to-guides">Observability How-to Guides<a class="td-heading-self-link" href="#observability-how-to-guides" aria-label="Heading self-link"></a></h1>
+<p>Practical step-by-step guides for setting up monitoring, metrics, and observability in your AgentHub deployments.</p>
+<h2 id="available-guides">Available Guides<a class="td-heading-self-link" href="#available-guides" aria-label="Heading self-link"></a></h2>
+<ul>
+<li><strong><a href="/agenthub/docs/howto/observability/add_observability/">Add Observability</a></strong> - Integrate tracing and metrics into your agents</li>
+<li><strong><a href="/agenthub/docs/howto/observability/use_dashboards/">Use Dashboards</a></strong> - Set up and customize monitoring dashboards</li>
+</ul>
+
+</div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+  
+
+  
+    
+    
+	
+    
+
+<div class="td-content" style="">
+    
+	<h1 id="pg-47e8a0c22c12b8bf388e06f98dbea307">1 - How to Add Observability to Your Agent</h1>
+    <div class="lead">Use AgentHub&rsquo;s unified abstractions to automatically get distributed tracing, metrics, and structured logging in your agents.</div>
+	<h1 id="how-to-add-observability-to-your-agent">How to Add Observability to Your Agent<a class="td-heading-self-link" href="#how-to-add-observability-to-your-agent" aria-label="Heading self-link"></a></h1>
+<p><strong>Goal-oriented guide</strong>: Use AgentHub&rsquo;s unified abstractions to automatically get distributed tracing, metrics, and structured logging in your agents with minimal configuration.</p>
+<h2 id="prerequisites">Prerequisites<a class="td-heading-self-link" href="#prerequisites" aria-label="Heading self-link"></a></h2>
+<ul>
+<li>Go 1.24+ installed</li>
+<li>Basic understanding of AgentHub concepts</li>
+<li>10-15 minutes</li>
+</ul>
+<h2 id="overview-what-you-get-automatically">Overview: What You Get Automatically<a class="td-heading-self-link" href="#overview-what-you-get-automatically" aria-label="Heading self-link"></a></h2>
+<p>With AgentHub&rsquo;s unified abstractions, you automatically get:</p>
+<p>✅ <strong>Distributed Tracing</strong> - OpenTelemetry traces with correlation IDs
+✅ <strong>Comprehensive Metrics</strong> - Performance and health monitoring
+✅ <strong>Structured Logging</strong> - JSON logs with trace correlation
+✅ <strong>Health Endpoints</strong> - HTTP health checks and metrics endpoints
+✅ <strong>Graceful Shutdown</strong> - Clean resource management</p>
+<h2 id="quick-start-observable-agent-in-5-minutes">Quick Start: Observable Agent in 5 Minutes<a class="td-heading-self-link" href="#quick-start-observable-agent-in-5-minutes" aria-label="Heading self-link"></a></h2>
+<h3 id="step-1-create-your-agent-using-abstractions">Step 1: Create Your Agent Using Abstractions<a class="td-heading-self-link" href="#step-1-create-your-agent-using-abstractions" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;github.com/owulveryck/agenthub/internal/agenthub&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cancel</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithTimeout</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Background</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#0000cf;font-weight:bold">60</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Second</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">cancel</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Create configuration (observability included automatically)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;my-agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">config</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">HealthPort</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;8083&#34;</span> <span style="color:#8f5902;font-style:italic">// Unique port for your agent
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Create AgentHub client (observability built-in)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">client</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewAgentHubClient</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">config</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87">panic</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Failed to create AgentHub client: &#34;</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Error</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Automatic graceful shutdown
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#204a87;font-weight:bold">func</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">shutdownCtx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">shutdownCancel</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithTimeout</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Background</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#0000cf;font-weight:bold">10</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Second</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">shutdownCancel</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Shutdown</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">shutdownCtx</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ErrorContext</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">shutdownCtx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Error during shutdown&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;error&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Start the client (enables observability)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Start</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ErrorContext</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to start client&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;error&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87">panic</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Your agent logic here...
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Info</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;My observable agent is running!&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Keep running
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#204a87;font-weight:bold">select</span> <span style="color:#000;font-weight:bold">{}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>That&rsquo;s it! Your agent now has full observability.</p>
+<h3 id="step-2-configure-environment-variables">Step 2: Configure Environment Variables<a class="td-heading-self-link" href="#step-2-configure-environment-variables" aria-label="Heading self-link"></a></h3>
+<p>Set observability configuration via environment:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Tracing configuration</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;http://localhost:14268/api/traces&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">OTEL_SERVICE_NAME</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;my-agent&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">OTEL_SERVICE_VERSION</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;1.0.0&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Health server port</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BROKER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8083&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Broker connection</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;localhost&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;50051&#34;</span>
+</span></span></code></pre></div><h3 id="step-3-run-your-observable-agent">Step 3: Run Your Observable Agent<a class="td-heading-self-link" href="#step-3-run-your-observable-agent" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>go run main.go
+</span></span></code></pre></div><p><strong>Expected Output:</strong></p>
+<pre tabindex="0"><code>time=2025-09-29T10:00:00.000Z level=INFO msg=&#34;Starting health server&#34; port=8083
+time=2025-09-29T10:00:00.000Z level=INFO msg=&#34;AgentHub client connected&#34; broker_addr=localhost:50051
+time=2025-09-29T10:00:00.000Z level=INFO msg=&#34;My observable agent is running!&#34;
+</code></pre><h2 id="available-observability-features">Available Observability Features<a class="td-heading-self-link" href="#available-observability-features" aria-label="Heading self-link"></a></h2>
+<h3 id="automatic-health-endpoints">Automatic Health Endpoints<a class="td-heading-self-link" href="#automatic-health-endpoints" aria-label="Heading self-link"></a></h3>
+<p>Your agent automatically exposes:</p>
+<ul>
+<li><strong>Health Check</strong>: <code>http://localhost:8083/health</code></li>
+<li><strong>Metrics</strong>: <code>http://localhost:8083/metrics</code> (Prometheus format)</li>
+<li><strong>Readiness</strong>: <code>http://localhost:8083/ready</code></li>
+</ul>
+<h3 id="structured-logging">Structured Logging<a class="td-heading-self-link" href="#structured-logging" aria-label="Heading self-link"></a></h3>
+<p>All logs are automatically structured with trace correlation:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;time&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;2025-09-29T10:00:00.000Z&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;level&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;INFO&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;msg&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Task published&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;trace_id&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;abc123...&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;span_id&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;def456...&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;task_type&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;process_document&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;correlation_id&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;req_789&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="distributed-tracing">Distributed Tracing<a class="td-heading-self-link" href="#distributed-tracing" aria-label="Heading self-link"></a></h3>
+<p>Traces are automatically created for:</p>
+<ul>
+<li>gRPC calls to broker</li>
+<li>Task publishing and subscribing</li>
+<li>Custom operations (when you use the TraceManager)</li>
+</ul>
+<h3 id="metrics-collection">Metrics Collection<a class="td-heading-self-link" href="#metrics-collection" aria-label="Heading self-link"></a></h3>
+<p>Automatic metrics include:</p>
+<ul>
+<li>Task processing duration</li>
+<li>Success/failure rates</li>
+<li>gRPC call metrics</li>
+<li>Health check status</li>
+</ul>
+<h2 id="advanced-usage">Advanced Usage<a class="td-heading-self-link" href="#advanced-usage" aria-label="Heading self-link"></a></h2>
+<h3 id="adding-custom-tracing">Adding Custom Tracing<a class="td-heading-self-link" href="#adding-custom-tracing" aria-label="Heading self-link"></a></h3>
+<p>Use the built-in TraceManager for custom operations:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Custom operation with tracing
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">span</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TraceManager</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">StartPublishSpan</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;my_operation&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;document&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">span</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">End</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Add custom attributes
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TraceManager</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddComponentAttribute</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">span</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;my-component&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">span</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SetAttributes</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">attribute</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">String</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;document.id&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;doc-123&#34;</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Your operation logic
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">result</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">doCustomOperation</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">span</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">RecordError</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">span</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SetStatus</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">codes</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Error</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Error</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="adding-custom-metrics">Adding Custom Metrics<a class="td-heading-self-link" href="#adding-custom-metrics" aria-label="Heading self-link"></a></h3>
+<p>Use the MetricsManager for custom metrics:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Start timing an operation
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">timer</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">MetricsManager</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">StartTimer</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">timer</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;my_operation&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;my-component&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Your operation
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">processDocument</span><span style="color:#000;font-weight:bold">()</span>
+</span></span></code></pre></div><h3 id="custom-log-fields">Custom Log Fields<a class="td-heading-self-link" href="#custom-log-fields" aria-label="Heading self-link"></a></h3>
+<p>Use the structured logger with context:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">InfoContext</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Processing document&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;document_id&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;doc-123&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;user_id&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;user-456&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;processing_type&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;ocr&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="publisher-example-with-observability">Publisher Example with Observability<a class="td-heading-self-link" href="#publisher-example-with-observability" aria-label="Heading self-link"></a></h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;github.com/owulveryck/agenthub/internal/agenthub&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">pb</span> <span style="color:#4e9a06">&#34;github.com/owulveryck/agenthub/events/a2a&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;google.golang.org/protobuf/types/known/structpb&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cancel</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithTimeout</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Background</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#0000cf;font-weight:bold">60</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Second</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">cancel</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Observable client setup
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;publisher&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">config</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">HealthPort</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;8081&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">client</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewAgentHubClient</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">config</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87">panic</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Shutdown</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Background</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Start</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87">panic</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Create observable task publisher
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">publisher</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskPublisher</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">Client</span><span style="color:#000;font-weight:bold">:</span>         <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Client</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">TraceManager</span><span style="color:#000;font-weight:bold">:</span>   <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TraceManager</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">MetricsManager</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">MetricsManager</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">:</span>         <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">ComponentName</span><span style="color:#000;font-weight:bold">:</span>  <span style="color:#4e9a06">&#34;publisher&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Publish task with automatic tracing
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">data</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">structpb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewStruct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#4e9a06">&#34;message&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Hello, observable world!&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">task</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskMessage</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">TaskId</span><span style="color:#000;font-weight:bold">:</span>   <span style="color:#4e9a06">&#34;task-123&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">TaskType</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;greeting&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">Data</span><span style="color:#000;font-weight:bold">:</span>     <span style="color:#000">data</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">Priority</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Priority_MEDIUM</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Automatically traced and metered
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">publisher</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PublishTask</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">task</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ErrorContext</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Failed to publish task&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;error&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">InfoContext</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Task published successfully&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;task_id&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">task</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskId</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="subscriber-example-with-observability">Subscriber Example with Observability<a class="td-heading-self-link" href="#subscriber-example-with-observability" aria-label="Heading self-link"></a></h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;os/signal&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;syscall&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;github.com/owulveryck/agenthub/internal/agenthub&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">pb</span> <span style="color:#4e9a06">&#34;github.com/owulveryck/agenthub/events/a2a&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#4e9a06">&#34;google.golang.org/protobuf/types/known/structpb&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">cancel</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithCancel</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Background</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">cancel</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Observable client setup
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;subscriber&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">config</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">HealthPort</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;8082&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">client</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewAgentHubClient</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">config</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87">panic</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Shutdown</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Background</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Start</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87">panic</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Create observable task subscriber
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">subscriber</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewTaskSubscriber</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">client</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;my-subscriber&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Register handler with automatic tracing
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">subscriber</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">RegisterHandler</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;greeting&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">func</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Context</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">task</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskMessage</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">structpb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Struct</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskStatus</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#8f5902;font-style:italic">// This is automatically traced and logged
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>		<span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Logger</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">InfoContext</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Processing greeting task&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;task_id&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">task</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskId</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#8f5902;font-style:italic">// Your processing logic
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>		<span style="color:#000">result</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">structpb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewStruct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#4e9a06">&#34;response&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Hello back!&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">result</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TaskStatus_COMPLETED</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">})</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Start processing with automatic observability
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#204a87;font-weight:bold">go</span> <span style="color:#000">subscriber</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">StartProcessing</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8f5902;font-style:italic">// Graceful shutdown
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">sigChan</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#204a87">make</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">chan</span> <span style="color:#000">os</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Signal</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">signal</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Notify</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">sigChan</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">syscall</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SIGINT</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">syscall</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SIGTERM</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#ce5c00;font-weight:bold">&lt;-</span><span style="color:#000">sigChan</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="configuration-reference">Configuration Reference<a class="td-heading-self-link" href="#configuration-reference" aria-label="Heading self-link"></a></h2>
+<blockquote>
+<p>📖 <strong>Complete Reference</strong>: For all environment variables and configuration options, see <a href="/agenthub/docs/reference/configuration/environment_variables/">Environment Variables Reference</a></p>
+</blockquote>
+<h3 id="key-environment-variables">Key Environment Variables<a class="td-heading-self-link" href="#key-environment-variables" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Description</th>
+          <th>Default</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>JAEGER_ENDPOINT</code></td>
+          <td>Jaeger tracing endpoint</td>
+          <td>&quot;&quot; (tracing disabled)</td>
+      </tr>
+      <tr>
+          <td><code>SERVICE_NAME</code></td>
+          <td>Service name for tracing</td>
+          <td>&ldquo;agenthub-service&rdquo;</td>
+      </tr>
+      <tr>
+          <td><code>SERVICE_VERSION</code></td>
+          <td>Service version</td>
+          <td>&ldquo;1.0.0&rdquo;</td>
+      </tr>
+      <tr>
+          <td><code>BROKER_HEALTH_PORT</code></td>
+          <td>Health endpoint port</td>
+          <td>&ldquo;8080&rdquo;</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_BROKER_ADDR</code></td>
+          <td>Broker address</td>
+          <td>&ldquo;localhost&rdquo;</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_BROKER_PORT</code></td>
+          <td>Broker port</td>
+          <td>&ldquo;50051&rdquo;</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="health-endpoints">Health Endpoints<a class="td-heading-self-link" href="#health-endpoints" aria-label="Heading self-link"></a></h3>
+<p>Each agent exposes these endpoints:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Endpoint</th>
+          <th>Purpose</th>
+          <th>Response</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>/health</code></td>
+          <td>Overall health status</td>
+          <td>JSON status</td>
+      </tr>
+      <tr>
+          <td><code>/metrics</code></td>
+          <td>Prometheus metrics</td>
+          <td>Metrics format</td>
+      </tr>
+      <tr>
+          <td><code>/ready</code></td>
+          <td>Readiness check</td>
+          <td>200 OK or 503</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="troubleshooting">Troubleshooting<a class="td-heading-self-link" href="#troubleshooting" aria-label="Heading self-link"></a></h2>
+<h3 id="common-issues">Common Issues<a class="td-heading-self-link" href="#common-issues" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Issue</th>
+          <th>Solution</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>No traces in Jaeger</td>
+          <td>Set <code>JAEGER_ENDPOINT</code> environment variable</td>
+      </tr>
+      <tr>
+          <td>Health endpoint not accessible</td>
+          <td>Check <code>BROKER_HEALTH_PORT</code> is unique</td>
+      </tr>
+      <tr>
+          <td>Logs not structured</td>
+          <td>Ensure using <code>client.Logger</code> not standard <code>log</code></td>
+      </tr>
+      <tr>
+          <td>Missing correlation IDs</td>
+          <td>Use <code>context.Context</code> in all operations</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="verification-steps">Verification Steps<a class="td-heading-self-link" href="#verification-steps" aria-label="Heading self-link"></a></h3>
+<ol>
+<li>
+<p><strong>Check health endpoint</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl http://localhost:8083/health
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Verify metrics</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl http://localhost:8083/metrics
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Check traces in Jaeger</strong>:</p>
+<ul>
+<li>Open http://localhost:16686</li>
+<li>Search for your service name</li>
+</ul>
+</li>
+</ol>
+<h2 id="migration-from-manual-setup">Migration from Manual Setup<a class="td-heading-self-link" href="#migration-from-manual-setup" aria-label="Heading self-link"></a></h2>
+<p>If you have existing agents using manual observability setup:</p>
+<h3 id="old-approach-manual">Old Approach (Manual)<a class="td-heading-self-link" href="#old-approach-manual" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// 50+ lines of OpenTelemetry setup
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">obs</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">observability</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewObservability</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">config</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">traceManager</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">observability</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewTraceManager</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">serviceName</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Manual gRPC client setup
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Manual health server setup
+</span></span></span></code></pre></div><h3 id="new-approach-unified">New Approach (Unified)<a class="td-heading-self-link" href="#new-approach-unified" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// 3 lines - everything automatic
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;my-agent&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">client</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewAgentHubClient</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">config</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Start</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>The unified abstractions provide the same observability features with 90% less code and no manual setup required.</p>
+<hr>
+<p>With AgentHub&rsquo;s unified abstractions, observability is no longer an add-on feature but a built-in capability that comes automatically with every agent. Focus on your business logic while the platform handles monitoring, tracing, and health checks for you.</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-7cc42cec1fbf6d7b5e36697d76c93dde">2 - How to Use Grafana Dashboards</h1>
+    <div class="lead">Master the AgentHub observability dashboards to monitor, analyze, and troubleshoot your event-driven system effectively.</div>
+	<h1 id="how-to-use-grafana-dashboards">How to Use Grafana Dashboards<a class="td-heading-self-link" href="#how-to-use-grafana-dashboards" aria-label="Heading self-link"></a></h1>
+<p><strong>Goal-oriented guide</strong>: Master the AgentHub observability dashboards to monitor, analyze, and troubleshoot your event-driven system effectively.</p>
+<h2 id="prerequisites">Prerequisites<a class="td-heading-self-link" href="#prerequisites" aria-label="Heading self-link"></a></h2>
+<ul>
+<li>AgentHub observability stack running (<code>docker-compose up -d</code>)</li>
+<li>AgentHub agents running with observability enabled</li>
+<li>Basic understanding of metrics concepts</li>
+<li>10-15 minutes</li>
+</ul>
+<h2 id="quick-access">Quick Access<a class="td-heading-self-link" href="#quick-access" aria-label="Heading self-link"></a></h2>
+<ul>
+<li><strong>Grafana Dashboard</strong>: http://localhost:3333 (admin/admin)</li>
+<li><strong>Direct Dashboard</strong>: http://localhost:3333/d/agenthub-eda-dashboard</li>
+</ul>
+<h2 id="dashboard-overview">Dashboard Overview<a class="td-heading-self-link" href="#dashboard-overview" aria-label="Heading self-link"></a></h2>
+<p>The <strong>AgentHub EDA System Observatory</strong> provides comprehensive monitoring across three main areas:</p>
+<ol>
+<li><strong>Event Metrics</strong> (Top Row) - Event processing performance</li>
+<li><strong>Distributed Tracing</strong> (Middle) - Request flow visualization</li>
+<li><strong>System Health</strong> (Bottom Row) - Infrastructure monitoring</li>
+</ol>
+<h2 id="panel-by-panel-guide">Panel-by-Panel Guide<a class="td-heading-self-link" href="#panel-by-panel-guide" aria-label="Heading self-link"></a></h2>
+<h3 id="-event-processing-rate-top-left">🚀 Event Processing Rate (Top Left)<a class="td-heading-self-link" href="#-event-processing-rate-top-left" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Events processed per second by each service</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Monitor throughput</strong>: See how many events your system processes</li>
+<li><strong>Identify bottlenecks</strong>: Low rates may indicate performance issues</li>
+<li><strong>Compare services</strong>: See which agents are busiest</li>
+</ul>
+<p><strong>Reading the chart</strong>:</p>
+<pre tabindex="0"><code>Green line: agenthub-broker (150 events/sec)
+Blue line:  agenthub-publisher (50 events/sec)
+Red line:   agenthub-subscriber (145 events/sec)
+</code></pre><p><strong>Troubleshooting</strong>:</p>
+<ul>
+<li><strong>Flat lines</strong>: No activity - check if agents are running</li>
+<li><strong>Dropping rates</strong>: Performance degradation - check CPU/memory</li>
+<li><strong>Spiky patterns</strong>: Bursty workloads - consider load balancing</li>
+</ul>
+<h3 id="-event-processing-error-rate-top-right">🚨 Event Processing Error Rate (Top Right)<a class="td-heading-self-link" href="#-event-processing-error-rate-top-right" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Percentage of events that failed processing</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Monitor reliability</strong>: Should stay below 5% (green zone)</li>
+<li><strong>Alert threshold</strong>: Yellow above 5%, red above 10%</li>
+<li><strong>Quick health check</strong>: Single glance system reliability</li>
+</ul>
+<p><strong>Color coding</strong>:</p>
+<ul>
+<li><strong>Green (0-5%)</strong>: Healthy system</li>
+<li><strong>Yellow (5-10%)</strong>: Moderate issues</li>
+<li><strong>Red (&gt;10%)</strong>: Critical problems</li>
+</ul>
+<p><strong>Troubleshooting</strong>:</p>
+<ul>
+<li><strong>High error rates</strong>: Check Jaeger for failing traces</li>
+<li><strong>Sudden spikes</strong>: Look for recent deployments or config changes</li>
+<li><strong>Persistent errors</strong>: Check logs for recurring issues</li>
+</ul>
+<h3 id="-event-types-distribution-middle-left">📈 Event Types Distribution (Middle Left)<a class="td-heading-self-link" href="#-event-types-distribution-middle-left" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Breakdown of event types by volume</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Understand workload</strong>: See what types of tasks dominate</li>
+<li><strong>Capacity planning</strong>: Identify which task types need scaling</li>
+<li><strong>Anomaly detection</strong>: Unusual distributions may indicate issues</li>
+</ul>
+<p><strong>Example interpretation</strong>:</p>
+<pre tabindex="0"><code>greeting: 40% (blue) - Most common task type
+math_calculation: 35% (green) - Heavy computational tasks
+random_number: 20% (yellow) - Quick tasks
+unknown_task: 5% (red) - Error-generating tasks
+</code></pre><p><strong>Troubleshooting</strong>:</p>
+<ul>
+<li><strong>Missing task types</strong>: Check if specific agents are down</li>
+<li><strong>Unexpected distributions</strong>: May indicate upstream issues</li>
+<li><strong>Dominant error types</strong>: Focus optimization efforts</li>
+</ul>
+<h3 id="-event-processing-latency-middle-right">⏱️ Event Processing Latency (Middle Right)<a class="td-heading-self-link" href="#-event-processing-latency-middle-right" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Processing time percentiles (p50, p95, p99)</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Performance monitoring</strong>: Track how fast events are processed</li>
+<li><strong>SLA compliance</strong>: Ensure latencies meet requirements</li>
+<li><strong>Outlier detection</strong>: p99 shows worst-case scenarios</li>
+</ul>
+<p><strong>Understanding percentiles</strong>:</p>
+<ul>
+<li><strong>p50 (median)</strong>: 50% of events process faster than this</li>
+<li><strong>p95</strong>: 95% of events process faster than this</li>
+<li><strong>p99</strong>: 99% of events process faster than this</li>
+</ul>
+<p><strong>Healthy ranges</strong>:</p>
+<ul>
+<li><strong>p50</strong>: &lt; 50ms (very responsive)</li>
+<li><strong>p95</strong>: &lt; 200ms (good performance)</li>
+<li><strong>p99</strong>: &lt; 500ms (acceptable outliers)</li>
+</ul>
+<p><strong>Troubleshooting</strong>:</p>
+<ul>
+<li><strong>Rising latencies</strong>: Check CPU/memory usage</li>
+<li><strong>High p99</strong>: Look for resource contention or long-running tasks</li>
+<li><strong>Flatlined metrics</strong>: May indicate measurement issues</li>
+</ul>
+<h3 id="-distributed-traces-middle-section">🔍 Distributed Traces (Middle Section)<a class="td-heading-self-link" href="#-distributed-traces-middle-section" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Integration with Jaeger for trace visualization</p>
+<p><strong>How to use</strong>:</p>
+<ol>
+<li><strong>Click &ldquo;Explore&rdquo;</strong> to open Jaeger</li>
+<li><strong>Select service</strong> from dropdown</li>
+<li><strong>Find specific traces</strong> to debug issues</li>
+<li><strong>Analyze request flows</strong> across services</li>
+</ol>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li><strong>Debugging errors</strong>: Find root cause of failures</li>
+<li><strong>Performance analysis</strong>: Identify slow operations</li>
+<li><strong>Understanding flows</strong>: See complete request journeys</li>
+</ul>
+<h3 id="-service-cpu-usage-bottom-left">🖥️ Service CPU Usage (Bottom Left)<a class="td-heading-self-link" href="#-service-cpu-usage-bottom-left" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: CPU utilization by service</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Capacity monitoring</strong>: Ensure services aren&rsquo;t overloaded</li>
+<li><strong>Resource planning</strong>: Identify when to scale</li>
+<li><strong>Performance correlation</strong>: High CPU often explains high latency</li>
+</ul>
+<p><strong>Healthy ranges</strong>:</p>
+<ul>
+<li><strong>&lt; 50%</strong>: Comfortable utilization</li>
+<li><strong>50-70%</strong>: Moderate load</li>
+<li><strong>&gt; 70%</strong>: Consider scaling</li>
+</ul>
+<h3 id="-service-memory-usage-bottom-center">💾 Service Memory Usage (Bottom Center)<a class="td-heading-self-link" href="#-service-memory-usage-bottom-center" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Memory consumption by service</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Memory leak detection</strong>: Watch for continuously growing usage</li>
+<li><strong>Capacity planning</strong>: Ensure sufficient memory allocation</li>
+<li><strong>Garbage collection</strong>: High usage may impact performance</li>
+</ul>
+<p><strong>Monitoring tips</strong>:</p>
+<ul>
+<li><strong>Steady growth</strong>: May indicate memory leaks</li>
+<li><strong>Sawtooth pattern</strong>: Normal GC behavior</li>
+<li><strong>Sudden spikes</strong>: Check for large event batches</li>
+</ul>
+<h3 id="-go-goroutines-bottom-right">🧵 Go Goroutines (Bottom Right)<a class="td-heading-self-link" href="#-go-goroutines-bottom-right" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Number of concurrent goroutines per service</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Concurrency monitoring</strong>: Track parallel processing</li>
+<li><strong>Resource leak detection</strong>: Continuously growing numbers indicate leaks</li>
+<li><strong>Performance tuning</strong>: Optimize concurrency levels</li>
+</ul>
+<p><strong>Normal patterns</strong>:</p>
+<ul>
+<li><strong>Stable baseline</strong>: Normal operation</li>
+<li><strong>Activity spikes</strong>: During high load</li>
+<li><strong>Continuous growth</strong>: Potential goroutine leaks</li>
+</ul>
+<h3 id="-service-health-status-bottom-far-right">🏥 Service Health Status (Bottom Far Right)<a class="td-heading-self-link" href="#-service-health-status-bottom-far-right" aria-label="Heading self-link"></a></h3>
+<p><strong>What it shows</strong>: Up/down status of each service</p>
+<p><strong>How to use</strong>:</p>
+<ul>
+<li><strong>Quick status check</strong>: See if all services are running</li>
+<li><strong>Outage detection</strong>: Immediately identify down services</li>
+<li><strong>Health monitoring</strong>: Green = UP, Red = DOWN</li>
+</ul>
+<h2 id="dashboard-variables-and-filters">Dashboard Variables and Filters<a class="td-heading-self-link" href="#dashboard-variables-and-filters" aria-label="Heading self-link"></a></h2>
+<h3 id="service-filter">Service Filter<a class="td-heading-self-link" href="#service-filter" aria-label="Heading self-link"></a></h3>
+<p><strong>Location</strong>: Top of dashboard
+<strong>Purpose</strong>: Filter metrics by specific services
+<strong>Usage</strong>:</p>
+<ul>
+<li>Select &ldquo;All&rdquo; to see everything</li>
+<li>Choose specific services to focus analysis</li>
+<li>Useful for isolating problems to specific components</li>
+</ul>
+<h3 id="event-type-filter">Event Type Filter<a class="td-heading-self-link" href="#event-type-filter" aria-label="Heading self-link"></a></h3>
+<p><strong>Location</strong>: Top of dashboard
+<strong>Purpose</strong>: Filter by event/task types
+<strong>Usage</strong>:</p>
+<ul>
+<li>Analyze specific workflow types</li>
+<li>Debug particular task categories</li>
+<li>Compare performance across task types</li>
+</ul>
+<h3 id="time-range-selector">Time Range Selector<a class="td-heading-self-link" href="#time-range-selector" aria-label="Heading self-link"></a></h3>
+<p><strong>Location</strong>: Top right of dashboard
+<strong>Purpose</strong>: Control time window for analysis
+<strong>Common ranges</strong>:</p>
+<ul>
+<li><strong>5 minutes</strong>: Real-time monitoring</li>
+<li><strong>1 hour</strong>: Recent trend analysis</li>
+<li><strong>24 hours</strong>: Daily pattern analysis</li>
+<li><strong>7 days</strong>: Weekly trend and capacity planning</li>
+</ul>
+<h2 id="advanced-usage-patterns">Advanced Usage Patterns<a class="td-heading-self-link" href="#advanced-usage-patterns" aria-label="Heading self-link"></a></h2>
+<h3 id="performance-investigation-workflow">Performance Investigation Workflow<a class="td-heading-self-link" href="#performance-investigation-workflow" aria-label="Heading self-link"></a></h3>
+<ol>
+<li>
+<p><strong>Start with Overview</strong>:</p>
+<ul>
+<li>Check error rates (should be &lt; 5%)</li>
+<li>Verify processing rates look normal</li>
+<li>Scan for any red/yellow indicators</li>
+</ul>
+</li>
+<li>
+<p><strong>Drill Down on Issues</strong>:</p>
+<ul>
+<li>If high error rates → check distributed traces</li>
+<li>If high latency → examine CPU/memory usage</li>
+<li>If low throughput → check service health</li>
+</ul>
+</li>
+<li>
+<p><strong>Root Cause Analysis</strong>:</p>
+<ul>
+<li>Use time range selector to find when problems started</li>
+<li>Filter by specific services to isolate issues</li>
+<li>Correlate metrics across different panels</li>
+</ul>
+</li>
+</ol>
+<h3 id="capacity-planning-workflow">Capacity Planning Workflow<a class="td-heading-self-link" href="#capacity-planning-workflow" aria-label="Heading self-link"></a></h3>
+<ol>
+<li>
+<p><strong>Analyze Peak Patterns</strong>:</p>
+<ul>
+<li>Set time range to 7 days</li>
+<li>Identify peak usage periods</li>
+<li>Note maximum throughput achieved</li>
+</ul>
+</li>
+<li>
+<p><strong>Resource Utilization</strong>:</p>
+<ul>
+<li>Check CPU usage during peaks</li>
+<li>Monitor memory consumption trends</li>
+<li>Verify goroutine scaling behavior</li>
+</ul>
+</li>
+<li>
+<p><strong>Plan Scaling</strong>:</p>
+<ul>
+<li>If CPU &gt; 70% during peaks, scale up</li>
+<li>If memory continuously growing, investigate leaks</li>
+<li>If error rates spike during load, optimize before scaling</li>
+</ul>
+</li>
+</ol>
+<h3 id="troubleshooting-workflow">Troubleshooting Workflow<a class="td-heading-self-link" href="#troubleshooting-workflow" aria-label="Heading self-link"></a></h3>
+<ol>
+<li>
+<p><strong>Identify Symptoms</strong>:</p>
+<ul>
+<li>High error rates: Focus on traces and logs</li>
+<li>High latency: Check resource utilization</li>
+<li>Low throughput: Verify service health</li>
+</ul>
+</li>
+<li>
+<p><strong>Time Correlation</strong>:</p>
+<ul>
+<li>Use time range to find when issues started</li>
+<li>Look for correlated changes across metrics</li>
+<li>Check for deployment or configuration changes</li>
+</ul>
+</li>
+<li>
+<p><strong>Service Isolation</strong>:</p>
+<ul>
+<li>Use service filter to identify problematic components</li>
+<li>Compare healthy vs unhealthy services</li>
+<li>Check inter-service dependencies</li>
+</ul>
+</li>
+</ol>
+<h2 id="dashboard-customization">Dashboard Customization<a class="td-heading-self-link" href="#dashboard-customization" aria-label="Heading self-link"></a></h2>
+<h3 id="adding-new-panels">Adding New Panels<a class="td-heading-self-link" href="#adding-new-panels" aria-label="Heading self-link"></a></h3>
+<ol>
+<li><strong>Click &ldquo;+ Add panel&rdquo;</strong> in top menu</li>
+<li><strong>Choose visualization type</strong>:
+<ul>
+<li>Time series for trends</li>
+<li>Stat for current values</li>
+<li>Gauge for thresholds</li>
+</ul>
+</li>
+<li><strong>Configure query</strong>:
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-promql" data-lang="promql"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Example: Custom error rate</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">rate</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">my_custom_errors_total</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">5m</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">)</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#ce5c00;font-weight:bold">/</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">rate</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">my_custom_requests_total</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">5m</span><span style="color:#000;font-weight:bold">]</span><span style="color:#ce5c00;font-weight:bold">)</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">100</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div></li>
+</ol>
+<h3 id="creating-alerts">Creating Alerts<a class="td-heading-self-link" href="#creating-alerts" aria-label="Heading self-link"></a></h3>
+<ol>
+<li><strong>Edit existing panel</strong> or create new one</li>
+<li><strong>Click &ldquo;Alert&rdquo; tab</strong></li>
+<li><strong>Configure conditions</strong>:
+<pre tabindex="0"><code>Query: rate(event_errors_total[5m]) / rate(events_processed_total[5m]) * 100
+Condition: IS ABOVE 5
+Evaluation: Every 1m for 2m
+</code></pre></li>
+<li><strong>Set notification channels</strong></li>
+</ol>
+<h3 id="custom-time-ranges">Custom Time Ranges<a class="td-heading-self-link" href="#custom-time-ranges" aria-label="Heading self-link"></a></h3>
+<ol>
+<li><strong>Click time picker</strong> (top right)</li>
+<li><strong>Select &ldquo;Custom range&rdquo;</strong></li>
+<li><strong>Set specific dates/times</strong> for historical analysis</li>
+<li><strong>Use &ldquo;Refresh&rdquo; settings</strong> for auto-updating</li>
+</ol>
+<h2 id="troubleshooting-dashboard-issues">Troubleshooting Dashboard Issues<a class="td-heading-self-link" href="#troubleshooting-dashboard-issues" aria-label="Heading self-link"></a></h2>
+<h3 id="dashboard-not-loading">Dashboard Not Loading<a class="td-heading-self-link" href="#dashboard-not-loading" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Check Grafana status</span>
+</span></span><span style="display:flex;"><span>docker-compose ps grafana
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Check Grafana logs</span>
+</span></span><span style="display:flex;"><span>docker-compose logs grafana
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Restart if needed</span>
+</span></span><span style="display:flex;"><span>docker-compose restart grafana
+</span></span></code></pre></div><h3 id="no-data-in-panels">No Data in Panels<a class="td-heading-self-link" href="#no-data-in-panels" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Check Prometheus connection</span>
+</span></span><span style="display:flex;"><span>curl http://localhost:9090/api/v1/targets
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Verify agents are exposing metrics</span>
+</span></span><span style="display:flex;"><span>curl http://localhost:8080/metrics
+</span></span><span style="display:flex;"><span>curl http://localhost:8081/metrics
+</span></span><span style="display:flex;"><span>curl http://localhost:8082/metrics
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Check Prometheus configuration</span>
+</span></span><span style="display:flex;"><span>docker-compose logs prometheus
+</span></span></code></pre></div><h3 id="slow-dashboard-performance">Slow Dashboard Performance<a class="td-heading-self-link" href="#slow-dashboard-performance" aria-label="Heading self-link"></a></h3>
+<ol>
+<li><strong>Reduce time range</strong>: Use shorter windows for better performance</li>
+<li><strong>Limit service selection</strong>: Filter to specific services</li>
+<li><strong>Optimize queries</strong>: Use appropriate rate intervals</li>
+<li><strong>Check resource usage</strong>: Ensure Prometheus has enough memory</li>
+</ol>
+<h3 id="authentication-issues">Authentication Issues<a class="td-heading-self-link" href="#authentication-issues" aria-label="Heading self-link"></a></h3>
+<ul>
+<li><strong>Default credentials</strong>: admin/admin</li>
+<li><strong>Reset password</strong>: Through Grafana UI after first login</li>
+<li><strong>Lost access</strong>: Restart Grafana container to reset</li>
+</ul>
+<h2 id="best-practices">Best Practices<a class="td-heading-self-link" href="#best-practices" aria-label="Heading self-link"></a></h2>
+<h3 id="regular-monitoring">Regular Monitoring<a class="td-heading-self-link" href="#regular-monitoring" aria-label="Heading self-link"></a></h3>
+<ul>
+<li><strong>Check dashboard daily</strong>: Quick health overview</li>
+<li><strong>Weekly reviews</strong>: Trend analysis and capacity planning</li>
+<li><strong>Set up alerts</strong>: Proactive monitoring for critical metrics</li>
+</ul>
+<h3 id="performance-optimization">Performance Optimization<a class="td-heading-self-link" href="#performance-optimization" aria-label="Heading self-link"></a></h3>
+<ul>
+<li><strong>Use appropriate time ranges</strong>: Don&rsquo;t query more data than needed</li>
+<li><strong>Filter effectively</strong>: Use service and event type filters</li>
+<li><strong>Refresh intervals</strong>: Balance real-time needs with performance</li>
+</ul>
+<h3 id="team-usage">Team Usage<a class="td-heading-self-link" href="#team-usage" aria-label="Heading self-link"></a></h3>
+<ul>
+<li><strong>Share dashboard URLs</strong>: Bookmark specific views</li>
+<li><strong>Create annotations</strong>: Mark deployments and incidents</li>
+<li><strong>Export snapshots</strong>: Share findings with team members</li>
+</ul>
+<h2 id="integration-with-other-tools">Integration with Other Tools<a class="td-heading-self-link" href="#integration-with-other-tools" aria-label="Heading self-link"></a></h2>
+<h3 id="jaeger-integration">Jaeger Integration<a class="td-heading-self-link" href="#jaeger-integration" aria-label="Heading self-link"></a></h3>
+<ul>
+<li>Click <strong>Explore</strong> in traces panel</li>
+<li>Auto-links to Jaeger with service context</li>
+<li>Correlate traces with metrics timeframes</li>
+</ul>
+<h3 id="prometheus-integration">Prometheus Integration<a class="td-heading-self-link" href="#prometheus-integration" aria-label="Heading self-link"></a></h3>
+<ul>
+<li>Click <strong>Explore</strong> on any panel</li>
+<li>Edit queries in Prometheus query language</li>
+<li>Access raw metrics for custom analysis</li>
+</ul>
+<h3 id="log-correlation">Log Correlation<a class="td-heading-self-link" href="#log-correlation" aria-label="Heading self-link"></a></h3>
+<ul>
+<li>Use trace IDs from Jaeger</li>
+<li>Search logs for matching trace IDs</li>
+<li>Correlate log events with metric spikes</li>
+</ul>
+<hr>
+<p><strong>🎯 Next Steps</strong>:</p>
+<p><strong>Deep Debugging</strong>: <strong><a href="debug_with_tracing.md">Debug with Distributed Tracing</a></strong></p>
+<p><strong>Production Setup</strong>: <strong><a href="configure_alerts.md">Configure Alerts</a></strong></p>
+<p><strong>Understanding</strong>: <strong><a href="../explanation/observability_architecture.md">Observability Architecture Explained</a></strong></p>
+
+</div>
+
+
+
+    
+	
+  
+
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub Issues" aria-label="GitHub Issues">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub/issues" aria-label="GitHub Issues">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2023&ndash;2025
+    <span class="td-footer__authors">Olivier Wulveryck | <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> |</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/agenthub/js/main.js"></script>
+<script defer src="/agenthub/js/click-to-copy.js" crossorigin="anonymous"></script>
+<script src='/agenthub/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

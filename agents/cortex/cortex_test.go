@@ -2,6 +2,7 @@ package cortex
 
 import (
 	"context"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -30,7 +31,7 @@ func TestCortex_RegisterAgent(t *testing.T) {
 	llmClient := llm.NewMockClient()
 	mockClient := &MockAgentHubClient{}
 
-	cortex := NewCortex(sm, llmClient, mockClient)
+	cortex := NewCortex(sm, llmClient, mockClient, slog.Default())
 
 	// Register an agent
 	agentCard := &pb.AgentCard{
@@ -66,7 +67,7 @@ func TestCortex_HandleChatRequest(t *testing.T) {
 	sm := state.NewInMemoryStateManager()
 
 	// Mock LLM that returns a simple acknowledgment
-	llmClient := llm.NewMockClientWithFunc(func(ctx context.Context, history []*pb.Message, agents []*pb.AgentCard, event *pb.Message) (*llm.Decision, error) {
+	llmClient := llm.NewMockClientWithFunc(func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*llm.Decision, error) {
 		return &llm.Decision{
 			Reasoning: "User said hello, responding",
 			Actions: []llm.Action{
@@ -79,7 +80,7 @@ func TestCortex_HandleChatRequest(t *testing.T) {
 	})
 
 	mockClient := &MockAgentHubClient{}
-	cortex := NewCortex(sm, llmClient, mockClient)
+	cortex := NewCortex(sm, llmClient, mockClient, slog.Default())
 
 	// Create a chat request
 	chatRequest := &pb.Message{
@@ -156,7 +157,7 @@ func TestCortex_HandleTaskResult(t *testing.T) {
 	sm.Set("session-1", initialState)
 
 	// Mock LLM that synthesizes the result
-	llmClient := llm.NewMockClientWithFunc(func(ctx context.Context, history []*pb.Message, agents []*pb.AgentCard, event *pb.Message) (*llm.Decision, error) {
+	llmClient := llm.NewMockClientWithFunc(func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*llm.Decision, error) {
 		return &llm.Decision{
 			Reasoning: "Task completed, informing user",
 			Actions: []llm.Action{
@@ -169,7 +170,7 @@ func TestCortex_HandleTaskResult(t *testing.T) {
 	})
 
 	mockClient := &MockAgentHubClient{}
-	cortex := NewCortex(sm, llmClient, mockClient)
+	cortex := NewCortex(sm, llmClient, mockClient, slog.Default())
 
 	// Create a task result message
 	taskResult := &pb.Message{
@@ -210,7 +211,7 @@ func TestCortex_GetAvailableAgents(t *testing.T) {
 	llmClient := llm.NewMockClient()
 	mockClient := &MockAgentHubClient{}
 
-	cortex := NewCortex(sm, llmClient, mockClient)
+	cortex := NewCortex(sm, llmClient, mockClient, slog.Default())
 
 	// Register multiple agents
 	cortex.RegisterAgent("agent-1", &pb.AgentCard{Name: "agent-1", Description: "First agent"})

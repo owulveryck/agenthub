@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentHub Demo - OCTO</title>
+<style>
+  /*
+   * OCTO Color System
+   * Marine #0E2356 | Turquoise #00D2DD | White #FFFFFF
+   */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+    background: #0E2356;
+    color: #FFFFFF;
+    height: 100vh;
+    overflow: hidden;
+  }
+  #layout {
+    display: grid;
+    grid-template-rows: 35% 65%;
+    height: 100vh;
+  }
+
+  /* ── Chat panel ─────────────────────────────── */
+  #chat-panel {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid #00D2DD;
+  }
+  .panel-header {
+    background: #3E4F78;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #FFFFFF;
+    border-bottom: 2px solid #00D2DD;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  #chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    background: #0E2356;
+  }
+  #chat-input-bar {
+    display: flex;
+    border-top: 1px solid #3E4F78;
+    background: #263967;
+    flex-shrink: 0;
+  }
+  #chat-input-bar span {
+    padding: 10px 4px 10px 14px;
+    color: #00D2DD;
+    font-size: 15px;
+    font-weight: bold;
+  }
+  #chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 6px;
+  }
+  #chat-input::placeholder { color: #6E7B9A; }
+  #upload-btn {
+    background: transparent;
+    border: 1px solid #00D2DD;
+    color: #00D2DD;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 6px 12px;
+    margin: 4px 8px 4px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  #upload-btn:hover { background: #00D2DD22; }
+  #file-input { display: none; }
+
+  .msg { padding: 3px 0; word-wrap: break-word; }
+  .msg-user { color: #00D2DD; }
+  .msg-user::before { content: '> '; color: #00D2DD; }
+  .msg-agent { color: #FFFFFF; }
+  .msg-agent::before { content: '\1F916 '; }
+  .msg-status { color: #9FA7BB; font-style: italic; }
+
+  /* ── Diagram panel ──────────────────────────── */
+  #diagram-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #diagram-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px 0;
+  }
+  #diagram-container svg {
+    width: 100%;
+    height: 100%;
+  }
+  #event-feed {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: 11px;
+    color: #B7BDCC;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-top: 1px solid #263967;
+    min-height: 28px;
+  }
+  #event-feed span { color: #6E7B9A; margin-right: 6px; }
+
+  /* ── Observability links ──────────────────────── */
+  .obs-links { display: flex; gap: 10px; }
+  .obs-links a {
+    color: #00D2DD;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 2px 8px;
+    border: 1px solid #00D2DD33;
+    border-radius: 3px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .obs-links a:hover {
+    background: #00D2DD22;
+    border-color: #00D2DD88;
+  }
+
+  /* ── Status indicator ───────────────────────── */
+  #status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  #status-dot.connected    { background: #00D2DD; }
+  #status-dot.disconnected { background: #CFD3DD; }
+  #status-dot.connecting   { background: #6E7B9A; }
+
+  /* ── Scrollbar ──────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0E2356; }
+  ::-webkit-scrollbar-thumb { background: #3E4F78; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #586586; }
+
+  /* ── Agent tooltip ────────────────────────── */
+  #agent-tooltip {
+    display: none;
+    position: fixed;
+    background: #1a2a4a;
+    border: 1px solid #00D2DD;
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: #FFFFFF;
+    font-size: 12px;
+    line-height: 1.5;
+    max-width: 320px;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  #agent-tooltip .tt-name {
+    color: #00D2DD;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  #agent-tooltip .tt-version { color: #6E7B9A; font-size: 11px; }
+  #agent-tooltip .tt-desc { margin: 4px 0 6px; color: #B7BDCC; }
+  #agent-tooltip .tt-skill { margin: 2px 0; }
+  #agent-tooltip .tt-skill-name { color: #00D2DD; }
+</style>
+</head>
+<body>
+<div id="layout">
+  <!-- Chat -->
+  <div id="chat-panel">
+    <div class="panel-header">
+      <span><span id="status-dot" class="connecting"></span>AgentHub Chat</span>
+      <span id="status-text" style="font-weight:normal;color:#9FA7BB">connecting...</span>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-input-bar">
+      <span>&gt;</span>
+      <input id="chat-input" type="text" placeholder="Type a message and press Enter..." autofocus>
+      <input id="file-input" type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4,audio/x-m4a">
+      <button id="upload-btn" title="Upload Audio">Upload Audio</button>
+    </div>
+  </div>
+  <!-- Diagram -->
+  <div id="diagram-panel">
+    <div class="panel-header">
+      <span>Architecture</span>
+      <div class="obs-links">
+        <a href="http://localhost:16686" target="_blank">Jaeger</a>
+        <a href="http://localhost:3333" target="_blank">Grafana</a>
+        <a href="http://localhost:9090" target="_blank">Prometheus</a>
+      </div>
+    </div>
+    <div id="diagram-container">
+      <svg id="diagram" viewBox="0 0 1000 370" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <marker id="arrow" viewBox="0 0 10 6" refX="10" refY="3"
+                  markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,3 L0,6" fill="#3E4F78"/>
+          </marker>
+          <marker id="arrow-active" viewBox="0 0 10 6" refX="10" refY="3"
+                  markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,3 L0,6" fill="#00D2DD"/>
+          </marker>
+        </defs>
+
+        <!-- Connection lines -->
+        <line id="line-chat-broker"   x1="215" y1="140" x2="335" y2="140"
+              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
+        <line id="line-broker-cortex" x1="545" y1="110" x2="670" y2="65"
+              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
+        <line id="line-broker-echo"   x1="545" y1="170" x2="670" y2="215"
+              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
+        <line id="line-broker-mp3"   x1="500" y1="195" x2="670" y2="310"
+              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Nodes -->
+        <g id="node-chat">
+          <rect x="50" y="100" width="165" height="80" rx="10"
+                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
+          <text x="132" y="138" text-anchor="middle"
+                fill="#FFFFFF" font-size="16" font-weight="bold"
+                font-family="monospace">You</text>
+          <text id="sub-chat" x="132" y="158" text-anchor="middle"
+                fill="#6E7B9A" font-size="10" font-family="monospace">Chat Client</text>
+        </g>
+
+        <g id="node-broker">
+          <rect x="335" y="85" width="210" height="110" rx="12"
+                fill="#263967" stroke="#3E4F78" stroke-width="2.5"/>
+          <text x="440" y="130" text-anchor="middle"
+                fill="#FFFFFF" font-size="18" font-weight="bold"
+                font-family="monospace">Broker</text>
+          <text x="440" y="152" text-anchor="middle"
+                fill="#6E7B9A" font-size="11" font-family="monospace">Event Bus</text>
+          <text id="sub-broker" x="440" y="172" text-anchor="middle"
+                fill="#586586" font-size="9" font-family="monospace"></text>
+        </g>
+
+        <g id="node-cortex">
+          <rect x="670" y="25" width="190" height="80" rx="10"
+                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
+          <text x="765" y="63" text-anchor="middle"
+                fill="#FFFFFF" font-size="16" font-weight="bold"
+                font-family="monospace">Cortex</text>
+          <text id="sub-cortex" x="765" y="83" text-anchor="middle"
+                fill="#6E7B9A" font-size="10" font-family="monospace">Orchestrator</text>
+        </g>
+
+        <g id="node-echo">
+          <rect x="670" y="175" width="190" height="80" rx="10"
+                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
+          <text x="765" y="213" text-anchor="middle"
+                fill="#FFFFFF" font-size="16" font-weight="bold"
+                font-family="monospace">Echo Agent</text>
+          <text id="sub-echo" x="765" y="233" text-anchor="middle"
+                fill="#6E7B9A" font-size="10" font-family="monospace">Task Worker</text>
+        </g>
+
+        <g id="node-mp3">
+          <rect x="670" y="270" width="190" height="80" rx="10"
+                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
+          <text x="765" y="308" text-anchor="middle"
+                fill="#FFFFFF" font-size="16" font-weight="bold"
+                font-family="monospace">Audio Analyzer</text>
+          <text id="sub-mp3" x="765" y="328" text-anchor="middle"
+                fill="#6E7B9A" font-size="10" font-family="monospace">Task Worker</text>
+        </g>
+      </svg>
+    </div>
+    <div id="event-feed"></div>
+  </div>
+</div>
+<script>
+(function() {
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var chatMessages = document.getElementById('chat-messages');
+  var chatInput = document.getElementById('chat-input');
+  var statusDot = document.getElementById('status-dot');
+  var statusText = document.getElementById('status-text');
+  var diagram = document.getElementById('diagram');
+  var eventFeed = document.getElementById('event-feed');
+
+  /* ── Node and edge geometry ────────────────── */
+  // Edge endpoints (where dots enter/leave nodes)
+  var edges = {
+    'chat|broker':   { x1: 215, y1: 140, x2: 335, y2: 140 },
+    'broker|cortex': { x1: 545, y1: 110, x2: 670, y2: 65  },
+    'broker|echo':   { x1: 545, y1: 170, x2: 670, y2: 215 },
+    'broker|mp3':    { x1: 500, y1: 195, x2: 670, y2: 310 }
+  };
+
+  function getPath(from, to) {
+    var k1 = from + '|' + to, k2 = to + '|' + from;
+    if (edges[k1]) return { sx: edges[k1].x1, sy: edges[k1].y1, ex: edges[k1].x2, ey: edges[k1].y2 };
+    if (edges[k2]) return { sx: edges[k2].x2, sy: edges[k2].y2, ex: edges[k2].x1, ey: edges[k2].y1 };
+    return null;
+  }
+
+  function agentToNode(name) {
+    if (!name) return null;
+    var n = name.toLowerCase();
+    if (n.indexOf('demo_web') >= 0 || n.indexOf('chat') >= 0) return 'chat';
+    if (n.indexOf('cortex') >= 0) return 'cortex';
+    if (n.indexOf('mp3') >= 0) return 'mp3';
+    if (n.indexOf('echo') >= 0) return 'echo';
+    return null;
+  }
+
+  /* ── SVG animation engine ──────────────────── */
+  function animateDot(from, to, dur, cb) {
+    var p = getPath(from, to);
+    if (!p) { if (cb) cb(); return; }
+
+    // Highlight the connection line
+    var lineId = 'line-' + [from, to].sort().join('-');
+    var line = document.getElementById(lineId);
+    if (line) {
+      line.setAttribute('stroke', '#00D2DD');
+      line.setAttribute('stroke-width', '3');
+      line.setAttribute('marker-end', 'url(#arrow-active)');
+    }
+
+    var circle = document.createElementNS(SVG_NS, 'circle');
+    circle.setAttribute('r', '7');
+    circle.setAttribute('fill', '#00D2DD');
+    circle.setAttribute('filter', 'url(#glow)');
+    circle.setAttribute('cx', p.sx);
+    circle.setAttribute('cy', p.sy);
+    diagram.appendChild(circle);
+
+    var start = null;
+    function frame(ts) {
+      if (!start) start = ts;
+      var t = Math.min((ts - start) / dur, 1);
+      // ease-out cubic
+      var e = 1 - Math.pow(1 - t, 3);
+      circle.setAttribute('cx', p.sx + (p.ex - p.sx) * e);
+      circle.setAttribute('cy', p.sy + (p.ey - p.sy) * e);
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        circle.remove();
+        // Reset line
+        if (line) {
+          setTimeout(function() {
+            line.setAttribute('stroke', '#3E4F78');
+            line.setAttribute('stroke-width', '2');
+            line.setAttribute('marker-end', 'url(#arrow)');
+          }, 200);
+        }
+        if (cb) cb();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function highlightNode(nodeId, durationMs) {
+    var g = document.getElementById('node-' + nodeId);
+    if (!g) return;
+    var rect = g.querySelector('rect');
+    if (!rect) return;
+    rect.setAttribute('stroke', '#00D2DD');
+    rect.setAttribute('stroke-width', '3');
+    setTimeout(function() {
+      rect.setAttribute('stroke', '#3E4F78');
+      rect.setAttribute('stroke-width', nodeId === 'broker' ? '2.5' : '2');
+    }, durationMs || 1500);
+  }
+
+  function setNodeSubtext(nodeId, text) {
+    var el = document.getElementById('sub-' + nodeId);
+    if (el) el.textContent = text;
+  }
+
+  /* ── Routing: multi-hop dot through broker ─── */
+  function sendDotRoute(from, to) {
+    if (!from || !to) return;
+    if (from === to) { highlightNode(from, 1000); return; }
+
+    highlightNode(from, 1800);
+
+    if (from === 'broker') {
+      animateDot('broker', to, 500, function() { highlightNode(to, 1200); });
+    } else if (to === 'broker') {
+      animateDot(from, 'broker', 500, function() { highlightNode('broker', 1200); });
+    } else {
+      // Multi-hop: from → broker → to
+      animateDot(from, 'broker', 400, function() {
+        highlightNode('broker', 800);
+        setTimeout(function() {
+          animateDot('broker', to, 400, function() { highlightNode(to, 1200); });
+        }, 150);
+      });
+    }
+  }
+
+  /* ── Map event source to node id ────────────── */
+  function sourceToNode(source) {
+    if (source === 'broker') return 'broker';
+    if (source === 'cortex') return 'cortex';
+    if (source === 'echo_agent') return 'echo';
+    if (source === 'mp3_agent') return 'mp3';
+    return null;
+  }
+
+  /* ── Event feed (compact bottom strip) ──────── */
+  var ICONS = { 'in':'\u2193','out':'\u2191','route':'\u2192','ok':'\u2713','err':'\u2717','info':'\u25CF' };
+
+  function addToFeed(msg) {
+    var icon = ICONS[msg.icon] || '\u25CF';
+    var t = msg.time ? msg.time + ' ' : '';
+    var html = '<span>' + t + '</span>' + icon + ' '
+      + escapeHtml(msg.source) + ' \u2014 ' + escapeHtml(msg.content);
+    if (msg.detail) html += '  <span>' + escapeHtml(msg.detail) + '</span>';
+    eventFeed.innerHTML = html;
+  }
+
+  /* ── Handle incoming events ─────────────────── */
+  function handleEvent(msg) {
+    addToFeed(msg);
+    var node = sourceToNode(msg.source);
+
+    // Broker "Message received" with routing detail "from → to"
+    if (msg.source === 'broker' && msg.content === 'Message received' && msg.detail) {
+      var parts = msg.detail.split(' \u2192 ');
+      if (parts.length === 2) {
+        var from = agentToNode(parts[0]);
+        var to = agentToNode(parts[1]);
+        if (from && to) {
+          sendDotRoute(from, to);
+          return;
+        }
+      }
+    }
+
+    // Broker "Message routed" — just flash broker
+    if (msg.source === 'broker' && msg.content === 'Message routed') {
+      highlightNode('broker', 800);
+      setNodeSubtext('broker', msg.detail || '');
+      return;
+    }
+
+    // Broker registration events — flash broker
+    if (msg.source === 'broker' && (msg.content === 'Agent registered' || msg.content === 'Agent connected')) {
+      highlightNode('broker', 1200);
+      var registered = agentToNode(msg.detail);
+      if (registered) {
+        animateDot(registered, 'broker', 500, function() {
+          highlightNode('broker', 800);
+        });
+      }
+      return;
+    }
+
+    // Agent events — highlight the agent node
+    if (node) {
+      highlightNode(node, 1200);
+      if (msg.icon === 'ok' || msg.icon === 'info') {
+        setNodeSubtext(node, msg.content);
+      }
+    }
+  }
+
+  /* ── Utilities ──────────────────────────────── */
+  function escapeHtml(text) {
+    if (!text) return '';
+    var d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+  }
+
+  function isNearBottom(el) {
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+  }
+
+  function appendHtml(panel, html) {
+    var wasNearBottom = isNearBottom(panel);
+    var div = document.createElement('div');
+    div.innerHTML = html;
+    panel.appendChild(div);
+    while (panel.children.length > 300) panel.removeChild(panel.firstChild);
+    if (wasNearBottom) panel.scrollTop = panel.scrollHeight;
+  }
+
+  /* ── WebSocket ──────────────────────────────── */
+  var ws = null, reconnectTimer = null;
+
+  function setStatus(state) {
+    statusDot.className = state;
+    statusText.textContent = state;
+  }
+
+  function connect() {
+    if (ws) { ws.close(); ws = null; }
+    setStatus('connecting');
+    var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(proto + '//' + location.host + '/ws');
+
+    ws.onopen = function() {
+      setStatus('connected');
+      if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+    };
+    ws.onclose = function() {
+      setStatus('disconnected'); ws = null;
+      reconnectTimer = setTimeout(connect, 2000);
+    };
+    ws.onerror = function() { setStatus('disconnected'); };
+
+    ws.onmessage = function(evt) {
+      var msg;
+      try { msg = JSON.parse(evt.data); } catch(e) { return; }
+      switch (msg.type) {
+        case 'event':
+          handleEvent(msg);
+          break;
+        case 'chat_response':
+          appendHtml(chatMessages,
+            '<div class="msg msg-agent">' + escapeHtml(msg.content) + '</div>');
+          break;
+        case 'agent_card':
+          if (msg.source && msg.agent_card) {
+            agentCards[agentToNode(msg.source)] = msg.agent_card;
+          }
+          break;
+        case 'status':
+          appendHtml(chatMessages,
+            '<div class="msg msg-status">[' + escapeHtml(msg.source || 'system') + '] '
+            + escapeHtml(msg.content) + '</div>');
+          break;
+      }
+    };
+  }
+
+  chatInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      var text = chatInput.value.trim();
+      if (!text) return;
+      chatInput.value = '';
+      appendHtml(chatMessages,
+        '<div class="msg msg-user">' + escapeHtml(text) + '</div>');
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'chat_message', content: text }));
+      }
+    }
+  });
+
+  connect();
+
+  /* ── Agent card tooltips ────────────────────── */
+  var agentCards = {
+    broker: { name: 'Broker', description: 'Central event bus for agent-to-agent communication', version: '1.0.0', skills: [] },
+    cortex: { name: 'Cortex', description: 'Orchestrator that analyzes user intent and dispatches tasks to agents', version: '1.0.0', skills: [] }
+  };
+  var tooltip = document.getElementById('agent-tooltip');
+
+  function showTooltip(nodeId, e) {
+    var card = agentCards[nodeId];
+    if (!card) return;
+    var html = '<div class="tt-name">' + escapeHtml(card.name) + '</div>';
+    if (card.version) html += '<span class="tt-version">v' + escapeHtml(card.version) + '</span>';
+    html += '<div class="tt-desc">' + escapeHtml(card.description) + '</div>';
+    if (card.skills && card.skills.length > 0) {
+      html += '<div style="margin-top:4px;font-size:11px;color:#6E7B9A">Skills:</div>';
+      for (var i = 0; i < card.skills.length; i++) {
+        html += '<div class="tt-skill"><span class="tt-skill-name">' + escapeHtml(card.skills[i].name) + '</span>';
+        if (card.skills[i].description) html += ' — ' + escapeHtml(card.skills[i].description);
+        html += '</div>';
+      }
+    }
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    positionTooltip(e);
+  }
+
+  function positionTooltip(e) {
+    var x = e.clientX + 12, y = e.clientY + 12;
+    var tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+    if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 12;
+    if (y + th > window.innerHeight - 8) y = e.clientY - th - 12;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  }
+
+  var nodeIds = ['chat', 'broker', 'cortex', 'echo', 'mp3'];
+  nodeIds.forEach(function(nid) {
+    var g = document.getElementById('node-' + nid);
+    if (!g) return;
+    g.style.cursor = 'pointer';
+    g.addEventListener('mouseover', function(e) { showTooltip(nid, e); });
+    g.addEventListener('mousemove', function(e) { positionTooltip(e); });
+    g.addEventListener('mouseout', function() { tooltip.style.display = 'none'; });
+  });
+
+  /* ── File upload ────────────────────────────── */
+  var uploadBtn = document.getElementById('upload-btn');
+  var fileInput = document.getElementById('file-input');
+
+  uploadBtn.addEventListener('click', function() {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', function() {
+    var file = fileInput.files[0];
+    if (!file) return;
+
+    var formData = new FormData();
+    formData.append('file', file);
+
+    appendHtml(chatMessages,
+      '<div class="msg msg-status">Uploading ' + escapeHtml(file.name) + '...</div>');
+
+    fetch('/upload', { method: 'POST', body: formData })
+      .then(function(resp) {
+        if (!resp.ok) throw new Error('Upload failed: ' + resp.status);
+        return resp.json();
+      })
+      .then(function(data) {
+        var msg = 'Analyze this audio file: ' + data.path;
+        appendHtml(chatMessages,
+          '<div class="msg msg-user">' + escapeHtml(msg) + '</div>');
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'chat_message', content: msg }));
+        }
+      })
+      .catch(function(err) {
+        appendHtml(chatMessages,
+          '<div class="msg msg-status">Upload error: ' + escapeHtml(err.message) + '</div>');
+      });
+
+    fileInput.value = '';
+  });
+})();
+</script>
+<div id="agent-tooltip"></div>
+</body>
+</html>

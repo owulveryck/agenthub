@@ -20,13 +20,29 @@ const (
 
 // WSMessage is the JSON protocol for browser <-> server communication.
 type WSMessage struct {
-	Type    string `json:"type"`              // "event", "chat_response", "chat_message", "status"
-	Source  string `json:"source,omitempty"`  // "broker", "cortex", "echo_agent"
-	Content string `json:"content,omitempty"` // text payload
-	Status  string `json:"status,omitempty"`  // "error" for error events
-	Icon    string `json:"icon,omitempty"`    // "in", "out", "route", "ok", "err", "info"
-	Detail  string `json:"detail,omitempty"`  // secondary info line
-	Time    string `json:"time,omitempty"`    // HH:MM:SS timestamp
+	Type      string         `json:"type"`              // "event", "chat_response", "chat_message", "status", "agent_card"
+	Source    string         `json:"source,omitempty"`  // "broker", "cortex", "echo_agent"
+	Content   string         `json:"content,omitempty"` // text payload
+	Status    string         `json:"status,omitempty"`  // "error" for error events
+	Icon      string         `json:"icon,omitempty"`    // "in", "out", "route", "ok", "err", "info"
+	Detail    string         `json:"detail,omitempty"`  // secondary info line
+	Time      string         `json:"time,omitempty"`    // HH:MM:SS timestamp
+	AgentCard *AgentCardInfo `json:"agent_card,omitempty"`
+}
+
+// AgentCardInfo carries A2A agent card data to the browser.
+type AgentCardInfo struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Version     string      `json:"version"`
+	Skills      []SkillInfo `json:"skills"`
+}
+
+// SkillInfo describes a single agent skill.
+type SkillInfo struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Tags        []string `json:"tags,omitempty"`
 }
 
 var upgrader = websocket.Upgrader{

@@ -3,6 +3,7 @@ module github.com/owulveryck/agenthub
 go 1.24.0
 
 require (
+	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/gorilla/websocket v1.5.3
 	github.com/prometheus/client_golang v1.20.5
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0

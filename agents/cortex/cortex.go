@@ -63,14 +63,14 @@ func (c *Cortex) RegisterAgent(agentID string, card *pb.AgentCard) {
 	c.registeredAgents[agentID] = card
 }
 
-// GetAvailableAgents returns a list of all registered agents.
-func (c *Cortex) GetAvailableAgents() []*pb.AgentCard {
+// GetAvailableAgents returns a map of all registered agents keyed by agent ID.
+func (c *Cortex) GetAvailableAgents() map[string]*pb.AgentCard {
 	c.agentsMu.RLock()
 	defer c.agentsMu.RUnlock()
 
-	agents := make([]*pb.AgentCard, 0, len(c.registeredAgents))
-	for _, card := range c.registeredAgents {
-		agents = append(agents, card)
+	agents := make(map[string]*pb.AgentCard, len(c.registeredAgents))
+	for id, card := range c.registeredAgents {
+		agents[id] = card
 	}
 
 	return agents
@@ -140,8 +140,8 @@ func (c *Cortex) handleChatRequest(ctx context.Context, traceManager *observabil
 
 	// Add available agent names to trace
 	agentNames := make([]string, 0, len(availableAgents))
-	for _, agent := range availableAgents {
-		agentNames = append(agentNames, agent.GetName())
+	for agentID, agent := range availableAgents {
+		agentNames = append(agentNames, fmt.Sprintf("%s(%s)", agent.GetName(), agentID))
 	}
 	if len(agentNames) > 0 {
 		traceManager.AddSpanEvent(llmSpan, "available_agents_list",
@@ -473,15 +473,30 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, traceManager *observabi
 
 	traceManager.AddComponentAttribute(taskSpan, "cortex_orchestrator")
 
+	// Use the original user message content so the target agent
+	// gets the full text (e.g. file paths, instructions).
+	content := triggeringMsg.GetContent()
+	if len(content) == 0 {
+		content = []*pb.Part{
+			{Part: &pb.Part_Text{Text: fmt.Sprintf("Task: %s", action.TaskType)}},
+		}
+	}
+
+	if len(content) > 0 {
+		c.logger.InfoContext(ctx, "Dispatching task with content",
+			"target_agent", action.TargetAgent,
+			"task_type", action.TaskType,
+			"content_preview", content[0].GetText(),
+		)
+	}
+
 	// Create task request message
 	taskMsg := &pb.Message{
 		MessageId: fmt.Sprintf("task_request_%d", time.Now().UnixNano()),
 		ContextId: conversationState.SessionID,
 		TaskId:    taskID,
 		Role:      pb.Role_ROLE_AGENT,
-		Content: []*pb.Part{
-			{Part: &pb.Part_Text{Text: fmt.Sprintf("Task: %s", action.TaskType)}},
-		},
+		Content:   content,
 		Metadata: &structpb.Struct{
 			Fields: map[string]*structpb.Value{
 				"task_type":           structpb.NewStringValue(action.TaskType),

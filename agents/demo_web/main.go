@@ -3,11 +3,15 @@ package main
 import (
 	"context"
 	"embed"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -62,6 +66,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", hub.ServeWS)
+	mux.HandleFunc("/upload", handleUpload(logger))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data, err := staticFS.ReadFile("index.html")
 		if err != nil {
@@ -101,4 +106,51 @@ func main() {
 	pm.Shutdown()
 
 	logger.Info("shutdown complete")
+}
+
+const maxUploadSize = 50 << 20 // 50 MB
+
+func handleUpload(logger *slog.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
+
+		file, header, err := r.FormFile("file")
+		if err != nil {
+			logger.Error("upload: failed to read form file", "error", err)
+			http.Error(w, "failed to read uploaded file", http.StatusBadRequest)
+			return
+		}
+		defer file.Close()
+
+		ext := ".mp3"
+		if header != nil {
+			if e := strings.ToLower(filepath.Ext(header.Filename)); e == ".m4a" {
+				ext = ".m4a"
+			}
+		}
+
+		tmp, err := os.CreateTemp("", "agenthub-*"+ext)
+		if err != nil {
+			logger.Error("upload: failed to create temp file", "error", err)
+			http.Error(w, "server error", http.StatusInternalServerError)
+			return
+		}
+		defer tmp.Close()
+
+		if _, err := io.Copy(tmp, file); err != nil {
+			logger.Error("upload: failed to write temp file", "error", err)
+			http.Error(w, "server error", http.StatusInternalServerError)
+			return
+		}
+
+		logger.Info("file uploaded", "path", tmp.Name())
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"path": tmp.Name()})
+	}
 }

@@ -16,7 +16,7 @@ type MockClient struct {
 	DecideFunc func(
 		ctx context.Context,
 		conversationHistory []*pb.Message,
-		availableAgents []*pb.AgentCard,
+		availableAgents map[string]*pb.AgentCard,
 		newEvent *pb.Message,
 	) (*Decision, error)
 
@@ -34,7 +34,7 @@ func NewMockClient() *MockClient {
 func NewMockClientWithFunc(fn func(
 	ctx context.Context,
 	conversationHistory []*pb.Message,
-	availableAgents []*pb.AgentCard,
+	availableAgents map[string]*pb.AgentCard,
 	newEvent *pb.Message,
 ) (*Decision, error)) *MockClient {
 	return &MockClient{
@@ -46,7 +46,7 @@ func NewMockClientWithFunc(fn func(
 func (m *MockClient) Decide(
 	ctx context.Context,
 	conversationHistory []*pb.Message,
-	availableAgents []*pb.AgentCard,
+	availableAgents map[string]*pb.AgentCard,
 	newEvent *pb.Message,
 ) (*Decision, error) {
 	m.CallCount++
@@ -84,8 +84,8 @@ func (m *MockClient) Decide(
 }
 
 // SimpleEchoDecider returns a decision function that echoes user messages.
-func SimpleEchoDecider() func(context.Context, []*pb.Message, []*pb.AgentCard, *pb.Message) (*Decision, error) {
-	return func(ctx context.Context, history []*pb.Message, agents []*pb.AgentCard, event *pb.Message) (*Decision, error) {
+func SimpleEchoDecider() func(context.Context, []*pb.Message, map[string]*pb.AgentCard, *pb.Message) (*Decision, error) {
+	return func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*Decision, error) {
 		if event == nil {
 			return &Decision{Actions: []Action{}}, nil
 		}
@@ -117,8 +117,8 @@ func SimpleEchoDecider() func(context.Context, []*pb.Message, []*pb.AgentCard, *
 // - Responds directly for queries that don't need agent orchestration
 //
 // For echo requests, it looks for keywords like "echo", "repeat", "say back"
-func IntelligentDecider() func(context.Context, []*pb.Message, []*pb.AgentCard, *pb.Message) (*Decision, error) {
-	return func(ctx context.Context, history []*pb.Message, agents []*pb.AgentCard, event *pb.Message) (*Decision, error) {
+func IntelligentDecider() func(context.Context, []*pb.Message, map[string]*pb.AgentCard, *pb.Message) (*Decision, error) {
+	return func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*Decision, error) {
 		if event == nil {
 			return &Decision{
 				Reasoning: "No event received",
@@ -153,6 +153,34 @@ func IntelligentDecider() func(context.Context, []*pb.Message, []*pb.AgentCard, 
 
 		// Normalize text for intent detection
 		normalizedText := strings.ToLower(strings.TrimSpace(userText))
+
+		// Check if user wants audio analysis
+		isAudioRequest := strings.Contains(normalizedText, "mp3") ||
+			strings.Contains(normalizedText, "m4a") ||
+			strings.Contains(normalizedText, "audio") ||
+			strings.Contains(normalizedText, "music") ||
+			strings.Contains(normalizedText, "song") ||
+			strings.Contains(normalizedText, "analyze")
+
+		if isAudioRequest {
+			return &Decision{
+				Reasoning: fmt.Sprintf("User message '%s' contains an audio analysis request (detected keywords: mp3/m4a/audio/music/song/analyze). Dispatching to the audio analyzer agent.", userText),
+				Actions: []Action{
+					{
+						Type:         "chat.response",
+						ResponseText: "I'm sending this to the audio analyzer agent to extract the file metadata.",
+					},
+					{
+						Type:        "task.request",
+						TaskType:    "Analyze Audio",
+						TargetAgent: "agent_mp3",
+						TaskPayload: map[string]interface{}{
+							"input": userText,
+						},
+					},
+				},
+			}, nil
+		}
 
 		// Check if user wants an echo
 		isEchoRequest := strings.Contains(normalizedText, "echo") ||
@@ -200,8 +228,8 @@ func IntelligentDecider() func(context.Context, []*pb.Message, []*pb.AgentCard, 
 // - AGENT task results: synthesize final response (no new task)
 //
 // DEPRECATED: Use IntelligentDecider for more realistic behavior
-func TaskDispatcherDecider(taskType, targetAgent string) func(context.Context, []*pb.Message, []*pb.AgentCard, *pb.Message) (*Decision, error) {
-	return func(ctx context.Context, history []*pb.Message, agents []*pb.AgentCard, event *pb.Message) (*Decision, error) {
+func TaskDispatcherDecider(taskType, targetAgent string) func(context.Context, []*pb.Message, map[string]*pb.AgentCard, *pb.Message) (*Decision, error) {
+	return func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*Decision, error) {
 		// Check if this is a task result (from an agent)
 		if event.GetRole() == pb.Role_ROLE_AGENT && event.GetTaskId() != "" {
 			// This is a task result - synthesize final response

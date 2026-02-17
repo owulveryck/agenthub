@@ -51,6 +51,9 @@ func (cc *ChatClient) Start(ctx context.Context) error {
 	// Subscribe to messages destined for this agent
 	go cc.receiveMessages(ctx)
 
+	// Subscribe to agent card events
+	go cc.receiveAgentEvents(ctx)
+
 	cc.logger.Info("chat client started", "agent_id", chatAgentID, "session", cc.sessionID)
 	return nil
 }
@@ -119,6 +122,56 @@ func (cc *ChatClient) SendMessage(ctx context.Context, text string) {
 	}
 }
 
+func (cc *ChatClient) receiveAgentEvents(ctx context.Context) {
+	stream, err := cc.client.Client.SubscribeToAgentEvents(ctx, &pb.SubscribeToAgentEventsRequest{
+		AgentId: chatAgentID,
+	})
+	if err != nil {
+		cc.logger.Error("failed to subscribe to agent events", "error", err)
+		return
+	}
+
+	for {
+		event, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF || ctx.Err() != nil {
+				return
+			}
+			cc.logger.Error("error receiving agent event", "error", err)
+			return
+		}
+
+		cardEvent := event.GetAgentCard()
+		if cardEvent == nil {
+			continue
+		}
+
+		card := cardEvent.GetAgentCard()
+		if card == nil {
+			continue
+		}
+
+		info := &AgentCardInfo{
+			Name:        card.GetName(),
+			Description: card.GetDescription(),
+			Version:     card.GetVersion(),
+		}
+		for _, s := range card.GetSkills() {
+			info.Skills = append(info.Skills, SkillInfo{
+				Name:        s.GetName(),
+				Description: s.GetDescription(),
+				Tags:        s.GetTags(),
+			})
+		}
+
+		cc.hub.Broadcast(WSMessage{
+			Type:      "agent_card",
+			Source:    cardEvent.GetAgentId(),
+			AgentCard: info,
+		})
+	}
+}
+
 func (cc *ChatClient) receiveMessages(ctx context.Context) {
 	stream, err := cc.client.Client.SubscribeToMessages(ctx, &pb.SubscribeToMessagesRequest{
 		AgentId: chatAgentID,
@@ -142,6 +195,13 @@ func (cc *ChatClient) receiveMessages(ctx context.Context) {
 		if msg == nil {
 			continue
 		}
+
+		cc.logger.Debug("received message from broker",
+			"message_id", msg.GetMessageId(),
+			"context_id", msg.GetContextId(),
+			"role", msg.GetRole().String(),
+			"has_content", len(msg.GetContent()) > 0,
+		)
 
 		// Filter: only our session (or task_result) and only AGENT role
 		isTaskResult := false

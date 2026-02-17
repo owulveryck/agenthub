@@ -51,7 +51,7 @@ func TestMockClient_DefaultBehavior(t *testing.T) {
 
 func TestMockClient_CustomDecideFunc(t *testing.T) {
 	called := false
-	customFunc := func(ctx context.Context, history []*pb.Message, agents []*pb.AgentCard, event *pb.Message) (*Decision, error) {
+	customFunc := func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*Decision, error) {
 		called = true
 		return &Decision{
 			Reasoning: "Custom logic",

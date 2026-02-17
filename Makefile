@@ -25,6 +25,7 @@ CHAT_RESPONDER_BINARY := chat_responder
 CHAT_REPL_BINARY := chat_repl
 CHAT_CLI_BINARY := chat_cli
 ECHO_AGENT_BINARY := echo_agent
+MP3_AGENT_BINARY := mp3_agent
 CORTEX_BINARY := cortex
 DEMO_WEB_BINARY := demo_web
 
@@ -35,7 +36,7 @@ GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller bi
 # Targets
 # ==============================================================================
 
-.PHONY: all proto build build-broker build-agents run-server run-publisher run-subscriber run-chat-responder run-chat-repl run-chat-cli run-echo-agent run-cortex run-demo-web clean help
+.PHONY: all proto build build-broker build-agents run-server run-publisher run-subscriber run-chat-responder run-chat-repl run-chat-cli run-echo-agent run-mp3-agent run-cortex run-demo-web clean help
 
 all: build
 
@@ -103,6 +104,10 @@ build-agents: proto
 	go build $(GO_BUILD_FLAGS) -o bin/$(ECHO_AGENT_BINARY) agents/echo_agent/main.go
 	@echo "  ✓ Echo agent built: bin/$(ECHO_AGENT_BINARY)"
 
+	@echo "  Building mp3_agent..."
+	go build $(GO_BUILD_FLAGS) -o bin/$(MP3_AGENT_BINARY) ./agents/mp3_agent
+	@echo "  ✓ MP3 agent built: bin/$(MP3_AGENT_BINARY)"
+
 	@echo "  Building cortex..."
 	go build $(GO_BUILD_FLAGS) -o bin/$(CORTEX_BINARY) agents/cortex/cmd/main.go
 	@echo "  ✓ Cortex built: bin/$(CORTEX_BINARY)"
@@ -148,6 +153,11 @@ run-echo-agent:
 	@echo "Starting Echo Agent..."
 	go run agents/echo_agent/main.go
 
+# Target to run the MP3 agent
+run-mp3-agent:
+	@echo "Starting MP3 Agent..."
+	go run ./agents/mp3_agent
+
 # Target to run the cortex orchestrator
 run-cortex:
 	@echo "Starting Cortex Orchestrator..."
@@ -189,8 +199,9 @@ help:
 	@echo "  run-chat-repl        Runs the chat REPL agent."
 	@echo "  run-chat-cli         Runs the chat CLI agent."
 	@echo "  run-echo-agent       Runs the echo agent."
+	@echo "  run-mp3-agent        Runs the MP3 agent."
 	@echo "  run-cortex           Runs the Cortex orchestrator (uses VertexAI if configured)."
-	@echo "  run-demo-web         Runs the web demo (broker + cortex + echo_agent + web UI on :8090)."
+	@echo "  run-demo-web         Runs the web demo (broker + cortex + echo_agent + mp3_agent + web UI on :8090)."
 	@echo ""
 	@echo "Utility Targets:"
 	@echo "  clean                Removes generated Go files and build artifacts."

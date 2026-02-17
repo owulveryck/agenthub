@@ -83,7 +83,7 @@ func NewClient(ctx context.Context, config *Config) (*Client, error) {
 func (c *Client) Decide(
 	ctx context.Context,
 	conversationHistory []*pb.Message,
-	availableAgents []*pb.AgentCard,
+	availableAgents map[string]*pb.AgentCard,
 	newEvent *pb.Message,
 ) (*llm.Decision, error) {
 	if newEvent == nil {
@@ -152,7 +152,7 @@ func (c *Client) Decide(
 // buildOrchestrationPrompt creates the prompt for the LLM orchestrator
 func (c *Client) buildOrchestrationPrompt(
 	conversationHistory []*pb.Message,
-	availableAgents []*pb.AgentCard,
+	availableAgents map[string]*pb.AgentCard,
 	newEvent *pb.Message,
 ) string {
 	var prompt strings.Builder
@@ -167,8 +167,8 @@ func (c *Client) buildOrchestrationPrompt(
 	// List available agents
 	if len(availableAgents) > 0 {
 		prompt.WriteString("Available agents:\n")
-		for _, agent := range availableAgents {
-			prompt.WriteString(fmt.Sprintf("- %s: %s\n", agent.GetName(), agent.GetDescription()))
+		for agentID, agent := range availableAgents {
+			prompt.WriteString(fmt.Sprintf("- %s (id: %s): %s\n", agent.GetName(), agentID, agent.GetDescription()))
 			if len(agent.GetSkills()) > 0 {
 				prompt.WriteString("  Skills:\n")
 				for _, skill := range agent.GetSkills() {
@@ -223,13 +223,13 @@ func (c *Client) buildOrchestrationPrompt(
 	prompt.WriteString("    {\n")
 	prompt.WriteString(`      "type": "task.request",` + "\n")
 	prompt.WriteString(`      "taskType": "the type of task",` + "\n")
-	prompt.WriteString(`      "targetAgent": "agent_name"` + "\n")
+	prompt.WriteString(`      "targetAgent": "the agent id from the list above"` + "\n")
 	prompt.WriteString("    }\n")
 	prompt.WriteString("  ]\n")
 	prompt.WriteString("}\n\n")
 	prompt.WriteString("Action types:\n")
 	prompt.WriteString("- chat.response: Send a message to the user (has 'responseText' field)\n")
-	prompt.WriteString("- task.request: Delegate a task to an agent (has 'taskType' and 'targetAgent' fields)\n\n")
+	prompt.WriteString("- task.request: Delegate a task to an agent (has 'taskType' and 'targetAgent' fields). IMPORTANT: 'targetAgent' must be the agent id value (e.g. 'agent_mp3'), NOT the display name.\n\n")
 	prompt.WriteString("Guidelines:\n")
 	prompt.WriteString("- If this is a task result from an agent, synthesize it into a user-friendly response\n")
 	prompt.WriteString("- Only delegate to agents when their skills match the request\n")

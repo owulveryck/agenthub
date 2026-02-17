@@ -43,7 +43,7 @@ type Client interface {
 	Decide(
 		ctx context.Context,
 		conversationHistory []*pb.Message,
-		availableAgents []*pb.AgentCard,
+		availableAgents map[string]*pb.AgentCard,
 		newEvent *pb.Message,
 	) (*Decision, error)
 }

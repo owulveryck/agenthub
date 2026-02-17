@@ -54,6 +54,12 @@ func NewProcessManager(hub *Hub, logger *slog.Logger) *ProcessManager {
 			GoRun:  []string{"./agents/echo_agent"},
 			Delay:  1 * time.Second,
 		},
+		{
+			Name:   "mp3_agent",
+			Binary: "bin/mp3_agent",
+			GoRun:  []string{"./agents/mp3_agent"},
+			Delay:  1 * time.Second,
+		},
 	}
 	return &ProcessManager{
 		specs:  specs,
@@ -163,14 +169,7 @@ func (pm *ProcessManager) Shutdown() {
 }
 
 func (pm *ProcessManager) buildCmd(spec ProcessSpec, env []string) (*exec.Cmd, error) {
-	// Try pre-built binary first
-	if _, err := os.Stat(spec.Binary); err == nil {
-		cmd := exec.Command("./" + spec.Binary)
-		cmd.Env = env
-		return cmd, nil
-	}
-
-	// Fall back to go run
+	// Prefer go run (always uses fresh source) over pre-built binary
 	if len(spec.GoRun) > 0 {
 		args := append([]string{"run"}, spec.GoRun...)
 		cmd := exec.Command("go", args...)
@@ -178,7 +177,14 @@ func (pm *ProcessManager) buildCmd(spec ProcessSpec, env []string) (*exec.Cmd, e
 		return cmd, nil
 	}
 
-	return nil, fmt.Errorf("no binary or go run path for %s", spec.Name)
+	// Fall back to pre-built binary
+	if _, err := os.Stat(spec.Binary); err == nil {
+		cmd := exec.Command("./" + spec.Binary)
+		cmd.Env = env
+		return cmd, nil
+	}
+
+	return nil, fmt.Errorf("no go run path or binary for %s", spec.Name)
 }
 
 func (pm *ProcessManager) streamOutput(source string, r io.Reader) {

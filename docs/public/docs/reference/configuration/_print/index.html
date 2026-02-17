@@ -1,0 +1,1394 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head><script src="/agenthub/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=agenthub/livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="canonical" type="text/html" href="http://localhost:1313/agenthub/docs/reference/configuration/">
+<link rel="alternate" type="application/rss&#43;xml" href="http://localhost:1313/agenthub/docs/reference/configuration/index.xml">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/agenthub/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/agenthub/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-192x192.png" sizes="192x192">
+
+<title>Configuration | AgentHub</title>
+<meta name="description" content="Configuration reference and settings documentation">
+<meta property="og:url" content="http://localhost:1313/agenthub/docs/reference/configuration/">
+  <meta property="og:site_name" content="AgentHub">
+  <meta property="og:title" content="Configuration">
+  <meta property="og:description" content="Configuration reference and settings documentation">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="website">
+
+  <meta itemprop="name" content="Configuration">
+  <meta itemprop="description" content="Configuration reference and settings documentation">
+  <meta itemprop="dateModified" content="2025-09-29T11:46:06+02:00">
+  <meta itemprop="wordCount" content="37">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Configuration">
+  <meta name="twitter:description" content="Configuration reference and settings documentation">
+<link href="/agenthub/scss/main.css" rel="stylesheet">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+  </head>
+  <body class="td-section">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/agenthub/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">AgentHub</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="/agenthub/docs/"><span>Documentation</span></a>
+      </li>
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/agenthub/fr/">Français</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+
+
+
+
+<div class="td-content">
+<div class="pageinfo pageinfo-primary d-print-none">
+<p>
+This is the multi-page printable view of this section.
+<a href="#" onclick="print();return false;">Click here to print</a>.
+</p><p>
+<a href="/agenthub/docs/reference/configuration/">Return to the regular view of this page</a>.
+</p>
+</div>
+
+
+
+<h1 class="title">Configuration</h1>
+<div class="lead">Configuration reference and settings documentation</div>
+
+
+
+
+    <ul>
+    
+  
+  
+  
+  
+
+  
+    
+    
+	
+<li>1: <a href="#pg-6b1cc25f88f610f07cb499436b991d3d">Environment Variables Reference</a></li>
+
+
+    
+  
+    
+    
+	
+<li>2: <a href="#pg-d6b55869488fc91c952855bac8783d57">Configuration Reference</a></li>
+
+
+    
+  
+
+    </ul>
+
+
+<div class="content">
+      <h1 id="configuration-reference">Configuration Reference<a class="td-heading-self-link" href="#configuration-reference" aria-label="Heading self-link"></a></h1>
+<p>This section provides comprehensive documentation for all AgentHub configuration options, environment variables, and settings.</p>
+<h2 id="available-documentation">Available Documentation<a class="td-heading-self-link" href="#available-documentation" aria-label="Heading self-link"></a></h2>
+<ul>
+<li><strong><a href="/agenthub/docs/reference/configuration/environment_variables/">Environment Variables Reference</a></strong> - Complete environment variable reference for unified abstractions</li>
+<li><strong><a href="/agenthub/docs/reference/configuration/configuration_reference/">Configuration Reference</a></strong> - Complete configuration options and examples</li>
+</ul>
+
+</div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+  
+
+  
+    
+    
+	
+    
+
+<div class="td-content" style="">
+    
+	<h1 id="pg-6b1cc25f88f610f07cb499436b991d3d">1 - Environment Variables Reference</h1>
+    <div class="lead">Complete reference for all environment variables used by AgentHub&rsquo;s unified abstractions for configuration and observability.</div>
+	<h1 id="environment-variables-reference">Environment Variables Reference<a class="td-heading-self-link" href="#environment-variables-reference" aria-label="Heading self-link"></a></h1>
+<p>This reference documents all environment variables used by AgentHub&rsquo;s unified abstraction system. All components automatically load these variables for configuration.</p>
+<h2 id="core-configuration">Core Configuration<a class="td-heading-self-link" href="#core-configuration" aria-label="Heading self-link"></a></h2>
+<h3 id="broker-connection">Broker Connection<a class="td-heading-self-link" href="#broker-connection" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+          <th>Used By</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>AGENTHUB_BROKER_ADDR</code></td>
+          <td><code>localhost</code></td>
+          <td>Broker server hostname or IP address</td>
+          <td>Agents</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_BROKER_PORT</code></td>
+          <td><code>50051</code></td>
+          <td>Broker gRPC port number</td>
+          <td>Agents</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_GRPC_PORT</code></td>
+          <td><code>:50051</code></td>
+          <td>Server listen address (for broker)</td>
+          <td>Broker</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;production-broker.example.com&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;50051&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_GRPC_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;:50051&#34;</span>
+</span></span></code></pre></div><h3 id="health-monitoring">Health Monitoring<a class="td-heading-self-link" href="#health-monitoring" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+          <th>Used By</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>BROKER_HEALTH_PORT</code></td>
+          <td><code>8080</code></td>
+          <td>Broker health check endpoint port</td>
+          <td>Broker</td>
+      </tr>
+      <tr>
+          <td><code>PUBLISHER_HEALTH_PORT</code></td>
+          <td><code>8081</code></td>
+          <td>Publisher health check endpoint port</td>
+          <td>Publishers</td>
+      </tr>
+      <tr>
+          <td><code>SUBSCRIBER_HEALTH_PORT</code></td>
+          <td><code>8082</code></td>
+          <td>Subscriber health check endpoint port</td>
+          <td>Subscribers</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Health Endpoints Available:</strong></p>
+<ul>
+<li><code>http://localhost:8080/health</code> - Health check</li>
+<li><code>http://localhost:8080/metrics</code> - Prometheus metrics</li>
+<li><code>http://localhost:8080/ready</code> - Readiness check</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BROKER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8080&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PUBLISHER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8081&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SUBSCRIBER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8082&#34;</span>
+</span></span></code></pre></div><h2 id="observability-configuration">Observability Configuration<a class="td-heading-self-link" href="#observability-configuration" aria-label="Heading self-link"></a></h2>
+<h3 id="distributed-tracing">Distributed Tracing<a class="td-heading-self-link" href="#distributed-tracing" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+          <th>Used By</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>JAEGER_ENDPOINT</code></td>
+          <td><code>127.0.0.1:4317</code></td>
+          <td>Jaeger OTLP endpoint for traces</td>
+          <td>All components</td>
+      </tr>
+      <tr>
+          <td><code>SERVICE_NAME</code></td>
+          <td><code>agenthub-service</code></td>
+          <td>Service name for tracing</td>
+          <td>All components</td>
+      </tr>
+      <tr>
+          <td><code>SERVICE_VERSION</code></td>
+          <td><code>1.0.0</code></td>
+          <td>Service version for telemetry</td>
+          <td>All components</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;http://jaeger.example.com:14268/api/traces&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_NAME</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;my-agenthub-app&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_VERSION</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;2.1.0&#34;</span>
+</span></span></code></pre></div><p><strong>Jaeger Integration:</strong></p>
+<ul>
+<li>When <code>JAEGER_ENDPOINT</code> is set: Automatic tracing enabled</li>
+<li>When empty or unset: Tracing disabled (minimal overhead)</li>
+<li>Supports both gRPC (4317) and HTTP (14268) endpoints</li>
+</ul>
+<h3 id="metrics-collection">Metrics Collection<a class="td-heading-self-link" href="#metrics-collection" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+          <th>Used By</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>PROMETHEUS_PORT</code></td>
+          <td><code>9090</code></td>
+          <td>Prometheus server port</td>
+          <td>Observability stack</td>
+      </tr>
+      <tr>
+          <td><code>GRAFANA_PORT</code></td>
+          <td><code>3333</code></td>
+          <td>Grafana dashboard port</td>
+          <td>Observability stack</td>
+      </tr>
+      <tr>
+          <td><code>ALERTMANAGER_PORT</code></td>
+          <td><code>9093</code></td>
+          <td>AlertManager port</td>
+          <td>Observability stack</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PROMETHEUS_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;9090&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">GRAFANA_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;3333&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">ALERTMANAGER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;9093&#34;</span>
+</span></span></code></pre></div><h3 id="opentelemetry-collector">OpenTelemetry Collector<a class="td-heading-self-link" href="#opentelemetry-collector" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+          <th>Used By</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>OTLP_GRPC_PORT</code></td>
+          <td><code>4320</code></td>
+          <td>OTLP Collector gRPC port</td>
+          <td>Observability stack</td>
+      </tr>
+      <tr>
+          <td><code>OTLP_HTTP_PORT</code></td>
+          <td><code>4321</code></td>
+          <td>OTLP Collector HTTP port</td>
+          <td>Observability stack</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">OTLP_GRPC_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;4320&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">OTLP_HTTP_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;4321&#34;</span>
+</span></span></code></pre></div><h2 id="service-configuration">Service Configuration<a class="td-heading-self-link" href="#service-configuration" aria-label="Heading self-link"></a></h2>
+<h3 id="general-settings">General Settings<a class="td-heading-self-link" href="#general-settings" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+          <th>Used By</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>ENVIRONMENT</code></td>
+          <td><code>development</code></td>
+          <td>Deployment environment</td>
+          <td>All components</td>
+      </tr>
+      <tr>
+          <td><code>LOG_LEVEL</code></td>
+          <td><code>INFO</code></td>
+          <td>Logging level (DEBUG, INFO, WARN, ERROR)</td>
+          <td>All components</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">ENVIRONMENT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;production&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;WARN&#34;</span>
+</span></span></code></pre></div><h2 id="environment-specific-configurations">Environment-Specific Configurations<a class="td-heading-self-link" href="#environment-specific-configurations" aria-label="Heading self-link"></a></h2>
+<h3 id="development-environment">Development Environment<a class="td-heading-self-link" href="#development-environment" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># .envrc for development</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;localhost&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;50051&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_GRPC_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;:50051&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Health ports</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BROKER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8080&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PUBLISHER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8081&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SUBSCRIBER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8082&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Observability (local stack)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;http://localhost:14268/api/traces&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PROMETHEUS_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;9090&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">GRAFANA_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;3333&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Service metadata</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_NAME</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;agenthub-dev&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_VERSION</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;dev&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">ENVIRONMENT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;development&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;DEBUG&#34;</span>
+</span></span></code></pre></div><h3 id="staging-environment">Staging Environment<a class="td-heading-self-link" href="#staging-environment" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># .envrc for staging</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;staging-broker.example.com&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;50051&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Health ports (non-conflicting)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BROKER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8080&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PUBLISHER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8081&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SUBSCRIBER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8082&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Observability (staging stack)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;http://staging-jaeger.example.com:14268/api/traces&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PROMETHEUS_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;9090&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">GRAFANA_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;3333&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Service metadata</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_NAME</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;agenthub-staging&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_VERSION</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;1.2.0-rc1&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">ENVIRONMENT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;staging&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;INFO&#34;</span>
+</span></span></code></pre></div><h3 id="production-environment">Production Environment<a class="td-heading-self-link" href="#production-environment" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># .envrc for production</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;prod-broker.example.com&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;50051&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Health ports</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BROKER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8080&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PUBLISHER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8081&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SUBSCRIBER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;8082&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Observability (production stack)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;http://jaeger.prod.example.com:14268/api/traces&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PROMETHEUS_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;9090&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">GRAFANA_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;3333&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">ALERTMANAGER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;9093&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Service metadata</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_NAME</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;agenthub-prod&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SERVICE_VERSION</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;1.2.0&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">ENVIRONMENT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;production&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;WARN&#34;</span>
+</span></span></code></pre></div><h2 id="configuration-loading">Configuration Loading<a class="td-heading-self-link" href="#configuration-loading" aria-label="Heading self-link"></a></h2>
+<h3 id="automatic-loading-by-unified-abstractions">Automatic Loading by Unified Abstractions<a class="td-heading-self-link" href="#automatic-loading-by-unified-abstractions" aria-label="Heading self-link"></a></h3>
+<p>The unified abstractions automatically load environment variables:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Automatic configuration loading
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;my-component&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Results in:
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// config.BrokerAddr = &#34;localhost:50051&#34; (AGENTHUB_BROKER_ADDR + AGENTHUB_BROKER_PORT)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// config.ServerAddr = &#34;:50051&#34; (AGENTHUB_GRPC_PORT)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// config.HealthPort = &#34;8080&#34; (BROKER_HEALTH_PORT)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// config.ComponentName = &#34;my-component&#34; (from parameter)
+</span></span></span></code></pre></div><h3 id="using-direnv-recommended">Using direnv (Recommended)<a class="td-heading-self-link" href="#using-direnv-recommended" aria-label="Heading self-link"></a></h3>
+<ol>
+<li>
+<p><strong>Install direnv</strong>: <a href="https://direnv.net/docs/installation.html">https://direnv.net/docs/installation.html</a></p>
+</li>
+<li>
+<p><strong>Create .envrc file</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Create .envrc in project root</span>
+</span></span><span style="display:flex;"><span>cat &gt; .envrc <span style="color:#4e9a06">&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">export AGENTHUB_BROKER_ADDR=&#34;localhost&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">export AGENTHUB_BROKER_PORT=&#34;50051&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">export JAEGER_ENDPOINT=&#34;http://localhost:14268/api/traces&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">export SERVICE_NAME=&#34;my-agenthub-app&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">EOF</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Allow direnv</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>direnv allow
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Automatic loading</strong>: Variables load automatically when entering directory</p>
+</li>
+</ol>
+<h3 id="manual-loading">Manual Loading<a class="td-heading-self-link" href="#manual-loading" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Source variables manually</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">source</span> .envrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Or set individually</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;localhost&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#4e9a06">&#34;http://localhost:14268/api/traces&#34;</span>
+</span></span></code></pre></div><h2 id="configuration-validation">Configuration Validation<a class="td-heading-self-link" href="#configuration-validation" aria-label="Heading self-link"></a></h2>
+<h3 id="required-variables">Required Variables<a class="td-heading-self-link" href="#required-variables" aria-label="Heading self-link"></a></h3>
+<p><strong>Minimal configuration</strong> (all have defaults):</p>
+<ul>
+<li>No variables are strictly required</li>
+<li>Defaults work for local development</li>
+</ul>
+<p><strong>Production recommendations</strong>:</p>
+<ul>
+<li>Set <code>JAEGER_ENDPOINT</code> for tracing</li>
+<li>Set <code>SERVICE_NAME</code> for identification</li>
+<li>Set <code>ENVIRONMENT</code> to &ldquo;production&rdquo;</li>
+<li>Configure unique health ports if running multiple services</li>
+</ul>
+<h3 id="configuration-verification">Configuration Verification<a class="td-heading-self-link" href="#configuration-verification" aria-label="Heading self-link"></a></h3>
+<p><strong>Check loaded configuration</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;test&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Broker: %s\n&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">config</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">BrokerAddr</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Health: %s\n&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">config</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">HealthPort</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Component: %s\n&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">config</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ComponentName</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p><strong>Verify health endpoints</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Check if configuration is working</span>
+</span></span><span style="display:flex;"><span>curl http://localhost:8080/health
+</span></span><span style="display:flex;"><span>curl http://localhost:8081/health  <span style="color:#8f5902;font-style:italic"># Publisher</span>
+</span></span><span style="display:flex;"><span>curl http://localhost:8082/health  <span style="color:#8f5902;font-style:italic"># Subscriber</span>
+</span></span></code></pre></div><p><strong>Verify tracing</strong>:</p>
+<ul>
+<li>Open Jaeger UI: http://localhost:16686</li>
+<li>Look for traces from your service name</li>
+<li>Check spans are being created</li>
+</ul>
+<h2 id="common-patterns">Common Patterns<a class="td-heading-self-link" href="#common-patterns" aria-label="Heading self-link"></a></h2>
+<h3 id="docker-compose">Docker Compose<a class="td-heading-self-link" href="#docker-compose" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># docker-compose.yml</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">version</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;3.8&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">services</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">broker</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">build</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">.</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">command</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">go run broker/main.go</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">environment</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">AGENTHUB_GRPC_PORT=:50051</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">BROKER_HEALTH_PORT=8080</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">JAEGER_ENDPOINT=http://jaeger:14268/api/traces</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">SERVICE_NAME=agenthub-broker</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">ports</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;50051:50051&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;8080:8080&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">publisher</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">build</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">.</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">command</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">go run agents/publisher/main.go</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">environment</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">AGENTHUB_BROKER_ADDR=broker</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">AGENTHUB_BROKER_PORT=50051</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">PUBLISHER_HEALTH_PORT=8081</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">JAEGER_ENDPOINT=http://jaeger:14268/api/traces</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#000">SERVICE_NAME=agenthub-publisher</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">ports</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#4e9a06">&#34;8081:8081&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h3 id="kubernetes-configmap">Kubernetes ConfigMap<a class="td-heading-self-link" href="#kubernetes-configmap" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># configmap.yaml</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">apiVersion</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">v1</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">kind</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">ConfigMap</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">metadata</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">agenthub-config</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">data</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">AGENTHUB_BROKER_ADDR</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;agenthub-broker.default.svc.cluster.local&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">AGENTHUB_BROKER_PORT</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;50051&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">JAEGER_ENDPOINT</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;http://jaeger.observability.svc.cluster.local:14268/api/traces&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">SERVICE_NAME</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;agenthub-k8s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">SERVICE_VERSION</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.0.0&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">ENVIRONMENT</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;production&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">LOG_LEVEL</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;INFO&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#000">---</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#8f5902;font-style:italic"># deployment.yaml</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">apiVersion</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">apps/v1</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">kind</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">Deployment</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">metadata</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">agenthub-publisher</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">spec</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">template</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">spec</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span><span style="color:#204a87;font-weight:bold">containers</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">      </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">publisher</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">image</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">agenthub:latest</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">envFrom</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span>- <span style="color:#204a87;font-weight:bold">configMapRef</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">            </span><span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">agenthub-config</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span><span style="color:#204a87;font-weight:bold">env</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">        </span>- <span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">PUBLISHER_HEALTH_PORT</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">          </span><span style="color:#204a87;font-weight:bold">value</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;8080&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h2 id="troubleshooting">Troubleshooting<a class="td-heading-self-link" href="#troubleshooting" aria-label="Heading self-link"></a></h2>
+<h3 id="common-issues">Common Issues<a class="td-heading-self-link" href="#common-issues" aria-label="Heading self-link"></a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Problem</th>
+          <th>Solution</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Agent can&rsquo;t connect to broker</td>
+          <td>Check <code>AGENTHUB_BROKER_ADDR</code> and <code>AGENTHUB_BROKER_PORT</code></td>
+      </tr>
+      <tr>
+          <td>Health endpoint not accessible</td>
+          <td>Verify <code>*_HEALTH_PORT</code> variables and port availability</td>
+      </tr>
+      <tr>
+          <td>No traces in Jaeger</td>
+          <td>Set <code>JAEGER_ENDPOINT</code> and ensure Jaeger is running</td>
+      </tr>
+      <tr>
+          <td>Port conflicts</td>
+          <td>Use different ports for each component&rsquo;s health endpoints</td>
+      </tr>
+      <tr>
+          <td>Configuration not loading</td>
+          <td>Ensure variables are exported, check with <code>printenv</code></td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="debug-configuration">Debug Configuration<a class="td-heading-self-link" href="#debug-configuration" aria-label="Heading self-link"></a></h3>
+<p><strong>Check environment variables</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># List all AgentHub variables</span>
+</span></span><span style="display:flex;"><span>printenv <span style="color:#000;font-weight:bold">|</span> grep AGENTHUB
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># List all observability variables</span>
+</span></span><span style="display:flex;"><span>printenv <span style="color:#000;font-weight:bold">|</span> grep -E <span style="color:#4e9a06">&#34;(JAEGER|SERVICE|PROMETHEUS|GRAFANA)&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Check specific variable</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">echo</span> <span style="color:#000">$AGENTHUB_BROKER_ADDR</span>
+</span></span></code></pre></div><p><strong>Test configuration</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Quick test with temporary override</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span>test-broker go run agents/publisher/main.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Verify health endpoint responds</span>
+</span></span><span style="display:flex;"><span>curl -f http://localhost:8080/health <span style="color:#ce5c00;font-weight:bold">||</span> <span style="color:#204a87">echo</span> <span style="color:#4e9a06">&#34;Health check failed&#34;</span>
+</span></span></code></pre></div><h3 id="configuration-precedence">Configuration Precedence<a class="td-heading-self-link" href="#configuration-precedence" aria-label="Heading self-link"></a></h3>
+<ol>
+<li><strong>Environment variables</strong> (highest priority)</li>
+<li><strong>Default values</strong> (from code)</li>
+</ol>
+<p><strong>Example</strong>: If <code>AGENTHUB_BROKER_ADDR</code> is set, it overrides the default &ldquo;localhost&rdquo;</p>
+<hr>
+<p>This environment variable reference provides comprehensive documentation for configuring AgentHub using the unified abstraction system. For practical usage examples, see the <a href="/agenthub/docs/tutorials/getting-started/installation_and_setup/">Installation and Setup Tutorial</a> and <a href="/agenthub/docs/reference/configuration/configuration_reference/">Configuration Reference</a>.</p>
+
+</div>
+
+
+
+    
+	
+  
+    
+    
+	
+    
+
+<div class="td-content" style="page-break-before: always">
+    
+	<h1 id="pg-d6b55869488fc91c952855bac8783d57">2 - Configuration Reference</h1>
+    <div class="lead">Comprehensive reference for configuring AgentHub components using the unified abstraction library with environment-based configuration.</div>
+	<h1 id="configuration-reference">Configuration Reference<a class="td-heading-self-link" href="#configuration-reference" aria-label="Heading self-link"></a></h1>
+<p>This document provides comprehensive reference for configuring AgentHub components using the unified abstraction library with environment-based configuration.</p>
+<h2 id="unified-abstraction-configuration">Unified Abstraction Configuration<a class="td-heading-self-link" href="#unified-abstraction-configuration" aria-label="Heading self-link"></a></h2>
+<p>AgentHub uses environment variables for all configuration with the unified abstraction library providing automatic configuration setup.</p>
+<h3 id="core-environment-variables">Core Environment Variables<a class="td-heading-self-link" href="#core-environment-variables" aria-label="Heading self-link"></a></h3>
+<h4 id="grpc-connection-configuration">gRPC Connection Configuration<a class="td-heading-self-link" href="#grpc-connection-configuration" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>AGENTHUB_BROKER_ADDR</code></td>
+          <td><code>localhost</code></td>
+          <td>Broker server hostname or IP address</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_BROKER_PORT</code></td>
+          <td><code>50051</code></td>
+          <td>Broker gRPC port number</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_GRPC_PORT</code></td>
+          <td><code>:50051</code></td>
+          <td>Server listen address (for broker)</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Note:</strong> The unified abstraction automatically combines <code>AGENTHUB_BROKER_ADDR</code> and <code>AGENTHUB_BROKER_PORT</code> into a complete broker address (e.g., <code>localhost:50051</code>).</p>
+<h4 id="health-monitoring-configuration">Health Monitoring Configuration<a class="td-heading-self-link" href="#health-monitoring-configuration" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>BROKER_HEALTH_PORT</code></td>
+          <td><code>8080</code></td>
+          <td>Broker health check endpoint port</td>
+      </tr>
+      <tr>
+          <td><code>PUBLISHER_HEALTH_PORT</code></td>
+          <td><code>8081</code></td>
+          <td>Publisher health check endpoint port</td>
+      </tr>
+      <tr>
+          <td><code>SUBSCRIBER_HEALTH_PORT</code></td>
+          <td><code>8082</code></td>
+          <td>Subscriber health check endpoint port</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="observability-configuration">Observability Configuration<a class="td-heading-self-link" href="#observability-configuration" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>JAEGER_ENDPOINT</code></td>
+          <td><code>127.0.0.1:4317</code></td>
+          <td>Jaeger OTLP endpoint for distributed tracing</td>
+      </tr>
+      <tr>
+          <td><code>PROMETHEUS_PORT</code></td>
+          <td><code>9090</code></td>
+          <td>Prometheus metrics collection port</td>
+      </tr>
+      <tr>
+          <td><code>GRAFANA_PORT</code></td>
+          <td><code>3333</code></td>
+          <td>Grafana dashboard web interface port</td>
+      </tr>
+      <tr>
+          <td><code>ALERTMANAGER_PORT</code></td>
+          <td><code>9093</code></td>
+          <td>AlertManager web interface port</td>
+      </tr>
+      <tr>
+          <td><code>OTLP_GRPC_PORT</code></td>
+          <td><code>4320</code></td>
+          <td>OpenTelemetry Collector gRPC port</td>
+      </tr>
+      <tr>
+          <td><code>OTLP_HTTP_PORT</code></td>
+          <td><code>4321</code></td>
+          <td>OpenTelemetry Collector HTTP port</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="service-metadata">Service Metadata<a class="td-heading-self-link" href="#service-metadata" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>SERVICE_VERSION</code></td>
+          <td><code>1.0.0</code></td>
+          <td>Service version for telemetry and observability</td>
+      </tr>
+      <tr>
+          <td><code>ENVIRONMENT</code></td>
+          <td><code>development</code></td>
+          <td>Deployment environment (development, staging, production)</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="a2a-protocol-configuration">A2A Protocol Configuration<a class="td-heading-self-link" href="#a2a-protocol-configuration" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>AGENTHUB_MESSAGE_BUFFER_SIZE</code></td>
+          <td><code>100</code></td>
+          <td>Buffer size for A2A message processing</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_TASK_UPDATE_INTERVAL</code></td>
+          <td><code>1s</code></td>
+          <td>Interval for publishing task status updates</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_ARTIFACT_MAX_SIZE</code></td>
+          <td><code>10MB</code></td>
+          <td>Maximum size for task artifacts</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_CONTEXT_TIMEOUT</code></td>
+          <td><code>30s</code></td>
+          <td>Timeout for A2A message context</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_A2A_PROTOCOL_VERSION</code></td>
+          <td><code>1.0</code></td>
+          <td>A2A protocol version for compatibility</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_MESSAGE_HISTORY_LIMIT</code></td>
+          <td><code>50</code></td>
+          <td>Maximum message history per task</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="unified-abstraction-usage">Unified Abstraction Usage<a class="td-heading-self-link" href="#unified-abstraction-usage" aria-label="Heading self-link"></a></h2>
+<h3 id="using-configuration-with-the-unified-abstraction">Using Configuration with the Unified Abstraction<a class="td-heading-self-link" href="#using-configuration-with-the-unified-abstraction" aria-label="Heading self-link"></a></h3>
+<p>The unified abstraction library automatically loads configuration from environment variables:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Create configuration from environment variables
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;my-component&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Configuration is automatically populated:
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// - config.BrokerAddr: &#34;localhost:50051&#34; (combined from AGENTHUB_BROKER_ADDR + AGENTHUB_BROKER_PORT)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// - config.ServerAddr: &#34;:50051&#34; (from AGENTHUB_GRPC_PORT)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// - config.HealthPort: &#34;8080&#34; (from BROKER_HEALTH_PORT)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// - config.ComponentName: &#34;my-component&#34; (from parameter)
+</span></span></span></code></pre></div><h3 id="environment-variable-loading">Environment Variable Loading<a class="td-heading-self-link" href="#environment-variable-loading" aria-label="Heading self-link"></a></h3>
+<p>The recommended way to load environment variables:</p>
+<p><strong>Option 1: Using direnv (recommended)</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Place variables in .envrc file</span>
+</span></span><span style="display:flex;"><span>direnv allow
+</span></span></code></pre></div><p><strong>Option 2: Source manually</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">source</span> .envrc
+</span></span></code></pre></div><p><strong>Option 3: Set individual variables</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span>localhost
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">50051</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span>127.0.0.1:4317
+</span></span></code></pre></div><h3 id="configuration-override-examples">Configuration Override Examples<a class="td-heading-self-link" href="#configuration-override-examples" aria-label="Heading self-link"></a></h3>
+<p>You can override defaults by setting environment variables before running:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Use different broker address</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_ADDR</span><span style="color:#ce5c00;font-weight:bold">=</span>remote-broker.example.com
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">AGENTHUB_BROKER_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">9090</span>
+</span></span><span style="display:flex;"><span>go run broker/main.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Use different health ports to avoid conflicts</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">BROKER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">8083</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PUBLISHER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">8084</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">SUBSCRIBER_HEALTH_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">8085</span>
+</span></span><span style="display:flex;"><span>go run agents/publisher/main.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Use custom observability endpoints</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">JAEGER_ENDPOINT</span><span style="color:#ce5c00;font-weight:bold">=</span>jaeger.example.com:4317
+</span></span><span style="display:flex;"><span><span style="color:#204a87">export</span> <span style="color:#000">PROMETHEUS_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">9091</span>
+</span></span><span style="display:flex;"><span>go run broker/main.go
+</span></span></code></pre></div><h3 id="configuration-best-practices">Configuration Best Practices<a class="td-heading-self-link" href="#configuration-best-practices" aria-label="Heading self-link"></a></h3>
+<ol>
+<li><strong>Use .envrc for Development</strong>: Keep all environment variables in <code>.envrc</code> for consistent development experience</li>
+<li><strong>Override Selectively</strong>: Only override specific variables when needed, use defaults otherwise</li>
+<li><strong>Environment-Specific Configs</strong>: Use different variable values for development, staging, and production</li>
+<li><strong>Health Port Management</strong>: Use different health ports for each component to avoid conflicts</li>
+<li><strong>Observability Integration</strong>: Always configure observability endpoints for production deployments</li>
+</ol>
+<h3 id="legacy-configuration-migration">Legacy Configuration Migration<a class="td-heading-self-link" href="#legacy-configuration-migration" aria-label="Heading self-link"></a></h3>
+<p>If migrating from previous versions of AgentHub:</p>
+<p><strong>Old Configuration Pattern:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Manual server setup (deprecated)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">lis</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">net</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Listen</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;tcp&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;:50051&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">server</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">grpc</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewServer</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// ... extensive setup code
+</span></span></span></code></pre></div><p><strong>New Unified Abstraction Pattern:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Automatic configuration from environment
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewGRPCConfig</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;broker&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">server</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewAgentHubServer</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">config</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">service</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">agenthub</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewAgentHubService</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">server</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">RegisterAgentHubServer</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">server</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Server</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">service</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">server</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Start</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="command-line-usage">Command-Line Usage<a class="td-heading-self-link" href="#command-line-usage" aria-label="Heading self-link"></a></h2>
+<h3 id="basic-commands">Basic Commands<a class="td-heading-self-link" href="#basic-commands" aria-label="Heading self-link"></a></h3>
+<p>The unified abstraction provides simplified command execution:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>agenthub-server <span style="color:#ce5c00;font-weight:bold">[</span>OPTIONS<span style="color:#ce5c00;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Options:
+</span></span><span style="display:flex;"><span>  -port int
+</span></span><span style="display:flex;"><span>        Server port <span style="color:#ce5c00;font-weight:bold">(</span>default 50051<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  -host string
+</span></span><span style="display:flex;"><span>        Server host <span style="color:#ce5c00;font-weight:bold">(</span>default <span style="color:#4e9a06">&#34;0.0.0.0&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  -config string
+</span></span><span style="display:flex;"><span>        Configuration file path
+</span></span><span style="display:flex;"><span>  -log-level string
+</span></span><span style="display:flex;"><span>        Log level: debug, info, warn, error <span style="color:#ce5c00;font-weight:bold">(</span>default <span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  -log-file string
+</span></span><span style="display:flex;"><span>        Log file path <span style="color:#ce5c00;font-weight:bold">(</span>default: stdout<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  -max-connections int
+</span></span><span style="display:flex;"><span>        Maximum concurrent connections <span style="color:#ce5c00;font-weight:bold">(</span>default 1000<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  -channel-buffer-size int
+</span></span><span style="display:flex;"><span>        Channel buffer size <span style="color:#ce5c00;font-weight:bold">(</span>default 10<span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  -help
+</span></span><span style="display:flex;"><span>        Show <span style="color:#204a87">help</span> message
+</span></span><span style="display:flex;"><span>  -version
+</span></span><span style="display:flex;"><span>        Show version information
+</span></span></code></pre></div><h3 id="configuration-file">Configuration File<a class="td-heading-self-link" href="#configuration-file" aria-label="Heading self-link"></a></h3>
+<p>The broker can also be configured using a YAML configuration file:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># agenthub.yaml</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">server</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">host</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;0.0.0.0&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">port</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">50051</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_connections</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">1000</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;30s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">logging</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">format</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/var/log/agenthub/broker.log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">performance</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">channel_buffer_size</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">10</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_message_size</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;4MB&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">keepalive_time</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;30s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">keepalive_timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;5s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">limits</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_agents</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">10000</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_tasks_per_agent</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">100</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">memory_limit</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1GB&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">security</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">tls_enabled</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">false</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cert_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">key_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">ca_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><p><strong>Loading Configuration:</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>agenthub-server -config /path/to/agenthub.yaml
+</span></span></code></pre></div><h2 id="agent-configuration">Agent Configuration<a class="td-heading-self-link" href="#agent-configuration" aria-label="Heading self-link"></a></h2>
+<h3 id="environment-variables">Environment Variables<a class="td-heading-self-link" href="#environment-variables" aria-label="Heading self-link"></a></h3>
+<p>Agents can be configured using environment variables:</p>
+<h4 id="connection-configuration">Connection Configuration<a class="td-heading-self-link" href="#connection-configuration" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>AGENTHUB_BROKER_ADDRESS</code></td>
+          <td><code>localhost:50051</code></td>
+          <td>Broker server address</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_AGENT_ID</code></td>
+          <td>Generated</td>
+          <td>Unique agent identifier</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_CONNECTION_TIMEOUT</code></td>
+          <td><code>10s</code></td>
+          <td>Connection timeout</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_RETRY_ATTEMPTS</code></td>
+          <td><code>3</code></td>
+          <td>Connection retry attempts</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_RETRY_DELAY</code></td>
+          <td><code>1s</code></td>
+          <td>Delay between retries</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="task-processing-configuration">Task Processing Configuration<a class="td-heading-self-link" href="#task-processing-configuration" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>AGENTHUB_MAX_CONCURRENT_TASKS</code></td>
+          <td><code>5</code></td>
+          <td>Maximum concurrent task processing</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_TASK_TIMEOUT</code></td>
+          <td><code>300s</code></td>
+          <td>Default task timeout</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_PROGRESS_INTERVAL</code></td>
+          <td><code>5s</code></td>
+          <td>Progress reporting interval</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_TASK_TYPES</code></td>
+          <td><code>&quot;&quot;</code></td>
+          <td>Comma-separated list of supported task types</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="logging-configuration">Logging Configuration<a class="td-heading-self-link" href="#logging-configuration" aria-label="Heading self-link"></a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>AGENTHUB_AGENT_LOG_LEVEL</code></td>
+          <td><code>info</code></td>
+          <td>Agent logging level</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_AGENT_LOG_FORMAT</code></td>
+          <td><code>text</code></td>
+          <td>Agent log format</td>
+      </tr>
+      <tr>
+          <td><code>AGENTHUB_AGENT_LOG_FILE</code></td>
+          <td><code>&quot;&quot;</code></td>
+          <td>Agent log file path</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="agent-configuration-examples">Agent Configuration Examples<a class="td-heading-self-link" href="#agent-configuration-examples" aria-label="Heading self-link"></a></h3>
+<h4 id="publisher-configuration">Publisher Configuration<a class="td-heading-self-link" href="#publisher-configuration" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;strconv&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">PublisherConfig</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">BrokerAddress</span>    <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">AgentID</span>          <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ConnectionTimeout</span> <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Duration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">RetryAttempts</span>    <span style="color:#204a87;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">RetryDelay</span>       <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Duration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">LogLevel</span>         <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">LoadPublisherConfig</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">PublisherConfig</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">PublisherConfig</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">BrokerAddress</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_BROKER_ADDRESS&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;localhost:50051&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">AgentID</span><span style="color:#000;font-weight:bold">:</span>          <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_AGENT_ID&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">generateAgentID</span><span style="color:#000;font-weight:bold">()),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">ConnectionTimeout</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">getDuration</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_CONNECTION_TIMEOUT&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;10s&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">RetryAttempts</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#000">getInt</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_RETRY_ATTEMPTS&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">RetryDelay</span><span style="color:#000;font-weight:bold">:</span>       <span style="color:#000">getDuration</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_RETRY_DELAY&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;1s&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">LogLevel</span><span style="color:#000;font-weight:bold">:</span>         <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_AGENT_LOG_LEVEL&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">config</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">key</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">defaultValue</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">os</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Getenv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">key</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#4e9a06">&#34;&#34;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">value</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">defaultValue</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">getInt</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">key</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">defaultValue</span> <span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">os</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Getenv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">key</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#4e9a06">&#34;&#34;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">strconv</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Atoi</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">i</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">defaultValue</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">getDuration</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">key</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">defaultValue</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Duration</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">os</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Getenv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">key</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">value</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#4e9a06">&#34;&#34;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">d</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ParseDuration</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">d</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">d</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">_</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ParseDuration</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">defaultValue</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">d</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h4 id="subscriber-configuration">Subscriber Configuration<a class="td-heading-self-link" href="#subscriber-configuration" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">SubscriberConfig</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">BrokerAddress</span>      <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">AgentID</span>            <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">MaxConcurrentTasks</span> <span style="color:#204a87;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskTimeout</span>        <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Duration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ProgressInterval</span>   <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Duration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">SupportedTaskTypes</span> <span style="color:#000;font-weight:bold">[]</span><span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">LogLevel</span>           <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">LoadSubscriberConfig</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">SubscriberConfig</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">taskTypesStr</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_TASK_TYPES&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">taskTypes</span> <span style="color:#000;font-weight:bold">[]</span><span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">taskTypesStr</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#4e9a06">&#34;&#34;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">taskTypes</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">strings</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Split</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">taskTypesStr</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;,&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">taskType</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#204a87;font-weight:bold">range</span> <span style="color:#000">taskTypes</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">taskTypes</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">strings</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TrimSpace</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">taskType</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">SubscriberConfig</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">BrokerAddress</span><span style="color:#000;font-weight:bold">:</span>      <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_BROKER_ADDRESS&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;localhost:50051&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">AgentID</span><span style="color:#000;font-weight:bold">:</span>            <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_AGENT_ID&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">generateAgentID</span><span style="color:#000;font-weight:bold">()),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">MaxConcurrentTasks</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">getInt</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_MAX_CONCURRENT_TASKS&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">TaskTimeout</span><span style="color:#000;font-weight:bold">:</span>        <span style="color:#000">getDuration</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_TASK_TIMEOUT&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;300s&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">ProgressInterval</span><span style="color:#000;font-weight:bold">:</span>   <span style="color:#000">getDuration</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_PROGRESS_INTERVAL&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;5s&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">SupportedTaskTypes</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">taskTypes</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">LogLevel</span><span style="color:#000;font-weight:bold">:</span>           <span style="color:#000">getEnv</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AGENTHUB_AGENT_LOG_LEVEL&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#000;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">config</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="agent-configuration-file">Agent Configuration File<a class="td-heading-self-link" href="#agent-configuration-file" aria-label="Heading self-link"></a></h3>
+<p>Agents can also use configuration files:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># agent.yaml</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">agent</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">id</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;data_processor_001&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">broker_address</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;broker.example.com:50051&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">connection_timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;10s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">retry_attempts</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">retry_delay</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">task_processing</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_concurrent_tasks</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">task_timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;300s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">progress_interval</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;5s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">supported_task_types</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span>- <span style="color:#4e9a06">&#34;data_analysis&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span>- <span style="color:#4e9a06">&#34;data_transformation&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span>- <span style="color:#4e9a06">&#34;data_validation&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">logging</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">format</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/var/log/agenthub/agent.log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">health</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">port</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">8080</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">endpoint</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/health&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">check_interval</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;30s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h2 id="security-configuration">Security Configuration<a class="td-heading-self-link" href="#security-configuration" aria-label="Heading self-link"></a></h2>
+<h3 id="tls-configuration">TLS Configuration<a class="td-heading-self-link" href="#tls-configuration" aria-label="Heading self-link"></a></h3>
+<h4 id="broker-tls-setup">Broker TLS Setup<a class="td-heading-self-link" href="#broker-tls-setup" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># broker configuration</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">security</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">tls_enabled</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cert_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/etc/agenthub/certs/server.crt&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">key_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/etc/agenthub/certs/server.key&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">ca_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/etc/agenthub/certs/ca.crt&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">client_auth</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;require_and_verify&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h4 id="agent-tls-setup">Agent TLS Setup<a class="td-heading-self-link" href="#agent-tls-setup" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Agent TLS connection
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">createTLSConnection</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">address</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">grpc</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ClientConn</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">error</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">config</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">tls</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Config</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">ServerName</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;agenthub-broker&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Load client certificates if needed
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">creds</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">credentials</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NewTLS</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">config</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">conn</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">grpc</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Dial</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">address</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">grpc</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithTransportCredentials</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">creds</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">nil</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Errorf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;failed to connect with TLS: %v&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">conn</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="authentication-configuration">Authentication Configuration<a class="td-heading-self-link" href="#authentication-configuration" aria-label="Heading self-link"></a></h3>
+<h4 id="jwt-authentication">JWT Authentication<a class="td-heading-self-link" href="#jwt-authentication" aria-label="Heading self-link"></a></h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># broker configuration</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">security</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">auth_enabled</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">auth_method</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;jwt&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">jwt_secret</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;your-secret-key&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">jwt_issuer</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;agenthub-broker&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">jwt_expiry</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;24h&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Agent authentication
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">AuthenticatedAgent</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">client</span>   <span style="color:#000">pb</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AgentHubClient</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">token</span>    <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">agentID</span>  <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">AuthenticatedAgent</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">authenticate</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">error</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Add authentication token to context
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">ctx</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">metadata</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AppendToOutgoingContext</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Background</span><span style="color:#000;font-weight:bold">(),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#4e9a06">&#34;authorization&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Bearer &#34;</span><span style="color:#ce5c00;font-weight:bold">+</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">token</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Use authenticated context for A2A requests
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">_</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PublishMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">request</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">err</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="production-configuration-examples">Production Configuration Examples<a class="td-heading-self-link" href="#production-configuration-examples" aria-label="Heading self-link"></a></h2>
+<h3 id="high-performance-broker-configuration">High-Performance Broker Configuration<a class="td-heading-self-link" href="#high-performance-broker-configuration" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># production-broker.yaml</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">server</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">host</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;0.0.0.0&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">port</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">50051</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_connections</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">5000</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;60s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">performance</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">channel_buffer_size</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">50</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_message_size</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;16MB&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">keepalive_time</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;10s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">keepalive_timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;3s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">limits</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_agents</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">50000</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_tasks_per_agent</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">500</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">memory_limit</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;8GB&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">logging</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;warn&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">format</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/var/log/agenthub/broker.log&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">security</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">tls_enabled</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">cert_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/etc/ssl/certs/agenthub.crt&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">key_file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/etc/ssl/private/agenthub.key&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h3 id="cluster-agent-configuration">Cluster Agent Configuration<a class="td-heading-self-link" href="#cluster-agent-configuration" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># cluster-agent.yaml</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">agent</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">id</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;${HOSTNAME}_${POD_ID}&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">broker_address</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;agenthub-broker.agenthub.svc.cluster.local:50051&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">connection_timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;15s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">retry_attempts</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">retry_delay</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;2s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">task_processing</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">max_concurrent_tasks</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">10</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">task_timeout</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1800s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#8f5902;font-style:italic"># 30 minutes</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">progress_interval</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;10s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">logging</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">level</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;info&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">format</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;json&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;stdout&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">health</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">port</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">8080</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">endpoint</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/health&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">check_interval</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;30s&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline"></span><span style="color:#204a87;font-weight:bold">metrics</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">enabled</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">port</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">9090</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">endpoint</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;/metrics&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span></span></span></code></pre></div><h2 id="environment-specific-configurations">Environment-Specific Configurations<a class="td-heading-self-link" href="#environment-specific-configurations" aria-label="Heading self-link"></a></h2>
+<h3 id="development-environment">Development Environment<a class="td-heading-self-link" href="#development-environment" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># .env.development</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">50051</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span>debug
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_LOG_FORMAT</span><span style="color:#ce5c00;font-weight:bold">=</span>text
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MAX_CONNECTIONS</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">100</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_CHANNEL_BUFFER_SIZE</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">5</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Agent settings</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_BROKER_ADDRESS</span><span style="color:#ce5c00;font-weight:bold">=</span>localhost:50051
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MAX_CONCURRENT_TASKS</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_TASK_TIMEOUT</span><span style="color:#ce5c00;font-weight:bold">=</span>60s
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_AGENT_LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span>debug
+</span></span></code></pre></div><h3 id="staging-environment">Staging Environment<a class="td-heading-self-link" href="#staging-environment" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># .env.staging</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">50051</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span>info
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_LOG_FORMAT</span><span style="color:#ce5c00;font-weight:bold">=</span>json
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MAX_CONNECTIONS</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">1000</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_CHANNEL_BUFFER_SIZE</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">20</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Security</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_TLS_ENABLED</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_CERT_FILE</span><span style="color:#ce5c00;font-weight:bold">=</span>/etc/certs/staging.crt
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_KEY_FILE</span><span style="color:#ce5c00;font-weight:bold">=</span>/etc/certs/staging.key
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Agent settings</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_BROKER_ADDRESS</span><span style="color:#ce5c00;font-weight:bold">=</span>staging-broker.example.com:50051
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MAX_CONCURRENT_TASKS</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">5</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_TASK_TIMEOUT</span><span style="color:#ce5c00;font-weight:bold">=</span>300s
+</span></span></code></pre></div><h3 id="production-environment">Production Environment<a class="td-heading-self-link" href="#production-environment" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># .env.production</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_PORT</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">50051</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_LOG_LEVEL</span><span style="color:#ce5c00;font-weight:bold">=</span>warn
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_LOG_FORMAT</span><span style="color:#ce5c00;font-weight:bold">=</span>json
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_LOG_FILE</span><span style="color:#ce5c00;font-weight:bold">=</span>/var/log/agenthub/broker.log
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MAX_CONNECTIONS</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">5000</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_CHANNEL_BUFFER_SIZE</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">50</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Security</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_TLS_ENABLED</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87">true</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_CERT_FILE</span><span style="color:#ce5c00;font-weight:bold">=</span>/etc/ssl/certs/agenthub.crt
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_KEY_FILE</span><span style="color:#ce5c00;font-weight:bold">=</span>/etc/ssl/private/agenthub.key
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_CA_FILE</span><span style="color:#ce5c00;font-weight:bold">=</span>/etc/ssl/certs/ca.crt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Performance</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MAX_MESSAGE_SIZE</span><span style="color:#ce5c00;font-weight:bold">=</span>16MB
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_KEEPALIVE_TIME</span><span style="color:#ce5c00;font-weight:bold">=</span>10s
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MEMORY_LIMIT</span><span style="color:#ce5c00;font-weight:bold">=</span>8GB
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"># Agent settings</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_BROKER_ADDRESS</span><span style="color:#ce5c00;font-weight:bold">=</span>agenthub-prod.example.com:50051
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_MAX_CONCURRENT_TASKS</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_TASK_TIMEOUT</span><span style="color:#ce5c00;font-weight:bold">=</span>1800s
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_CONNECTION_TIMEOUT</span><span style="color:#ce5c00;font-weight:bold">=</span>15s
+</span></span><span style="display:flex;"><span><span style="color:#000">AGENTHUB_RETRY_ATTEMPTS</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#0000cf;font-weight:bold">5</span>
+</span></span></code></pre></div><h2 id="configuration-validation">Configuration Validation<a class="td-heading-self-link" href="#configuration-validation" aria-label="Heading self-link"></a></h2>
+<h3 id="broker-configuration-validation">Broker Configuration Validation<a class="td-heading-self-link" href="#broker-configuration-validation" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">BrokerConfig</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Port</span>             <span style="color:#204a87;font-weight:bold">int</span>           <span style="color:#4e9a06">`yaml:&#34;port&#34; validate:&#34;min=1,max=65535&#34;`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Host</span>             <span style="color:#204a87;font-weight:bold">string</span>        <span style="color:#4e9a06">`yaml:&#34;host&#34; validate:&#34;required&#34;`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">MaxConnections</span>   <span style="color:#204a87;font-weight:bold">int</span>           <span style="color:#4e9a06">`yaml:&#34;max_connections&#34; validate:&#34;min=1&#34;`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Timeout</span>          <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Duration</span> <span style="color:#4e9a06">`yaml:&#34;timeout&#34; validate:&#34;min=1s&#34;`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">ChannelBufferSize</span> <span style="color:#204a87;font-weight:bold">int</span>          <span style="color:#4e9a06">`yaml:&#34;channel_buffer_size&#34; validate:&#34;min=1&#34;`</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">BrokerConfig</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">Validate</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">error</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">validate</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">validator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">New</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">validate</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Struct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="agent-configuration-validation">Agent Configuration Validation<a class="td-heading-self-link" href="#agent-configuration-validation" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">AgentConfig</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">BrokerAddress</span>      <span style="color:#204a87;font-weight:bold">string</span>        <span style="color:#4e9a06">`yaml:&#34;broker_address&#34; validate:&#34;required&#34;`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">AgentID</span>            <span style="color:#204a87;font-weight:bold">string</span>        <span style="color:#4e9a06">`yaml:&#34;agent_id&#34; validate:&#34;required,min=1,max=64&#34;`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">MaxConcurrentTasks</span> <span style="color:#204a87;font-weight:bold">int</span>           <span style="color:#4e9a06">`yaml:&#34;max_concurrent_tasks&#34; validate:&#34;min=1,max=100&#34;`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">TaskTimeout</span>        <span style="color:#000">time</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Duration</span> <span style="color:#4e9a06">`yaml:&#34;task_timeout&#34; validate:&#34;min=1s&#34;`</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">AgentConfig</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">Validate</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">error</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">validate</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">validator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">New</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">validate</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Struct</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">err</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Custom validation
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">!</span><span style="color:#000">strings</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Contains</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">BrokerAddress</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;:&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">errors</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">New</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;broker_address must include port&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>This comprehensive configuration reference covers all aspects of configuring AgentHub for different environments and use cases.</p>
+
+</div>
+
+
+
+    
+	
+  
+
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub Issues" aria-label="GitHub Issues">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub/issues" aria-label="GitHub Issues">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2023&ndash;2025
+    <span class="td-footer__authors">Olivier Wulveryck | <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> |</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/agenthub/js/main.js"></script>
+<script defer src="/agenthub/js/click-to-copy.js" crossorigin="anonymous"></script>
+<script src='/agenthub/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

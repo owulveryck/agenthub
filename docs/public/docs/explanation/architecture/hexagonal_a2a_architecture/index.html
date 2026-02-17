@@ -1,0 +1,837 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head><script src="/agenthub/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=agenthub/livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+
+
+<link rel="shortcut icon" href="/agenthub/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/agenthub/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/agenthub/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/agenthub/favicons/android-192x192.png" sizes="192x192">
+
+<title>Hexagonal Architecture &amp; A2A Protocol Implementation | AgentHub</title>
+<meta name="description" content="Understanding AgentHub&#39;s hexagonal architecture with A2A protocol, gRPC communication, and event-driven design">
+<meta property="og:url" content="http://localhost:1313/agenthub/docs/explanation/architecture/hexagonal_a2a_architecture/">
+  <meta property="og:site_name" content="AgentHub">
+  <meta property="og:title" content="Hexagonal Architecture & A2A Protocol Implementation">
+  <meta property="og:description" content="Understanding AgentHub&#39;s hexagonal architecture with A2A protocol, gRPC communication, and event-driven design">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+  <meta itemprop="name" content="Hexagonal Architecture & A2A Protocol Implementation">
+  <meta itemprop="description" content="Understanding AgentHub&#39;s hexagonal architecture with A2A protocol, gRPC communication, and event-driven design">
+  <meta itemprop="wordCount" content="1101">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Hexagonal Architecture & A2A Protocol Implementation">
+  <meta name="twitter:description" content="Understanding AgentHub&#39;s hexagonal architecture with A2A protocol, gRPC communication, and event-driven design">
+<link href="/agenthub/scss/main.css" rel="stylesheet">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/agenthub/"><span class="navbar-brand__logo navbar-logo"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500"><g><path style="fill:#fff" d="M116.8525 421.9722c-5.7041.0-10.3442-4.3127-10.3442-9.6129V88.183c0-5.3002 4.6401-9.6117 10.3442-9.6117H320.858c3.0347.0 9.3959.5498 11.7506 2.6302l.3545.3442 58.905 63.2912c2.3101 2.491 2.9202 8.4928 2.9202 11.3184v256.2039c0 5.3002-4.6407 9.6129-10.3436 9.6129H116.8525z"/><g><g><g><path style="fill:#767676" d="M384.4445 423.2066H116.852c-6.3839.0-11.5786-4.8658-11.5786-10.8474V88.1831c0-5.9804 5.1947-10.8461 11.5786-10.8461h204.0062c.377.0 9.2786.0329 12.568 2.9389l.3947.3833 58.9508 63.337c3.2135 3.4652 3.2514 11.7924 3.2514 12.1593v256.2036C396.0231 418.3408 390.8284 423.2066 384.4445 423.2066zM116.5079 411.9189c.0848.0278.1999.0531.3441.0531h267.5925c.1442.0.2581-.0253.3441-.0531V156.1556c-.0076-.9033-.3593-3.7347-.7034-5.0037l-57.6527-61.9416c-1.4651-.3176-4.4533-.6389-5.5742-.6389H116.852c-.143.0-.2594.024-.3441.0531V411.9189zm267.4533-261.149zM327.0321 89.371v.0013V89.371z"/></g></g></g><g><g><path style="fill:#5b7fc0" d="M189.0874 210.1754l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4473C177.5953 212.627 183.0601 210.1742 189.0874 210.1754zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 234.1722 197.0804 232.033z"/><path style="opacity:.3;fill:#fff" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/><g><defs><path id="SVGID_1_" d="M194.7376 237.6875c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 234.2399 196.1861 236.239 194.7376 237.6875z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_2_);fill:#fff" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/><path style="opacity:.13;clip-path:url(#SVGID_2_);fill:#020202" d="M190.0704 225.0237c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 225.7247 191.9774 225.0237 190.0704 225.0237z"/></g><g><defs><path id="SVGID_3_" d="M189.0898 210.176c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 212.6276 183.0612 210.176 189.0898 210.176zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 236.239 197.0839 234.2399 197.0839 232.0372z"/></defs><clipPath id="SVGID_4_"><use xlink:href="#SVGID_3_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_4_);fill:#5b7fc0" d="M172.6595 215.6045c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8475-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 209.1953 176.6171 211.647 172.6595 215.6045z"/></g></g><rect x="198.8952" y="225.1043" style="fill:#5b7fc0" width="122.6266" height="13.8671"/></g><g><path style="fill:#d95140" d="M189.0874 155.7611l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.0249 2.454-11.4897 6.4116-15.4473C177.5953 158.2128 183.0601 155.7599 189.0874 155.7611zm7.993 21.8577c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.2508 181.7667 197.0816 179.758 197.0804 177.6188z"/><path style="opacity:.3;fill:#fff" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/><g><defs><path id="SVGID_5_" d="M194.7376 183.2733c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 179.8256 196.1861 181.8248 194.7376 183.2733z"/></defs><clipPath id="SVGID_6_"><use xlink:href="#SVGID_5_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_6_);fill:#fff" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/><path style="opacity:.13;clip-path:url(#SVGID_6_);fill:#020202" d="M190.0704 170.6095c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9546.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.663-2.8588-6.116.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C193.7885 171.3104 191.9774 170.6095 190.0704 170.6095z"/></g><g><defs><path id="SVGID_7_" d="M189.0898 155.7617c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8066-21.8612-21.8613.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 158.2134 183.0612 155.7617 189.0898 155.7617zm7.9941 21.8613c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 181.8248 197.0839 179.8256 197.0839 177.623z"/></defs><clipPath id="SVGID_8_"><use xlink:href="#SVGID_7_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_8_);fill:#d95140" d="M172.6595 161.1903c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 154.7811 176.6171 157.2327 172.6595 161.1903z"/></g><rect x="198.8952" y="170.69" style="fill:#d95140" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#56a55c" d="M189.5379 264.6147l.0012-.0012c7.7751.0012 15.0294 4.1862 18.932 10.9235 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3304-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032-5.8394.0-11.3281-2.2733-15.458-6.4032-4.13-4.13-6.4032-9.6186-6.4056-15.4628.0012-6.0249 2.454-11.4897 6.4116-15.4472C178.0458 267.0663 183.5105 264.6135 189.5379 264.6147zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6538 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403C196.7013 290.6202 197.5321 288.6115 197.5309 286.4723z"/><path style="opacity:.3;fill:#fff" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/><g><defs><path id="SVGID_9_" d="M195.1881 292.1268c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.9989 7.9942-7.9941 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.5344 288.6792 196.6366 290.6783 195.1881 292.1268z"/></defs><clipPath id="SVGID_10_"><use xlink:href="#SVGID_9_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_10_);fill:#fff" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/><path style="opacity:.13;clip-path:url(#SVGID_10_);fill:#020202" d="M190.5209 279.463c-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7446-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9941 2.3802-1e-4 4.616 1.0833 6.1218 2.8788C194.239 280.164 192.4279 279.463 190.5209 279.463z"/></g><g><defs><path id="SVGID_11_" d="M189.5403 264.6153c7.7763.0 15.0283 4.1826 18.926 10.9151 1.9201 3.3135 2.9377 7.0987 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8613-12.0547.0024-21.8636-9.8065-21.8612-21.8613.0-6.0285 2.4516-11.492 6.4116-15.452C178.0482 267.0669 183.5117 264.6153 189.5403 264.6153zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9941.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.6366 290.6783 197.5344 288.6792 197.5344 286.4765z"/></defs><clipPath id="SVGID_12_"><use xlink:href="#SVGID_11_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_12_);fill:#56a55c" d="M173.11 270.0439c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8613 12.0547.0024 21.8636-9.797 21.8613-21.8613.0024-3.8474-1.0151-7.6326-2.9353-10.9462-3.8977-6.7325-11.1497-10.9151-18.926-10.9151C182.5311 263.6346 177.0676 266.0863 173.11 270.0439z"/></g></g><rect x="199.3456" y="279.5436" style="fill:#56a55c" width="122.6266" height="13.8671"/></g><g><g><path style="fill:#f1bc42" d="M189.0874 318.7208l.0012-.0012c7.7751.0012 15.0295 4.1862 18.932 10.9234 1.9177 3.3159 2.9305 7.1011 2.9293 10.9378.0 5.8394-2.2733 11.3305-6.4032 15.4604-4.1288 4.1288-9.6186 6.4032-15.458 6.4032s-11.328-2.2733-15.458-6.4032-6.4032-9.6186-6.4056-15.4628c.0012-6.025 2.454-11.4897 6.4116-15.4472C177.5953 321.1724 183.0601 318.7196 189.0874 318.7208zm7.993 21.8576c.0012-1.4042-.3687-2.7868-1.063-3.9887-1.4293-2.4684-4.0833-3.9995-6.9299-4.0019-4.4077.0024-7.993 3.5877-7.993 7.993.0 2.1356.832 4.1431 2.3427 5.6539 1.5083 1.5083 3.5159 2.3403 5.6503 2.3415 2.1356.0 4.1443-.8308 5.6539-2.3403S197.0816 342.7176 197.0804 340.5784z"/><path style="opacity:.3;fill:#fff" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/><g><defs><path id="SVGID_13_" d="M194.7376 346.2329c-1.4461 1.4461-3.4452 2.3439-5.6479 2.3439-4.4077-.0024-7.9918-3.5865-7.9942-7.9942.0024-4.4125 3.5937-7.999 7.9942-7.9942 2.8443.0 5.497 1.5323 6.924 3.9983.6991 1.2067 1.0702 2.5881 1.0702 3.9959C197.0839 342.7853 196.1861 344.7844 194.7376 346.2329z"/></defs><clipPath id="SVGID_14_"><use xlink:href="#SVGID_13_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_14_);fill:#fff" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/><path style="opacity:.13;clip-path:url(#SVGID_14_);fill:#020202" d="M190.0704 333.5691c-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0011 1.9547.7088 3.7452 1.8782 5.1354-1.7447-1.4674-2.8575-3.6631-2.8588-6.1161.0024-4.4125 3.5936-7.999 7.9942-7.9942 2.3802-1e-4 4.616 1.0834 6.1218 2.8788C193.7885 334.2701 191.9774 333.5691 190.0704 333.5691z"/></g><g><defs><path id="SVGID_15_" d="M189.0898 318.7214c7.7763.0 15.0283 4.1826 18.926 10.915 1.9201 3.3136 2.9377 7.0988 2.9353 10.9462.0024 12.0643-9.8065 21.8636-21.8613 21.8612-12.0547.0024-21.8636-9.8065-21.8612-21.8612.0-6.0285 2.4516-11.4921 6.4116-15.452C177.5977 321.173 183.0612 318.7214 189.0898 318.7214zm7.9941 21.8612c0-1.4078-.3711-2.7892-1.0702-3.9959-1.4269-2.466-4.0797-3.9983-6.924-3.9983-4.4005-.0048-7.9918 3.5817-7.9942 7.9942.0024 4.4077 3.5865 7.9918 7.9942 7.9942 2.2027.0 4.2018-.8978 5.6479-2.3439C196.1861 344.7844 197.0839 342.7853 197.0839 340.5826z"/></defs><clipPath id="SVGID_16_"><use xlink:href="#SVGID_15_" style="overflow:visible"/></clipPath><path style="clip-path:url(#SVGID_16_);fill:#f1bc42" d="M172.6595 324.15c-3.96 3.96-6.4116 9.4235-6.4116 15.452-.0024 12.0547 9.8066 21.8636 21.8613 21.8612 12.0547.0024 21.8636-9.797 21.8613-21.8612.0024-3.8474-1.0151-7.6327-2.9353-10.9462-3.8977-6.7324-11.1497-10.9151-18.926-10.9151C182.0806 317.7407 176.6171 320.1924 172.6595 324.15z"/></g></g><rect x="198.8952" y="333.6497" style="fill:#f1bc42" width="122.6266" height="13.8671"/></g></g></svg></span><span class="navbar-brand__name">AgentHub</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="/agenthub/docs/"><span>Documentation</span></a>
+      </li>
+      <li class="nav-item dropdown d-none d-lg-block">
+        <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/agenthub/fr/">Français</a></li>
+    </ul>
+</div></li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            <div id="td-sidebar-menu" class="td-sidebar__inner">
+  <form class="td-sidebar__search d-flex align-items-center">
+    
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse" id="td-section-nav">
+    <div class="td-sidebar-nav__section nav-item dropdown d-block d-lg-none">
+      <div class="dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">English</a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/agenthub/fr/">Français</a></li>
+    </ul>
+</div>
+    </div>
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-agenthubdocs-li">
+  <a href="/agenthub/docs/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-agenthubdocs"><span class="">Documentation</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocstutorials-li">
+  <a href="/agenthub/docs/tutorials/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocstutorials"><span class="">Tutorials</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocstutorialsgetting-started-li">
+  <a href="/agenthub/docs/tutorials/getting-started/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocstutorialsgetting-started"><span class="">Getting Started</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsgetting-startedinstallation_and_setup-li">
+  <a href="/agenthub/docs/tutorials/getting-started/installation_and_setup/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsgetting-startedinstallation_and_setup"><span class="">Installation and Setup Tutorial</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsgetting-startedrun_demo-li">
+  <a href="/agenthub/docs/tutorials/getting-started/run_demo/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsgetting-startedrun_demo"><span class="">Running the A2A-Compliant AgentHub Demo</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocstutorialsobservability-li">
+  <a href="/agenthub/docs/tutorials/observability/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocstutorialsobservability"><span class="">Observability</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsobservabilitydashboard_tour-li">
+  <a href="/agenthub/docs/tutorials/observability/dashboard_tour/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsobservabilitydashboard_tour"><span class="">Interactive Dashboard Tour</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsobservabilityobservability_demo-li">
+  <a href="/agenthub/docs/tutorials/observability/observability_demo/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsobservabilityobservability_demo"><span class="">AgentHub Observability Demo Tutorial</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocstutorialsworkflows-li">
+  <a href="/agenthub/docs/tutorials/workflows/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocstutorialsworkflows"><span class="">Workflows</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocstutorialsworkflowsbuilding_multi_agent_workflows-li">
+  <a href="/agenthub/docs/tutorials/workflows/building_multi_agent_workflows/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocstutorialsworkflowsbuilding_multi_agent_workflows"><span class="">Building Multi-Agent Workflows</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocshowto-li">
+  <a href="/agenthub/docs/howto/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocshowto"><span class="">How-To Guides</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocshowtoagents-li">
+  <a href="/agenthub/docs/howto/agents/" title="Agent Development" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocshowtoagents"><span class="">Agents</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoagentscreate_publisher-li">
+  <a href="/agenthub/docs/howto/agents/create_publisher/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoagentscreate_publisher"><span class="">How to Create an A2A Task Publisher</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoagentscreate_subscriber-li">
+  <a href="/agenthub/docs/howto/agents/create_subscriber/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoagentscreate_subscriber"><span class="">How to Create an A2A Task Subscriber (Agent)</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocshowtoobservability-li">
+  <a href="/agenthub/docs/howto/observability/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocshowtoobservability"><span class="">Observability</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoobservabilityadd_observability-li">
+  <a href="/agenthub/docs/howto/observability/add_observability/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoobservabilityadd_observability"><span class="">How to Add Observability to Your Agent</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoobservabilityuse_dashboards-li">
+  <a href="/agenthub/docs/howto/observability/use_dashboards/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoobservabilityuse_dashboards"><span class="">How to Use Grafana Dashboards</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocshowtoa2a_protocol-li">
+  <a href="/agenthub/docs/howto/a2a_protocol/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocshowtoa2a_protocol"><span class="">Agent2Agent Protocol</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoa2a_protocolwork_with_a2a_messages-li">
+  <a href="/agenthub/docs/howto/a2a_protocol/work_with_a2a_messages/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoa2a_protocolwork_with_a2a_messages"><span class="">How to Work with A2A Messages</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoa2a_protocolwork_with_conversation_context-li">
+  <a href="/agenthub/docs/howto/a2a_protocol/work_with_conversation_context/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoa2a_protocolwork_with_conversation_context"><span class="">How to Work with A2A Conversation Context</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoa2a_protocolwork_with_a2a_artifacts-li">
+  <a href="/agenthub/docs/howto/a2a_protocol/work_with_a2a_artifacts/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoa2a_protocolwork_with_a2a_artifacts"><span class="">How to Work with A2A Artifacts</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtoa2a_protocolwork_with_task_lifecycle-li">
+  <a href="/agenthub/docs/howto/a2a_protocol/work_with_task_lifecycle/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtoa2a_protocolwork_with_task_lifecycle"><span class="">How to Work with A2A Task Lifecycle</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocshowtodebugging-li">
+  <a href="/agenthub/docs/howto/debugging/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocshowtodebugging"><span class="">Debugging</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocshowtodebuggingdebugging_agent_issues-li">
+  <a href="/agenthub/docs/howto/debugging/debugging_agent_issues/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocshowtodebuggingdebugging_agent_issues"><span class="">How to Debug Agent Issues</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsreference-li">
+  <a href="/agenthub/docs/reference/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsreference"><span class="">Reference</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsreferenceconfiguration-li">
+  <a href="/agenthub/docs/reference/configuration/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsreferenceconfiguration"><span class="">Configuration</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceconfigurationenvironment_variables-li">
+  <a href="/agenthub/docs/reference/configuration/environment_variables/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceconfigurationenvironment_variables"><span class="">Environment Variables Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceconfigurationconfiguration_reference-li">
+  <a href="/agenthub/docs/reference/configuration/configuration_reference/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceconfigurationconfiguration_reference"><span class="">Configuration Reference</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsreferenceapi-li">
+  <a href="/agenthub/docs/reference/api/" title="API Reference" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsreferenceapi"><span class="">API</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceapiapi_reference-li">
+  <a href="/agenthub/docs/reference/api/api_reference/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceapiapi_reference"><span class="">A2A-Compliant AgentHub API Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceapitracing_api-li">
+  <a href="/agenthub/docs/reference/api/tracing_api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceapitracing_api"><span class="">AgentHub Tracing API Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceapiunified_abstraction_api-li">
+  <a href="/agenthub/docs/reference/api/unified_abstraction_api/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceapiunified_abstraction_api"><span class="">Unified Abstraction Library API Reference</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsreferenceobservability-li">
+  <a href="/agenthub/docs/reference/observability/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsreferenceobservability"><span class="">Observability</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceobservabilityhealth_endpoints-li">
+  <a href="/agenthub/docs/reference/observability/health_endpoints/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceobservabilityhealth_endpoints"><span class="">AgentHub Health Endpoints Reference</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferenceobservabilityobservability_metrics-li">
+  <a href="/agenthub/docs/reference/observability/observability_metrics/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferenceobservabilityobservability_metrics"><span class="">AgentHub Observability Metrics Reference</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsreferencetasks-li">
+  <a href="/agenthub/docs/reference/tasks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsreferencetasks"><span class="">Tasks</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsreferencetasksthe_tasks-li">
+  <a href="/agenthub/docs/reference/tasks/the_tasks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsreferencetasksthe_tasks"><span class="">A2A Task Reference</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-agenthubdocsexplanation-li">
+  <a href="/agenthub/docs/explanation/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsexplanation"><span class="">Explanations</span></a>
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-agenthubdocsexplanationarchitecture-li">
+  <a href="/agenthub/docs/explanation/architecture/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsexplanationarchitecture"><span class="">Architecture</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationarchitecturebroker_architecture-li">
+  <a href="/agenthub/docs/explanation/architecture/broker_architecture/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationarchitecturebroker_architecture"><span class="">A2A-Compliant EDA Broker Architecture</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-agenthubdocsexplanationarchitecturehexagonal_a2a_architecture-li">
+  <a href="/agenthub/docs/explanation/architecture/hexagonal_a2a_architecture/" title="Hexagonal Architecture &amp; A2A Protocol Implementation" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationarchitecturehexagonal_a2a_architecture"><span class="td-sidebar-nav-active-item">Hexagonal A2A Architecture</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsexplanationconcepts-li">
+  <a href="/agenthub/docs/explanation/concepts/" title="Core Concepts" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsexplanationconcepts"><span class="">Concepts</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationconceptsthe_agent_to_agent_principle-li">
+  <a href="/agenthub/docs/explanation/concepts/the_agent_to_agent_principle/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationconceptsthe_agent_to_agent_principle"><span class="">The Agent2Agent Principle</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationconceptsa2a_migration-li">
+  <a href="/agenthub/docs/explanation/concepts/a2a_migration/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationconceptsa2a_migration"><span class="">Agent2Agent (A2A) Protocol Migration</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationconceptsthe_tasks-li">
+  <a href="/agenthub/docs/explanation/concepts/the_tasks/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationconceptsthe_tasks"><span class="">Understanding Tasks in Agent2Agent Communication</span></a>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-agenthubdocsexplanationfeatures-li">
+  <a href="/agenthub/docs/explanation/features/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-agenthubdocsexplanationfeatures"><span class="">Features</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationfeaturesdistributed_tracing-li">
+  <a href="/agenthub/docs/explanation/features/distributed_tracing/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationfeaturesdistributed_tracing"><span class="">Distributed Tracing &amp; OpenTelemetry</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationfeaturesgo_build_tags-li">
+  <a href="/agenthub/docs/explanation/features/go_build_tags/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationfeaturesgo_build_tags"><span class="">Architecture Evolution: From Build Tags to Unified Abstractions</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationfeaturesperformance_and_scaling-li">
+  <a href="/agenthub/docs/explanation/features/performance_and_scaling/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationfeaturesperformance_and_scaling"><span class="">Performance and Scaling Considerations</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-agenthubdocsexplanationfeaturesunified_abstraction_library-li">
+  <a href="/agenthub/docs/explanation/features/unified_abstraction_library/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-agenthubdocsexplanationfeaturesunified_abstraction_library"><span class="">The Unified Abstraction Library</span></a>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+<a href="https://github.com/owulveryck/agenthub/tree/main/content/en/docs/explanation/architecture/hexagonal_a2a_architecture.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> View page source</a>
+  <a href="https://github.com/owulveryck/agenthub/edit/main/content/en/docs/explanation/architecture/hexagonal_a2a_architecture.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Edit this page</a>
+  <a href="https://github.com/owulveryck/agenthub/new/main/content/en/docs/explanation/architecture?filename=change-me.md&amp;value=---%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0Aweight%3A&#43;100%0Adescription%3A&#43;%3E-%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0A---%0A%0A%23%23&#43;Heading%0A%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0A%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Create child page</a>
+  <a href="https://github.com/owulveryck/agenthub/issues/new?title=Hexagonal%20Architecture%20&amp;%20A2A%20Protocol%20Implementation" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> Create documentation issue</a>
+  <a href="https://github.com/owulveryck/agenthub/issues/new" class="td-page-meta--project td-page-meta__project-issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> Create project issue</a>
+  <a id="print" href="/agenthub/docs/explanation/architecture/_print/"><i class="fa-solid fa-print fa-fw"></i> Print entire section</a>
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#system-architecture">System Architecture</a></li>
+    <li><a href="#a2a-message-flow">A2A Message Flow</a></li>
+    <li><a href="#core-components">Core Components</a>
+      <ul>
+        <li><a href="#1-a2a-protocol-engine-domain-core">1. A2A Protocol Engine (Domain Core)</a></li>
+        <li><a href="#2-event-router-domain-core">2. Event Router (Domain Core)</a></li>
+        <li><a href="#3-grpc-adapter-infrastructure">3. gRPC Adapter (Infrastructure)</a></li>
+      </ul>
+    </li>
+    <li><a href="#hexagonal-architecture-benefits">Hexagonal Architecture Benefits</a>
+      <ul>
+        <li><a href="#1-domain-isolation">1. Domain Isolation</a></li>
+        <li><a href="#2-adapter-pattern">2. Adapter Pattern</a></li>
+        <li><a href="#3-port-interfaces">3. Port Interfaces</a></li>
+        <li><a href="#4-dependency-inversion">4. Dependency Inversion</a></li>
+      </ul>
+    </li>
+    <li><a href="#a2a-protocol-integration">A2A Protocol Integration</a>
+      <ul>
+        <li><a href="#message-structure-compliance">Message Structure Compliance</a></li>
+        <li><a href="#event-driven-architecture">Event-Driven Architecture</a></li>
+      </ul>
+    </li>
+    <li><a href="#observability-integration">Observability Integration</a>
+      <ul>
+        <li><a href="#distributed-tracing">Distributed Tracing</a></li>
+        <li><a href="#structured-attributes">Structured Attributes</a></li>
+      </ul>
+    </li>
+    <li><a href="#testing-strategy">Testing Strategy</a>
+      <ul>
+        <li><a href="#unit-testing-domain-core">Unit Testing (Domain Core)</a></li>
+        <li><a href="#integration-testing-adapters">Integration Testing (Adapters)</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            
+	
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/agenthub/docs/">Documentation</a></li>
+  <li class="breadcrumb-item">
+    <a href="/agenthub/docs/explanation/">Explanations</a></li>
+  <li class="breadcrumb-item">
+    <a href="/agenthub/docs/explanation/architecture/">Architecture</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Hexagonal A2A Architecture</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>Hexagonal Architecture &amp; A2A Protocol Implementation</h1>
+	<div class="lead">Understanding AgentHub&rsquo;s hexagonal architecture with A2A protocol, gRPC communication, and event-driven design</div>
+	<header class="article-meta">
+		
+  </header>
+	<h1 id="hexagonal-architecture--a2a-protocol-implementation">Hexagonal Architecture &amp; A2A Protocol Implementation<a class="td-heading-self-link" href="#hexagonal-architecture--a2a-protocol-implementation" aria-label="Heading self-link"></a></h1>
+<p>This document explains how AgentHub implements hexagonal architecture principles with the Agent2Agent (A2A) protocol, gRPC communication, and event-driven design patterns.</p>
+<h2 id="overview">Overview<a class="td-heading-self-link" href="#overview" aria-label="Heading self-link"></a></h2>
+<p>AgentHub follows hexagonal architecture (also known as Ports and Adapters) to achieve:</p>
+<ul>
+<li><strong>Domain isolation</strong>: Core A2A protocol logic separated from infrastructure</li>
+<li><strong>Testability</strong>: Clean interfaces enable comprehensive testing</li>
+<li><strong>Flexibility</strong>: Multiple adapters for different communication protocols</li>
+<li><strong>Maintainability</strong>: Clear separation of concerns and dependencies</li>
+</ul>
+<h2 id="system-architecture">System Architecture<a class="td-heading-self-link" href="#system-architecture" aria-label="Heading self-link"></a></h2>
+<pre class="mermaid">graph TB
+    subgraph &#34;AgentHub Ecosystem&#34;
+        subgraph &#34;External Agents&#34;
+            A[&#34;Agent A&lt;br/&gt;(Chat REPL)&#34;]
+            B[&#34;Agent B&lt;br/&gt;(Chat Responder)&#34;]
+            C[&#34;Agent C&lt;br/&gt;(Custom Agent)&#34;]
+        end
+
+        subgraph &#34;AgentHub Broker&#34;
+            subgraph &#34;Adapters (Infrastructure)&#34;
+                GRPC[&#34;gRPC Server&lt;br/&gt;Adapter&#34;]
+                HEALTH[&#34;Health Check&lt;br/&gt;Adapter&#34;]
+                METRICS[&#34;Metrics&lt;br/&gt;Adapter&#34;]
+                TRACING[&#34;Tracing Adapter&lt;br/&gt;(OTLP/Jaeger)&#34;]
+            end
+
+            subgraph &#34;Ports (Interfaces)&#34;
+                SP[&#34;AgentHub&lt;br/&gt;Service Port&#34;]
+                PP[&#34;Message&lt;br/&gt;Publisher Port&#34;]
+                EP[&#34;Event&lt;br/&gt;Subscriber Port&#34;]
+                OP[&#34;Observability&lt;br/&gt;Port&#34;]
+            end
+
+            subgraph &#34;Domain (Core Logic)&#34;
+                A2A[&#34;A2A Protocol&lt;br/&gt;Engine&#34;]
+                ROUTER[&#34;Event Router&lt;br/&gt;&amp; Broker&#34;]
+                VALIDATOR[&#34;Message&lt;br/&gt;Validator&#34;]
+                CONTEXT[&#34;Context&lt;br/&gt;Manager&#34;]
+                TASK[&#34;Task&lt;br/&gt;Lifecycle&#34;]
+            end
+        end
+
+        subgraph &#34;External Systems&#34;
+            OTLP[&#34;OTLP Collector&lt;br/&gt;&amp; Jaeger&#34;]
+            STORE[&#34;Event Store&lt;br/&gt;(Memory)&#34;]
+        end
+    end
+
+    %% External agent connections
+    A --&gt;|&#34;gRPC calls&lt;br/&gt;(PublishMessage,&lt;br/&gt;SubscribeToMessages)&#34;| GRPC
+    B --&gt;|&#34;gRPC calls&#34;| GRPC
+    C --&gt;|&#34;gRPC calls&#34;| GRPC
+
+    %% Adapter to Port connections
+    GRPC --&gt;|&#34;implements&#34;| SP
+    HEALTH --&gt;|&#34;implements&#34;| OP
+    METRICS --&gt;|&#34;implements&#34;| OP
+    TRACING --&gt;|&#34;implements&#34;| OP
+
+    %% Port to Domain connections
+    SP --&gt;|&#34;delegates to&#34;| A2A
+    PP --&gt;|&#34;delegates to&#34;| ROUTER
+    EP --&gt;|&#34;delegates to&#34;| ROUTER
+    OP --&gt;|&#34;observes&#34;| A2A
+
+    %% Domain internal connections
+    A2A --&gt;|&#34;uses&#34;| VALIDATOR
+    A2A --&gt;|&#34;uses&#34;| CONTEXT
+    A2A --&gt;|&#34;uses&#34;| TASK
+    ROUTER --&gt;|&#34;persists events&#34;| STORE
+    TRACING --&gt;|&#34;exports traces&#34;| OTLP
+
+    %% Styling
+    classDef agents fill:#add8e6
+    classDef adapters fill:#ffa500
+    classDef ports fill:#e0ffff
+    classDef domain fill:#ffb6c1
+    classDef external fill:#dda0dd
+
+    class A,B,C agents
+    class GRPC,HEALTH,METRICS,TRACING adapters
+    class SP,PP,EP,OP ports
+    class A2A,ROUTER,VALIDATOR,CONTEXT,TASK domain
+    class OTLP,STORE external</pre>
+<p><strong>Architecture Notes:</strong></p>
+<ul>
+<li><strong>Domain Core</strong>: Pure A2A protocol logic with message validation, event routing, context correlation, and task state management</li>
+<li><strong>Ports</strong>: Clean, technology-agnostic interfaces providing testable contracts and dependency inversion</li>
+<li><strong>Adapters</strong>: Infrastructure concerns including gRPC communication, observability exports, and protocol adaptations</li>
+</ul>
+<h2 id="a2a-message-flow">A2A Message Flow<a class="td-heading-self-link" href="#a2a-message-flow" aria-label="Heading self-link"></a></h2>
+<pre class="mermaid">sequenceDiagram
+    participant REPL as Chat REPL&lt;br/&gt;Agent
+    participant gRPC as gRPC&lt;br/&gt;Adapter
+    participant A2A as A2A Protocol&lt;br/&gt;Engine
+    participant Router as Event&lt;br/&gt;Router
+    participant Responder as Chat Responder&lt;br/&gt;Agent
+
+    rect rgb(240, 248, 255)
+        Note over REPL, Router: A2A Message Publishing
+        REPL-&gt;&gt;&#43;gRPC: PublishMessage(A2AMessage)
+        gRPC-&gt;&gt;&#43;A2A: validateA2AMessage()
+        A2A-&gt;&gt;A2A: check MessageId, Role, Content
+        A2A--&gt;&gt;-gRPC: validation result
+        gRPC-&gt;&gt;&#43;Router: routeA2AEvent(messageEvent)
+        Router-&gt;&gt;Router: identify subscribers&lt;br/&gt;by agent_id/broadcast
+        Router-&gt;&gt;Router: create tracing span&lt;br/&gt;with A2A attributes
+        Router--&gt;&gt;Responder: deliver message event
+        Router--&gt;&gt;-gRPC: routing success
+        gRPC--&gt;&gt;-REPL: PublishResponse(event_id)
+    end
+
+    rect rgb(255, 248, 240)
+        Note over Responder, Router: A2A Message Processing
+        Responder-&gt;&gt;&#43;gRPC: SubscribeToMessages(agent_id)
+        gRPC-&gt;&gt;Router: register subscriber
+        Router--&gt;&gt;gRPC: subscription stream
+        gRPC--&gt;&gt;-Responder: message stream
+        Note over Responder: Process A2A message&lt;br/&gt;with tracing spans
+        Responder-&gt;&gt;&#43;gRPC: PublishMessage(A2AResponse)
+        gRPC-&gt;&gt;A2A: validateA2AMessage()
+        A2A-&gt;&gt;A2A: check AGENT role,&lt;br/&gt;ContextId correlation
+        gRPC-&gt;&gt;Router: routeA2AEvent(responseEvent)
+        Router--&gt;&gt;REPL: deliver response event
+        gRPC--&gt;&gt;-Responder: PublishResponse
+    end
+
+    Note over REPL, Responder: A2A Protocol ensures:&lt;br/&gt;• Message structure compliance&lt;br/&gt;• Role semantics (USER/AGENT)&lt;br/&gt;• Context correlation&lt;br/&gt;• Event-driven routing</pre>
+<h2 id="core-components">Core Components<a class="td-heading-self-link" href="#core-components" aria-label="Heading self-link"></a></h2>
+<h3 id="1-a2a-protocol-engine-domain-core">1. A2A Protocol Engine (Domain Core)<a class="td-heading-self-link" href="#1-a2a-protocol-engine-domain-core" aria-label="Heading self-link"></a></h3>
+<p>The heart of the system implementing A2A protocol specifications:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Core domain logic - technology agnostic
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">A2AProtocolEngine</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">messageValidator</span> <span style="color:#000">MessageValidator</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">contextManager</span>   <span style="color:#000">ContextManager</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">taskLifecycle</span>    <span style="color:#000">TaskLifecycle</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// A2A message validation
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">e</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">A2AProtocolEngine</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">ValidateMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">msg</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">Message</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">error</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// A2A compliance checks
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">msg</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">MessageId</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#4e9a06">&#34;&#34;</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">ErrMissingMessageId</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">msg</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Role</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">ROLE_UNSPECIFIED</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">ErrInvalidRole</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#204a87">len</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">msg</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Content</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#0000cf;font-weight:bold">0</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">ErrEmptyContent</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="2-event-router-domain-core">2. Event Router (Domain Core)<a class="td-heading-self-link" href="#2-event-router-domain-core" aria-label="Heading self-link"></a></h3>
+<p>Manages event-driven communication between agents:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">EventRouter</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">messageSubscribers</span> <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">][]</span><span style="color:#204a87;font-weight:bold">chan</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">AgentEvent</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">taskSubscribers</span>    <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">][]</span><span style="color:#204a87;font-weight:bold">chan</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">AgentEvent</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">eventSubscribers</span>   <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">][]</span><span style="color:#204a87;font-weight:bold">chan</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">AgentEvent</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">r</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">EventRouter</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">RouteEvent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">event</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">AgentEvent</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">error</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Route based on A2A metadata
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">routing</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">event</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">GetRouting</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">subscribers</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">r</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">getSubscribers</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">routing</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ToAgentId</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">event</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PayloadType</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Deliver with tracing
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">_</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">sub</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#204a87;font-weight:bold">range</span> <span style="color:#000">subscribers</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">go</span> <span style="color:#000">r</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">deliverWithTracing</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">sub</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">event</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="3-grpc-adapter-infrastructure">3. gRPC Adapter (Infrastructure)<a class="td-heading-self-link" href="#3-grpc-adapter-infrastructure" aria-label="Heading self-link"></a></h3>
+<p>Translates between gRPC and domain logic:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">GrpcAdapter</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">a2aEngine</span>    <span style="color:#000">A2AProtocolEngine</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">eventRouter</span>  <span style="color:#000">EventRouter</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">tracer</span>       <span style="color:#000">TracingAdapter</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">GrpcAdapter</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">PublishMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Context</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">req</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">PublishMessageRequest</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">PublishResponse</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">error</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Start tracing span
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">span</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">tracer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">StartA2AMessageSpan</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;publish_message&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">req</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Message</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">MessageId</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">req</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Message</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Role</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">defer</span> <span style="color:#000">span</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">End</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Validate using domain logic
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">a2aEngine</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ValidateMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">req</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Message</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">tracer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">RecordError</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">span</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">nil</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Route using domain logic
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">event</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">createA2AEvent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">req</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">eventRouter</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">RouteEvent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">event</span><span style="color:#000;font-weight:bold">);</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">!=</span> <span style="color:#204a87;font-weight:bold">nil</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">nil</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">PublishResponse</span><span style="color:#000;font-weight:bold">{</span><span style="color:#000">Success</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">EventId</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">event</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">EventId</span><span style="color:#000;font-weight:bold">},</span> <span style="color:#204a87;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="hexagonal-architecture-benefits">Hexagonal Architecture Benefits<a class="td-heading-self-link" href="#hexagonal-architecture-benefits" aria-label="Heading self-link"></a></h2>
+<h3 id="1-domain-isolation">1. Domain Isolation<a class="td-heading-self-link" href="#1-domain-isolation" aria-label="Heading self-link"></a></h3>
+<ul>
+<li><strong>A2A protocol logic</strong> is pure, testable business logic</li>
+<li><strong>No infrastructure dependencies</strong> in the core domain</li>
+<li><strong>Technology-agnostic</strong> implementation</li>
+</ul>
+<h3 id="2-adapter-pattern">2. Adapter Pattern<a class="td-heading-self-link" href="#2-adapter-pattern" aria-label="Heading self-link"></a></h3>
+<ul>
+<li><strong>gRPC Adapter</strong>: Handles Protocol Buffer serialization/deserialization</li>
+<li><strong>Tracing Adapter</strong>: OTLP/Jaeger integration without domain coupling</li>
+<li><strong>Health Adapter</strong>: Service health monitoring</li>
+<li><strong>Metrics Adapter</strong>: Prometheus metrics collection</li>
+</ul>
+<h3 id="3-port-interfaces">3. Port Interfaces<a class="td-heading-self-link" href="#3-port-interfaces" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Clean, testable interfaces
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">MessagePublisher</span> <span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">PublishMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Context</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">msg</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">Message</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">PublishResponse</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">error</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">EventSubscriber</span> <span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">SubscribeToMessages</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Context</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">agentId</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">MessageStream</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">error</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">ObservabilityPort</span> <span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">StartSpan</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Context</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">operation</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Context</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">Span</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">RecordMetric</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">name</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">value</span> <span style="color:#204a87;font-weight:bold">float64</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">labels</span> <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="4-dependency-inversion">4. Dependency Inversion<a class="td-heading-self-link" href="#4-dependency-inversion" aria-label="Heading self-link"></a></h3>
+<ul>
+<li><strong>Domain depends on abstractions</strong> (ports), not concrete implementations</li>
+<li><strong>Adapters depend on domain</strong> through well-defined interfaces</li>
+<li><strong>Easy testing</strong> with mock implementations</li>
+</ul>
+<h2 id="a2a-protocol-integration">A2A Protocol Integration<a class="td-heading-self-link" href="#a2a-protocol-integration" aria-label="Heading self-link"></a></h2>
+<h3 id="message-structure-compliance">Message Structure Compliance<a class="td-heading-self-link" href="#message-structure-compliance" aria-label="Heading self-link"></a></h3>
+<pre class="mermaid">classDiagram
+    class A2AMessage {
+        &#43;string MessageId
+        &#43;string ContextId
+        &#43;Role Role
+        &#43;Part Content
+        &#43;Metadata Metadata
+        &#43;string TaskId
+    }
+
+    class Part {
+        &#43;string Text
+        &#43;bytes Data
+        &#43;FileData File
+    }
+
+    class EventMetadata {
+        &#43;string FromAgentId
+        &#43;string ToAgentId
+        &#43;string EventType
+        &#43;Priority Priority
+    }
+
+    class Role {
+        &lt;&lt;enumeration&gt;&gt;
+        USER
+        AGENT
+    }
+
+    class Metadata {
+        &#43;Fields map
+    }
+
+    A2AMessage &#34;1&#34; --&gt; &#34;0..*&#34; Part : contains
+    A2AMessage &#34;1&#34; --&gt; &#34;1&#34; EventMetadata : routed_with
+    A2AMessage &#34;1&#34; --&gt; &#34;1&#34; Role : has
+    A2AMessage &#34;1&#34; --&gt; &#34;0..1&#34; Metadata : includes</pre>
+<h3 id="event-driven-architecture">Event-Driven Architecture<a class="td-heading-self-link" href="#event-driven-architecture" aria-label="Heading self-link"></a></h3>
+<p>The system implements pure event-driven architecture:</p>
+<ol>
+<li><strong>Publishers</strong> emit A2A-compliant events</li>
+<li><strong>Broker</strong> routes events based on metadata</li>
+<li><strong>Subscribers</strong> receive relevant events</li>
+<li><strong>Correlation</strong> through ContextId maintains conversation flow</li>
+</ol>
+<h2 id="observability-integration">Observability Integration<a class="td-heading-self-link" href="#observability-integration" aria-label="Heading self-link"></a></h2>
+<h3 id="distributed-tracing">Distributed Tracing<a class="td-heading-self-link" href="#distributed-tracing" aria-label="Heading self-link"></a></h3>
+<pre class="mermaid">sequenceDiagram
+    participant A as Agent A
+    participant B as Broker
+    participant AB as Agent B
+    participant OTLP as OTLP Collector
+    participant J as Jaeger
+
+    A-&gt;&gt;&#43;B: PublishMessage&lt;br/&gt;[trace_id: 123]
+    B-&gt;&gt;B: Create A2A spans&lt;br/&gt;with structured attributes
+    B-&gt;&gt;&#43;AB: RouteEvent&lt;br/&gt;[trace_id: 123]
+    AB-&gt;&gt;AB: Process with&lt;br/&gt;child spans
+    AB-&gt;&gt;-B: PublishResponse&lt;br/&gt;[trace_id: 123]
+    B-&gt;&gt;-A: Success&lt;br/&gt;[trace_id: 123]
+
+    par Observability Export
+        B-&gt;&gt;OTLP: Export spans&lt;br/&gt;with A2A attributes
+        OTLP-&gt;&gt;J: Store traces
+        J-&gt;&gt;J: Build trace timeline&lt;br/&gt;with correlation
+    end
+
+    Note over A, J: End-to-end tracing&lt;br/&gt;with A2A protocol visibility</pre>
+<h3 id="structured-attributes">Structured Attributes<a class="td-heading-self-link" href="#structured-attributes" aria-label="Heading self-link"></a></h3>
+<p>Each span includes A2A-specific attributes:</p>
+<ul>
+<li><code>a2a.message.id</code></li>
+<li><code>a2a.message.role</code></li>
+<li><code>a2a.context.id</code></li>
+<li><code>a2a.event.type</code></li>
+<li><code>a2a.routing.from_agent</code></li>
+<li><code>a2a.routing.to_agent</code></li>
+</ul>
+<h2 id="testing-strategy">Testing Strategy<a class="td-heading-self-link" href="#testing-strategy" aria-label="Heading self-link"></a></h2>
+<h3 id="unit-testing-domain-core">Unit Testing (Domain Core)<a class="td-heading-self-link" href="#unit-testing-domain-core" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">TestA2AEngine_ValidateMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">t</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">testing</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">engine</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">NewA2AProtocolEngine</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Test A2A compliance
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">msg</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">Message</span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">MessageId</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;test_msg_123&#34;</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">Role</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">ROLE_USER</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">Content</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">[]</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">Part</span><span style="color:#000;font-weight:bold">{{</span><span style="color:#000">Text</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;hello&#34;</span><span style="color:#000;font-weight:bold">}},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">engine</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ValidateMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">msg</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">assert</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NoError</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">t</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h3 id="integration-testing-adapters">Integration Testing (Adapters)<a class="td-heading-self-link" href="#integration-testing-adapters" aria-label="Heading self-link"></a></h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">TestGrpcAdapter_PublishMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">t</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">testing</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Mock domain dependencies
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">mockEngine</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">MockA2AEngine</span><span style="color:#000;font-weight:bold">{}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">mockRouter</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">MockEventRouter</span><span style="color:#000;font-weight:bold">{}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">adapter</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">NewGrpcAdapter</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">mockEngine</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">mockRouter</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Test adapter behavior
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">resp</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">adapter</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PublishMessage</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ctx</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">validRequest</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">assert</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">NoError</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">t</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">err</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">assert</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">True</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">t</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">resp</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Success</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="conclusion">Conclusion<a class="td-heading-self-link" href="#conclusion" aria-label="Heading self-link"></a></h2>
+<p>AgentHub&rsquo;s hexagonal architecture with A2A protocol provides:</p>
+<ol>
+<li><strong>Clean Architecture</strong>: Separation of concerns with domain-driven design</li>
+<li><strong>A2A Compliance</strong>: Full protocol implementation with validation</li>
+<li><strong>Event-Driven Design</strong>: Scalable, loosely-coupled communication</li>
+<li><strong>Rich Observability</strong>: Comprehensive tracing and metrics</li>
+<li><strong>Testability</strong>: Clean interfaces enable thorough testing</li>
+<li><strong>Flexibility</strong>: Easy to extend with new adapters and protocols</li>
+</ol>
+<p>This architecture ensures maintainable, scalable, and observable agent communication while maintaining strict A2A protocol compliance.</p>
+
+	<style>
+  .feedback--answer {
+    display: inline-block;
+  }
+  .feedback--answer-no {
+    margin-left: 1em;
+  }
+  .feedback--response {
+    display: none;
+    margin-top: 1em;
+  }
+  .feedback--response__visible {
+    display: block;
+  }
+</style>
+<div class="d-print-none">
+<h2 class="feedback--title">Feedback</h2>
+<p class="feedback--question">Was this page helpful?</p>
+<button class="btn btn-primary mb-4 feedback--answer feedback--answer-yes">Yes</button>
+<button class="btn btn-primary mb-4 feedback--answer feedback--answer-no">No</button>
+<p class="feedback--response feedback--response-yes">
+  Glad to hear it! Please <a href="https://github.com/owulveryck/agenthub/issues/new">tell us how we can improve</a>.
+</p>
+<p class="feedback--response feedback--response-no">
+  Sorry to hear that. Please <a href="https://github.com/owulveryck/agenthub/issues/new">tell us how we can improve</a>.
+</p>
+</div>
+<script>
+  const yesButton = document.querySelector('.feedback--answer-yes');
+  const noButton = document.querySelector('.feedback--answer-no');
+  const yesResponse = document.querySelector('.feedback--response-yes');
+  const noResponse = document.querySelector('.feedback--response-no');
+  const disableButtons = () => {
+    yesButton.disabled = true;
+    noButton.disabled = true;
+  };
+  const sendFeedback = (value) => {
+    if (typeof gtag !== 'function') return;
+    gtag('event', 'page_helpful', {
+      'event_category': 'Helpful',
+      'event_label': window.location.pathname,
+      'value': value
+    });
+  };
+  yesButton.addEventListener('click', () => {
+    yesResponse.classList.add('feedback--response__visible');
+    disableButtons();
+    sendFeedback( 100 );
+  });
+  noButton.addEventListener('click', () => {
+    noResponse.classList.add('feedback--response__visible');
+    disableButtons();
+    sendFeedback(0);
+  });
+</script>
+<br />
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub Issues" aria-label="GitHub Issues">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub/issues" aria-label="GitHub Issues">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/owulveryck/agenthub" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2023&ndash;2025
+    <span class="td-footer__authors">Olivier Wulveryck | <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a> |</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><span class="ms-2"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script type="module" async>
+  import mermaid from "https:\/\/cdn.jsdelivr.net\/npm\/mermaid@latest\/dist\/mermaid.esm.min.mjs";
+
+  (function ($) {
+    if ($('.mermaid').length == 0) {
+      mermaid.initialize({ startOnLoad: false });
+      return;
+    }
+
+    var params = {};
+
+    
+    
+    var norm = function (defaultConfig, params) {
+      var result = {};
+      for (const key in defaultConfig) {
+        const keyLower = key.toLowerCase();
+        if (defaultConfig.hasOwnProperty(key) && params.hasOwnProperty(keyLower)) {
+          if (typeof defaultConfig[key] === "object") {
+            result[key] = norm(defaultConfig[key], params[keyLower]);
+          } else {
+            result[key] = params[keyLower];
+          }
+        }
+      }
+      return result;
+    };
+
+    var settings = norm(mermaid.mermaidAPI.defaultConfig, params);
+    settings.startOnLoad = true;
+    if ($('html[data-bs-theme="dark"]').length) {
+      settings.theme = 'dark';
+    }
+    mermaid.initialize(settings);
+
+    
+    const lightDarkModeThemeChangeHandler = function (mutationsList, observer) {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-bs-theme') {
+          
+          
+          
+          location.reload();
+        }
+      }
+    };
+
+    const observer = new MutationObserver(lightDarkModeThemeChangeHandler);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-bs-theme']
+    });
+    
+
+  })(jQuery);
+</script>
+<script src="/agenthub/js/main.js"></script>
+<script defer src="/agenthub/js/click-to-copy.js" crossorigin="anonymous"></script>
+<script src='/agenthub/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
