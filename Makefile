@@ -26,6 +26,7 @@ CHAT_REPL_BINARY := chat_repl
 CHAT_CLI_BINARY := chat_cli
 ECHO_AGENT_BINARY := echo_agent
 CORTEX_BINARY := cortex
+DEMO_WEB_BINARY := demo_web
 
 # Go compiler flags
 GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller binaries
@@ -34,7 +35,7 @@ GO_BUILD_FLAGS := -ldflags="-s -w" # Strip symbols and debug info for smaller bi
 # Targets
 # ==============================================================================
 
-.PHONY: all proto build build-broker build-agents run-server run-publisher run-subscriber run-chat-responder run-chat-repl run-chat-cli run-echo-agent run-cortex clean help
+.PHONY: all proto build build-broker build-agents run-server run-publisher run-subscriber run-chat-responder run-chat-repl run-chat-cli run-echo-agent run-cortex run-demo-web clean help
 
 all: build
 
@@ -106,6 +107,10 @@ build-agents: proto
 	go build $(GO_BUILD_FLAGS) -o bin/$(CORTEX_BINARY) agents/cortex/cmd/main.go
 	@echo "  ✓ Cortex built: bin/$(CORTEX_BINARY)"
 
+	@echo "  Building demo_web..."
+	go build $(GO_BUILD_FLAGS) -o bin/$(DEMO_WEB_BINARY) ./agents/demo_web
+	@echo "  ✓ Demo web built: bin/$(DEMO_WEB_BINARY)"
+
 	@echo "All agents built successfully."
 
 # Target to run the event bus server
@@ -148,6 +153,11 @@ run-cortex:
 	@echo "Starting Cortex Orchestrator..."
 	go run agents/cortex/cmd/main.go
 
+# Target to run the web demo (starts broker, cortex, echo_agent + web UI)
+run-demo-web:
+	@echo "Starting Web Demo..."
+	go run ./agents/demo_web
+
 # Target to clean up generated files and binaries
 clean:
 	@echo "Cleaning up generated files and binaries..."
@@ -180,6 +190,7 @@ help:
 	@echo "  run-chat-cli         Runs the chat CLI agent."
 	@echo "  run-echo-agent       Runs the echo agent."
 	@echo "  run-cortex           Runs the Cortex orchestrator (uses VertexAI if configured)."
+	@echo "  run-demo-web         Runs the web demo (broker + cortex + echo_agent + web UI on :8090)."
 	@echo ""
 	@echo "Utility Targets:"
 	@echo "  clean                Removes generated Go files and build artifacts."
