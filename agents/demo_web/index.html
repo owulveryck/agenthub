@@ -421,7 +421,7 @@
       </div>
     </div>
     <div id="diagram-container">
-      <svg id="diagram" viewBox="0 0 1000 470" preserveAspectRatio="xMidYMid meet">
+      <svg id="diagram" viewBox="0 0 880 330" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="4" result="b"/>
@@ -461,10 +461,10 @@
   /* ── Node data model (single source of truth) ── */
   var SHADOW_DX = 5, SHADOW_DY = 5;
   var nodeData = {
-    chat:   { x: 50,  y: 100, w: 165, h: 80,  rx: 10, label: 'You',           sub: 'Chat Client',  staticSub: null,       hasWorking: false },
-    broker: { x: 335, y: 85,  w: 210, h: 110, rx: 12, label: 'Broker',         sub: '',             staticSub: 'Event Bus', hasWorking: false },
-    cortex: { x: 670, y: 25,  w: 190, h: 80,  rx: 10, label: 'Cortex',         sub: 'Orchestrator', staticSub: null,       hasWorking: true },
-    echo:   { x: 670, y: 175, w: 190, h: 80,  rx: 10, label: 'Echo Agent',     sub: 'Task Worker',  staticSub: null,       hasWorking: true }
+    chat:   { x: 50,  y: 75,  w: 150, h: 70,  rx: 10, label: 'You',           sub: 'Chat Client',  staticSub: null,       hasWorking: false },
+    broker: { x: 310, y: 55,  w: 190, h: 100, rx: 12, label: 'Broker',         sub: '',             staticSub: 'Event Bus', hasWorking: false },
+    cortex: { x: 600, y: 10,  w: 175, h: 65,  rx: 10, label: 'Cortex',         sub: 'Orchestrator', staticSub: null,       hasWorking: true },
+    echo:   { x: 600, y: 90,  w: 175, h: 65,  rx: 10, label: 'Echo Agent',     sub: 'Task Worker',  staticSub: null,       hasWorking: true }
   };
 
   var edgeTopology = [
@@ -1226,7 +1226,7 @@
   var mp3Running = false;
   var mp3ToggleBtn = document.getElementById('mp3-toggle-btn');
 
-  var mp3NodeDef = { x: 670, y: 270, w: 190, h: 80, rx: 10, label: 'Audio Analyzer', sub: 'Task Worker', staticSub: null, hasWorking: true };
+  var mp3NodeDef = { x: 600, y: 170, w: 175, h: 65, rx: 10, label: 'Audio Analyzer', sub: 'Task Worker', staticSub: null, hasWorking: true };
 
   function addMp3Node() {
     nodeData.mp3 = { x: mp3NodeDef.x, y: mp3NodeDef.y, w: mp3NodeDef.w, h: mp3NodeDef.h, rx: mp3NodeDef.rx, label: mp3NodeDef.label, sub: mp3NodeDef.sub, staticSub: mp3NodeDef.staticSub, hasWorking: mp3NodeDef.hasWorking };
@@ -1306,7 +1306,7 @@
   var summaryRunning = false;
   var summaryToggleBtn = document.getElementById('summary-toggle-btn');
 
-  var summaryNodeDef = { x: 670, y: 365, w: 190, h: 80, rx: 10, label: 'Summary Gen', sub: 'Task Worker', staticSub: null, hasWorking: true };
+  var summaryNodeDef = { x: 600, y: 250, w: 175, h: 65, rx: 10, label: 'Summary Gen', sub: 'Task Worker', staticSub: null, hasWorking: true };
 
   function addSummaryNode() {
     nodeData.summary = { x: summaryNodeDef.x, y: summaryNodeDef.y, w: summaryNodeDef.w, h: summaryNodeDef.h, rx: summaryNodeDef.rx, label: summaryNodeDef.label, sub: summaryNodeDef.sub, staticSub: summaryNodeDef.staticSub, hasWorking: summaryNodeDef.hasWorking };
