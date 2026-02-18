@@ -67,9 +67,12 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", hub.ServeWS)
 	mux.HandleFunc("/upload", handleUpload(logger))
-	mux.HandleFunc("/agent/mp3/start", handleAgentStart(pm, ctx))
-	mux.HandleFunc("/agent/mp3/stop", handleAgentStop(pm))
-	mux.HandleFunc("/agent/mp3/status", handleAgentStatus(pm))
+	mux.HandleFunc("/agent/mp3/start", handleAgentStart(pm, ctx, Mp3AgentSpec))
+	mux.HandleFunc("/agent/mp3/stop", handleAgentStop(pm, "mp3_agent"))
+	mux.HandleFunc("/agent/mp3/status", handleAgentStatus(pm, "mp3_agent"))
+	mux.HandleFunc("/agent/summary/start", handleAgentStart(pm, ctx, SummaryAgentSpec))
+	mux.HandleFunc("/agent/summary/stop", handleAgentStop(pm, "summary_agent"))
+	mux.HandleFunc("/agent/summary/status", handleAgentStatus(pm, "summary_agent"))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data, err := staticFS.ReadFile("index.html")
 		if err != nil {
@@ -158,13 +161,13 @@ func handleUpload(logger *slog.Logger) http.HandlerFunc {
 	}
 }
 
-func handleAgentStart(pm *ProcessManager, ctx context.Context) http.HandlerFunc {
+func handleAgentStart(pm *ProcessManager, ctx context.Context, spec ProcessSpec) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		if err := pm.StartAgent(ctx, Mp3AgentSpec); err != nil {
+		if err := pm.StartAgent(ctx, spec); err != nil {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
 		}
@@ -173,13 +176,13 @@ func handleAgentStart(pm *ProcessManager, ctx context.Context) http.HandlerFunc 
 	}
 }
 
-func handleAgentStop(pm *ProcessManager) http.HandlerFunc {
+func handleAgentStop(pm *ProcessManager, agentName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		if err := pm.StopAgent("mp3_agent"); err != nil {
+		if err := pm.StopAgent(agentName); err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
@@ -188,13 +191,13 @@ func handleAgentStop(pm *ProcessManager) http.HandlerFunc {
 	}
 }
 
-func handleAgentStatus(pm *ProcessManager) http.HandlerFunc {
+func handleAgentStatus(pm *ProcessManager, agentName string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]bool{"running": pm.IsRunning("mp3_agent")})
+		json.NewEncoder(w).Encode(map[string]bool{"running": pm.IsRunning(agentName)})
 	}
 }

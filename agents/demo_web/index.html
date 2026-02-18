@@ -158,6 +158,25 @@
     box-shadow: 1px 1px 0px 0px var(--primary);
   }
   #mp3-toggle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  #summary-toggle-btn {
+    background: var(--surface);
+    border: var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px 0px var(--primary);
+    transition: transform 0.1s, box-shadow 0.1s;
+    white-space: nowrap;
+  }
+  #summary-toggle-btn:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px 0px var(--primary);
+  }
+  #summary-toggle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .msg { padding: 3px 0; word-wrap: break-word; }
   .msg-user { color: var(--primary); font-weight: 500; }
@@ -393,6 +412,7 @@
       <span class="panel-title">Architecture<span class="dot-accent">.</span></span>
       <div class="panel-right">
         <button id="mp3-toggle-btn">Start Audio Agent</button>
+        <button id="summary-toggle-btn">Start Summary Agent</button>
         <div class="obs-links">
           <a href="http://localhost:16686" target="_blank">Jaeger</a>
           <a href="http://localhost:3333" target="_blank">Grafana</a>
@@ -401,7 +421,7 @@
       </div>
     </div>
     <div id="diagram-container">
-      <svg id="diagram" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">
+      <svg id="diagram" viewBox="0 0 1000 470" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="4" result="b"/>
@@ -686,6 +706,7 @@
     if (n.indexOf('cortex') >= 0) return 'cortex';
     if (n.indexOf('mp3') >= 0) return 'mp3';
     if (n.indexOf('echo') >= 0) return 'echo';
+    if (n.indexOf('summary') >= 0) return 'summary';
     return null;
   }
 
@@ -800,6 +821,7 @@
     if (source === 'cortex') return 'cortex';
     if (source === 'echo_agent') return 'echo';
     if (source === 'mp3_agent') return 'mp3';
+    if (source === 'summary_agent') return 'summary';
     return null;
   }
 
@@ -1041,6 +1063,27 @@
           output_modes: ['text/plain']
         }
       ]
+    },
+    summary: {
+      name: 'Summary Generator',
+      description: 'Generates structured meeting summaries from transcriptions using generative AI',
+      version: '1.0.0',
+      protocol_version: '0.2.1',
+      url: 'grpc://localhost:50051',
+      preferred_transport: 'grpc',
+      provider: { organization: 'OCTO Technology', url: 'https://octo.com' },
+      capabilities: { streaming: false, push_notifications: false },
+      skills: [
+        {
+          id: 'generate_summary',
+          name: 'Generate Summary',
+          description: 'Takes a transcription text and produces a structured meeting summary with key topics, decisions, and action items',
+          tags: ['ai', 'summary', 'meeting'],
+          examples: ['Summarize this transcription'],
+          input_modes: ['text/plain'],
+          output_modes: ['text/plain']
+        }
+      ]
     }
   };
   var tooltip = document.getElementById('agent-tooltip');
@@ -1258,6 +1301,85 @@
   }
 
   mp3ToggleBtn.addEventListener('click', toggleMp3Agent);
+
+  /* ── Summary agent toggle ──────────────────────── */
+  var summaryRunning = false;
+  var summaryToggleBtn = document.getElementById('summary-toggle-btn');
+
+  var summaryNodeDef = { x: 670, y: 365, w: 190, h: 80, rx: 10, label: 'Summary Gen', sub: 'Task Worker', staticSub: null, hasWorking: true };
+
+  function addSummaryNode() {
+    nodeData.summary = { x: summaryNodeDef.x, y: summaryNodeDef.y, w: summaryNodeDef.w, h: summaryNodeDef.h, rx: summaryNodeDef.rx, label: summaryNodeDef.label, sub: summaryNodeDef.sub, staticSub: summaryNodeDef.staticSub, hasWorking: summaryNodeDef.hasWorking };
+    edgeTopology.push({ from: 'broker', to: 'summary' });
+    computeEdges();
+
+    // Render edge
+    var edgeDef = { from: 'broker', to: 'summary' };
+    var lineEl = renderEdge(edgeDef);
+    var firstNode = diagram.querySelector('g');
+    if (firstNode) {
+      diagram.insertBefore(lineEl, firstNode);
+    } else {
+      diagram.appendChild(lineEl);
+    }
+
+    // Render node
+    var g = renderNode('summary');
+    diagram.appendChild(g);
+
+    // Attach drag handlers
+    g.addEventListener('mousedown', function(e) { onNodeMouseDown('summary', e); });
+    g.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      var touch = e.touches[0];
+      var pos = svgPoint(touch);
+      var n = nodeData['summary'];
+      dragState = { nodeId: 'summary', offsetX: pos.x - n.x, offsetY: pos.y - n.y };
+      document.body.classList.add('dragging');
+      tooltip.style.display = 'none';
+    }, { passive: false });
+
+    // Attach tooltip handlers
+    g.addEventListener('mouseenter', function(e) { if (!dragState) showTooltip('summary', e); });
+    g.addEventListener('mousemove', function(e) { if (!dragState) positionTooltip(e); });
+    g.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
+
+    updateEdges();
+  }
+
+  function removeSummaryNode() {
+    var nodeEl = document.getElementById('node-summary');
+    if (nodeEl) nodeEl.remove();
+    var lineEl = document.getElementById('line-broker-summary');
+    if (lineEl) lineEl.remove();
+    delete nodeData.summary;
+    edgeTopology = edgeTopology.filter(function(e) { return !(e.from === 'broker' && e.to === 'summary'); });
+    computeEdges();
+  }
+
+  function toggleSummaryAgent() {
+    summaryToggleBtn.disabled = true;
+    summaryToggleBtn.textContent = summaryRunning ? 'Stopping...' : 'Starting...';
+
+    var url = summaryRunning ? '/agent/summary/stop' : '/agent/summary/start';
+    fetch(url, { method: 'POST' })
+      .then(function(resp) {
+        if (!resp.ok) throw new Error('Failed');
+        summaryRunning = !summaryRunning;
+        if (summaryRunning) {
+          addSummaryNode();
+        } else {
+          removeSummaryNode();
+        }
+        summaryToggleBtn.textContent = summaryRunning ? 'Stop Summary Agent' : 'Start Summary Agent';
+      })
+      .catch(function(err) {
+        summaryToggleBtn.textContent = summaryRunning ? 'Stop Summary Agent' : 'Start Summary Agent';
+      })
+      .finally(function() { summaryToggleBtn.disabled = false; });
+  }
+
+  summaryToggleBtn.addEventListener('click', toggleSummaryAgent);
 
   /* ── Initialize the diagram ──────────────────── */
   initDiagram();

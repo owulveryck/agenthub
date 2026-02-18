@@ -128,12 +128,42 @@ func IntelligentDecider() func(context.Context, []*pb.Message, map[string]*pb.Ag
 
 		// Check if this is a task result (from an agent)
 		if event.GetRole() == pb.Role_ROLE_AGENT && event.GetTaskId() != "" {
-			// This is a task result - synthesize final response with explanation
 			var resultText string
 			if len(event.Content) > 0 {
 				resultText = event.Content[0].GetText()
 			}
 
+			// Check if this is a transcription result and summary_agent is available
+			isTranscription := false
+			if event.GetMetadata() != nil && event.GetMetadata().GetFields() != nil {
+				if ct, ok := event.GetMetadata().GetFields()["content_type"]; ok {
+					isTranscription = ct.GetStringValue() == "transcription"
+				}
+			}
+
+			if isTranscription {
+				if _, hasSummary := agents["agent_summary"]; hasSummary {
+					return &Decision{
+						Reasoning: "Received transcription result. A summary agent is available, chaining to generate a meeting summary.",
+						Actions: []Action{
+							{
+								Type:         "chat.response",
+								ResponseText: "Transcription complete. Generating a summary...",
+							},
+							{
+								Type:        "task.request",
+								TaskType:    "Generate Summary",
+								TargetAgent: "agent_summary",
+								TaskPayload: map[string]interface{}{
+									"input": resultText,
+								},
+							},
+						},
+					}, nil
+				}
+			}
+
+			// No chaining — synthesize final response
 			return &Decision{
 				Reasoning: fmt.Sprintf("Received task result. The agent completed the requested task and returned: '%s'. I'm now synthesizing this result into a user-friendly response.", resultText),
 				Actions: []Action{

@@ -28,6 +28,14 @@ var Mp3AgentSpec = ProcessSpec{
 	Delay:  0,
 }
 
+// SummaryAgentSpec is the spec for the summary_agent, available for dynamic start/stop.
+var SummaryAgentSpec = ProcessSpec{
+	Name:   "summary_agent",
+	Binary: "bin/summary_agent",
+	GoRun:  []string{"./agents/summary_agent"},
+	Delay:  0,
+}
+
 // ProcessManager starts, monitors, and stops child processes.
 type ProcessManager struct {
 	specs  []ProcessSpec

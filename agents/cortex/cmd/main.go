@@ -377,8 +377,8 @@ func handleTaskArtifactUpdate(ctx context.Context, client *agenthub.AgentHubClie
 		"artifact_name", artifact.GetName(),
 	)
 
-	// Notify Cortex about the artifact
-	cortexInstance.HandleTaskArtifact(ctx, taskID, contextID, artifact)
+	// Notify Cortex about the artifact — route through LLM decision pipeline
+	cortexInstance.HandleTaskArtifact(ctx, client.TraceManager, taskID, contextID, artifact)
 }
 
 // createLLMClient creates the LLM client based on configuration

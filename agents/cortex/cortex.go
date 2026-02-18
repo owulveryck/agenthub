@@ -570,14 +570,17 @@ func (c *Cortex) HandleTaskCompletion(ctx context.Context, taskID, contextID str
 	})
 }
 
-// HandleTaskArtifact processes task artifact notifications from delegated agents
-func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID string, artifact *pb.Artifact) {
+// HandleTaskArtifact processes task artifact notifications from delegated agents.
+// Instead of sending results directly to the user, it routes them through the
+// LLM decision pipeline so the LLM can decide whether to chain to another agent
+// (e.g., transcription -> summary) or respond to the user.
+func (c *Cortex) HandleTaskArtifact(ctx context.Context, traceManager *observability.TraceManager, taskID, contextID string, artifact *pb.Artifact) {
 	c.logger.DebugContext(ctx, "HandleTaskArtifact called",
 		"task_id", taskID,
 		"context_id", contextID,
 		"artifact_id", artifact.GetArtifactId())
 
-	var shouldRespond bool
+	var shouldRoute bool
 	var responseText string
 
 	// Use WithLock to ensure thread-safe state access
@@ -586,7 +589,6 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 		taskContext, pending := conversationState.PendingTasks[taskID]
 		if !pending {
 			c.logger.DebugContext(ctx, "Task not found in pending tasks", "task_id", taskID)
-			// Task not found or already processed
 			return nil
 		}
 
@@ -596,7 +598,7 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 		}
 		taskContext.Artifacts = append(taskContext.Artifacts, artifact)
 
-		// Extract text content from artifact for response
+		// Extract text content from artifact
 		var textParts []string
 		for _, part := range artifact.GetParts() {
 			if textPart := part.GetText(); textPart != "" {
@@ -607,88 +609,40 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, taskID, contextID strin
 		c.logger.DebugContext(ctx, "Extracted text parts from artifact",
 			"part_count", len(textParts))
 
-		// By default, send artifact results back to the user
 		if len(textParts) > 0 {
-			shouldRespond = true
+			shouldRoute = true
 			if artifact.GetName() != "" && artifact.GetDescription() != "" {
 				responseText = fmt.Sprintf("%s: %s", artifact.GetName(), strings.Join(textParts, "\n"))
 			} else {
 				responseText = strings.Join(textParts, "\n")
 			}
-			c.logger.DebugContext(ctx, "Will send response to user", "response_text", responseText)
+			c.logger.DebugContext(ctx, "Will route artifact through LLM", "response_text_length", len(responseText))
 		}
 
 		return nil
 	})
 
-	// Send response to user if we have content
-	if shouldRespond && responseText != "" {
-		c.logger.DebugContext(ctx, "Calling sendTaskResultToUser", "context_id", contextID)
-		c.sendTaskResultToUser(ctx, contextID, taskID, responseText)
+	// Route through LLM decision pipeline instead of directly sending to user
+	if shouldRoute && responseText != "" {
+		artifactMsg := &pb.Message{
+			MessageId: fmt.Sprintf("artifact_result_%d", time.Now().UnixNano()),
+			ContextId: contextID,
+			TaskId:    taskID,
+			Role:      pb.Role_ROLE_AGENT,
+			Content:   []*pb.Part{{Part: &pb.Part_Text{Text: responseText}}},
+			Metadata:  artifact.GetMetadata(),
+		}
+		c.logger.DebugContext(ctx, "Routing artifact through HandleMessage", "context_id", contextID)
+		if err := c.HandleMessage(ctx, traceManager, artifactMsg); err != nil {
+			c.logger.ErrorContext(ctx, "Failed to route artifact through LLM",
+				"error", err,
+				"task_id", taskID,
+				"context_id", contextID)
+		}
 	} else {
-		c.logger.DebugContext(ctx, "Not sending response",
-			"should_respond", shouldRespond,
+		c.logger.DebugContext(ctx, "No content to route",
+			"should_route", shouldRoute,
 			"has_text", responseText != "")
-	}
-}
-
-// sendTaskResultToUser sends task results back to the user
-func (c *Cortex) sendTaskResultToUser(ctx context.Context, contextID, taskID, resultText string) {
-	messageID := fmt.Sprintf("cortex_task_result_%d", time.Now().UnixNano())
-
-	c.logger.DebugContext(ctx, "sendTaskResultToUser called",
-		"message_id", messageID,
-		"context_id", contextID,
-		"task_id", taskID,
-		"response_text", resultText)
-
-	responseMsg := &pb.Message{
-		MessageId: messageID,
-		ContextId: contextID,
-		Role:      pb.Role_ROLE_AGENT,
-		Content: []*pb.Part{
-			{Part: &pb.Part_Text{Text: resultText}},
-		},
-		Metadata: &structpb.Struct{
-			Fields: map[string]*structpb.Value{
-				"task_type":  structpb.NewStringValue("task_result"),
-				"from_agent": structpb.NewStringValue(CortexAgentID),
-				"task_id":    structpb.NewStringValue(taskID),
-			},
-		},
-	}
-
-	// Update conversation state with the response
-	_ = c.stateManager.WithLock(contextID, func(conversationState *state.ConversationState) error {
-		conversationState.Messages = append(conversationState.Messages, responseMsg)
-		c.logger.DebugContext(ctx, "Added response to conversation history",
-			"total_messages", len(conversationState.Messages))
-		return nil
-	})
-
-	// Publish the response - broadcast to all message subscribers (including REPL)
-	routing := &pb.AgentEventMetadata{
-		FromAgentId: CortexAgentID,
-		// No ToAgentId - broadcast to all
-		EventType: "a2a.message.task_result",
-		Priority:  pb.Priority_PRIORITY_MEDIUM,
-	}
-
-	c.logger.DebugContext(ctx, "Publishing message",
-		"from_agent", routing.FromAgentId,
-		"event_type", routing.EventType)
-
-	err := c.messagePublisher.PublishMessage(ctx, responseMsg, routing)
-	if err != nil {
-		c.logger.ErrorContext(ctx, "Failed to publish task result to user",
-			"error", err,
-			"message_id", messageID,
-			"task_id", taskID)
-	} else {
-		c.logger.InfoContext(ctx, "Successfully published task result message",
-			"message_id", messageID,
-			"context_id", contextID,
-			"task_id", taskID)
 	}
 }
 

@@ -112,6 +112,7 @@ func mp3Handler(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Ar
 	}
 
 	// Optional Gemini transcription
+	var hasTranscription bool
 	gcpProject := os.Getenv("GCP_PROJECT")
 	if gcpProject != "" {
 		transcript, err := transcribeAudio(ctx, filePath, gcpProject)
@@ -122,15 +123,28 @@ func mp3Handler(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Ar
 			sb.WriteString("-------------\n")
 			sb.WriteString(transcript)
 			sb.WriteString("\n")
+			hasTranscription = true
 		}
 	}
 
 	resultText := sb.String()
 
+	artifactName := "audio_metadata"
+	artifactDesc := "Audio file metadata analysis"
+	metadataFields := map[string]*structpb.Value{
+		"file_path":    structpb.NewStringValue(filePath),
+		"processed_at": structpb.NewStringValue(time.Now().Format(time.RFC3339)),
+	}
+	if hasTranscription {
+		artifactName = "transcription"
+		artifactDesc = "Audio transcription with metadata"
+		metadataFields["content_type"] = structpb.NewStringValue("transcription")
+	}
+
 	artifact := &pb.Artifact{
 		ArtifactId:  fmt.Sprintf("audio_%s_%d", task.GetId(), time.Now().Unix()),
-		Name:        "audio_metadata",
-		Description: "Audio file metadata analysis",
+		Name:        artifactName,
+		Description: artifactDesc,
 		Parts: []*pb.Part{
 			{
 				Part: &pb.Part_Text{
@@ -139,10 +153,7 @@ func mp3Handler(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Ar
 			},
 		},
 		Metadata: &structpb.Struct{
-			Fields: map[string]*structpb.Value{
-				"file_path":    structpb.NewStringValue(filePath),
-				"processed_at": structpb.NewStringValue(time.Now().Format(time.RFC3339)),
-			},
+			Fields: metadataFields,
 		},
 	}
 
