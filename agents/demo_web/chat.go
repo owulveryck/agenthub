@@ -152,15 +152,36 @@ func (cc *ChatClient) receiveAgentEvents(ctx context.Context) {
 		}
 
 		info := &AgentCardInfo{
-			Name:        card.GetName(),
-			Description: card.GetDescription(),
-			Version:     card.GetVersion(),
+			Name:               card.GetName(),
+			Description:        card.GetDescription(),
+			Version:            card.GetVersion(),
+			ProtocolVersion:    card.GetProtocolVersion(),
+			URL:                card.GetUrl(),
+			PreferredTransport: card.GetPreferredTransport(),
+			DocumentationURL:   card.GetDocumentationUrl(),
+			IconURL:            card.GetIconUrl(),
+		}
+		if p := card.GetProvider(); p != nil {
+			info.Provider = &ProviderInfo{
+				Organization: p.GetOrganization(),
+				URL:          p.GetUrl(),
+			}
+		}
+		if c := card.GetCapabilities(); c != nil {
+			info.Capabilities = &CapabilitiesInfo{
+				Streaming:         c.GetStreaming(),
+				PushNotifications: c.GetPushNotifications(),
+			}
 		}
 		for _, s := range card.GetSkills() {
 			info.Skills = append(info.Skills, SkillInfo{
+				ID:          s.GetId(),
 				Name:        s.GetName(),
 				Description: s.GetDescription(),
 				Tags:        s.GetTags(),
+				Examples:    s.GetExamples(),
+				InputModes:  s.GetInputModes(),
+				OutputModes: s.GetOutputModes(),
 			})
 		}
 

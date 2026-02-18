@@ -101,7 +101,6 @@
   #diagram-panel {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
   #diagram-container {
     flex: 1;
@@ -109,10 +108,12 @@
     align-items: center;
     justify-content: center;
     padding: 10px 20px 0;
+    min-width: 0;
   }
   #diagram-container svg {
     width: 100%;
-    height: 100%;
+    height: auto;
+    max-height: 100%;
   }
   #event-feed {
     flex-shrink: 0;
@@ -170,25 +171,106 @@
     background: #1a2a4a;
     border: 1px solid #00D2DD;
     border-radius: 6px;
-    padding: 10px 14px;
+    padding: 12px 16px;
     color: #FFFFFF;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.5;
-    max-width: 320px;
+    max-width: 420px;
     pointer-events: none;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  #agent-tooltip .tt-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 2px;
   }
   #agent-tooltip .tt-name {
     color: #00D2DD;
     font-weight: bold;
     font-size: 14px;
-    margin-bottom: 4px;
   }
-  #agent-tooltip .tt-version { color: #6E7B9A; font-size: 11px; }
-  #agent-tooltip .tt-desc { margin: 4px 0 6px; color: #B7BDCC; }
-  #agent-tooltip .tt-skill { margin: 2px 0; }
-  #agent-tooltip .tt-skill-name { color: #00D2DD; }
+  #agent-tooltip .tt-version { color: #6E7B9A; font-size: 10px; }
+  #agent-tooltip .tt-proto { color: #586586; font-size: 10px; }
+  #agent-tooltip .tt-desc { margin: 4px 0 8px; color: #B7BDCC; }
+  #agent-tooltip .tt-section {
+    border-top: 1px solid #263967;
+    padding-top: 6px;
+    margin-top: 6px;
+  }
+  #agent-tooltip .tt-label {
+    color: #6E7B9A;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+  }
+  #agent-tooltip .tt-field {
+    margin: 2px 0;
+    color: #B7BDCC;
+  }
+  #agent-tooltip .tt-field-key {
+    color: #6E7B9A;
+  }
+  #agent-tooltip .tt-field-val {
+    color: #FFFFFF;
+  }
+  #agent-tooltip .tt-cap {
+    display: inline-block;
+    padding: 1px 6px;
+    margin: 1px 3px 1px 0;
+    border-radius: 3px;
+    font-size: 10px;
+    background: #263967;
+    color: #00D2DD;
+    border: 1px solid #3E4F78;
+  }
+  #agent-tooltip .tt-tag {
+    display: inline-block;
+    padding: 1px 5px;
+    margin: 1px 2px 1px 0;
+    border-radius: 3px;
+    font-size: 9px;
+    background: #0E2356;
+    color: #6E7B9A;
+    border: 1px solid #263967;
+  }
+  #agent-tooltip .tt-skill {
+    margin: 4px 0;
+    padding: 4px 6px;
+    background: #0E2356;
+    border-radius: 4px;
+    border: 1px solid #263967;
+  }
+  #agent-tooltip .tt-skill-name { color: #00D2DD; font-weight: bold; }
+  #agent-tooltip .tt-skill-desc { color: #B7BDCC; margin-top: 1px; }
+  #agent-tooltip .tt-skill-meta { margin-top: 2px; }
+  #agent-tooltip .tt-mode {
+    display: inline-block;
+    padding: 0 4px;
+    margin: 1px 2px 1px 0;
+    border-radius: 2px;
+    font-size: 9px;
+    background: #263967;
+    color: #9FA7BB;
+  }
+
+  /* ── Working indicator ───────────────────── */
+  @keyframes agent-working {
+    0%, 100% { stroke: #00D2DD; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(0,210,221,0.3)); }
+    50%      { stroke: #00D2DD; stroke-width: 3.5; filter: drop-shadow(0 0 12px rgba(0,210,221,0.7)); }
+  }
+  .node-working rect {
+    animation: agent-working 2s ease-in-out infinite;
+  }
+  .working-label {
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .node-working .working-label {
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -275,6 +357,8 @@
                 font-family="monospace">Cortex</text>
           <text id="sub-cortex" x="765" y="83" text-anchor="middle"
                 fill="#6E7B9A" font-size="10" font-family="monospace">Orchestrator</text>
+          <text class="working-label" x="765" y="98" text-anchor="middle"
+                fill="#00D2DD" font-size="9" font-family="monospace">processing...</text>
         </g>
 
         <g id="node-echo">
@@ -285,6 +369,8 @@
                 font-family="monospace">Echo Agent</text>
           <text id="sub-echo" x="765" y="233" text-anchor="middle"
                 fill="#6E7B9A" font-size="10" font-family="monospace">Task Worker</text>
+          <text class="working-label" x="765" y="248" text-anchor="middle"
+                fill="#00D2DD" font-size="9" font-family="monospace">processing...</text>
         </g>
 
         <g id="node-mp3">
@@ -295,12 +381,15 @@
                 font-family="monospace">Audio Analyzer</text>
           <text id="sub-mp3" x="765" y="328" text-anchor="middle"
                 fill="#6E7B9A" font-size="10" font-family="monospace">Task Worker</text>
+          <text class="working-label" x="765" y="343" text-anchor="middle"
+                fill="#00D2DD" font-size="9" font-family="monospace">processing...</text>
         </g>
       </svg>
     </div>
     <div id="event-feed"></div>
   </div>
 </div>
+<div id="agent-tooltip"></div>
 <script>
 (function() {
   var SVG_NS = 'http://www.w3.org/2000/svg';
@@ -377,7 +466,7 @@
             line.setAttribute('stroke', '#3E4F78');
             line.setAttribute('stroke-width', '2');
             line.setAttribute('marker-end', 'url(#arrow)');
-          }, 200);
+          }, 500);
         }
         if (cb) cb();
       }
@@ -395,7 +484,7 @@
     setTimeout(function() {
       rect.setAttribute('stroke', '#3E4F78');
       rect.setAttribute('stroke-width', nodeId === 'broker' ? '2.5' : '2');
-    }, durationMs || 1500);
+    }, durationMs || 2000);
   }
 
   function setNodeSubtext(nodeId, text) {
@@ -403,24 +492,41 @@
     if (el) el.textContent = text;
   }
 
+  /* ── Working state tracking ──────────────── */
+  var workingAgents = {};
+
+  function setNodeWorking(nodeId) {
+    var g = document.getElementById('node-' + nodeId);
+    if (!g) return;
+    g.classList.add('node-working');
+    workingAgents[nodeId] = true;
+  }
+
+  function clearNodeWorking(nodeId) {
+    var g = document.getElementById('node-' + nodeId);
+    if (!g) return;
+    g.classList.remove('node-working');
+    delete workingAgents[nodeId];
+  }
+
   /* ── Routing: multi-hop dot through broker ─── */
   function sendDotRoute(from, to) {
     if (!from || !to) return;
-    if (from === to) { highlightNode(from, 1000); return; }
+    if (from === to) { highlightNode(from, 2000); return; }
 
-    highlightNode(from, 1800);
+    highlightNode(from, 3000);
 
     if (from === 'broker') {
-      animateDot('broker', to, 500, function() { highlightNode(to, 1200); });
+      animateDot('broker', to, 1000, function() { highlightNode(to, 2000); });
     } else if (to === 'broker') {
-      animateDot(from, 'broker', 500, function() { highlightNode('broker', 1200); });
+      animateDot(from, 'broker', 1000, function() { highlightNode('broker', 2000); });
     } else {
       // Multi-hop: from → broker → to
-      animateDot(from, 'broker', 400, function() {
-        highlightNode('broker', 800);
+      animateDot(from, 'broker', 800, function() {
+        highlightNode('broker', 1500);
         setTimeout(function() {
-          animateDot('broker', to, 400, function() { highlightNode(to, 1200); });
-        }, 150);
+          animateDot('broker', to, 800, function() { highlightNode(to, 2000); });
+        }, 300);
       });
     }
   }
@@ -451,6 +557,15 @@
     addToFeed(msg);
     var node = sourceToNode(msg.source);
 
+    // Track working state on agent nodes
+    if (node && msg.content) {
+      if (msg.content.indexOf('Processing task') >= 0) {
+        setNodeWorking(node);
+      } else if (msg.content.indexOf('Task completed') >= 0 || msg.content.indexOf('Task failed') >= 0) {
+        clearNodeWorking(node);
+      }
+    }
+
     // Broker "Message received" with routing detail "from → to"
     if (msg.source === 'broker' && msg.content === 'Message received' && msg.detail) {
       var parts = msg.detail.split(' \u2192 ');
@@ -466,18 +581,18 @@
 
     // Broker "Message routed" — just flash broker
     if (msg.source === 'broker' && msg.content === 'Message routed') {
-      highlightNode('broker', 800);
+      highlightNode('broker', 1500);
       setNodeSubtext('broker', msg.detail || '');
       return;
     }
 
     // Broker registration events — flash broker
     if (msg.source === 'broker' && (msg.content === 'Agent registered' || msg.content === 'Agent connected')) {
-      highlightNode('broker', 1200);
+      highlightNode('broker', 2000);
       var registered = agentToNode(msg.detail);
       if (registered) {
-        animateDot(registered, 'broker', 500, function() {
-          highlightNode('broker', 800);
+        animateDot(registered, 'broker', 1000, function() {
+          highlightNode('broker', 1500);
         });
       }
       return;
@@ -485,7 +600,7 @@
 
     // Agent events — highlight the agent node
     if (node) {
-      highlightNode(node, 1200);
+      highlightNode(node, 2000);
       if (msg.icon === 'ok' || msg.icon === 'info') {
         setNodeSubtext(node, msg.content);
       }
@@ -579,25 +694,173 @@
 
   /* ── Agent card tooltips ────────────────────── */
   var agentCards = {
-    broker: { name: 'Broker', description: 'Central event bus for agent-to-agent communication', version: '1.0.0', skills: [] },
-    cortex: { name: 'Cortex', description: 'Orchestrator that analyzes user intent and dispatches tasks to agents', version: '1.0.0', skills: [] }
+    chat: {
+      name: 'You',
+      description: 'Chat client interface for interacting with AgentHub agents',
+      version: '1.0.0',
+      protocol_version: '0.2.1',
+      url: 'grpc://localhost:50051',
+      preferred_transport: 'grpc',
+      provider: { organization: 'OCTO Technology', url: 'https://octo.com' },
+      capabilities: { streaming: true, push_notifications: false },
+      skills: []
+    },
+    broker: {
+      name: 'Broker',
+      description: 'Central event bus for agent-to-agent communication',
+      version: '1.0.0',
+      protocol_version: '0.2.1',
+      url: 'grpc://localhost:50051',
+      preferred_transport: 'grpc',
+      provider: { organization: 'OCTO Technology', url: 'https://octo.com' },
+      capabilities: { streaming: true, push_notifications: true },
+      skills: []
+    },
+    cortex: {
+      name: 'Cortex',
+      description: 'Orchestrator that analyzes user intent and dispatches tasks to specialized agents',
+      version: '1.0.0',
+      protocol_version: '0.2.1',
+      url: 'grpc://localhost:50051',
+      preferred_transport: 'grpc',
+      provider: { organization: 'OCTO Technology', url: 'https://octo.com' },
+      capabilities: { streaming: true, push_notifications: false },
+      skills: [
+        {
+          id: 'intent_analysis',
+          name: 'Intent Analysis',
+          description: 'Analyzes user messages to determine intent and route to appropriate agent',
+          tags: ['nlp', 'routing', 'orchestration'],
+          examples: ['Analyze this audio file', 'Hello world'],
+          input_modes: ['text/plain'],
+          output_modes: ['text/plain']
+        }
+      ]
+    },
+    echo: {
+      name: 'Echo Agent',
+      description: 'Task worker that echoes back messages for testing and debugging',
+      version: '1.0.0',
+      protocol_version: '0.2.1',
+      url: 'grpc://localhost:50051',
+      preferred_transport: 'grpc',
+      provider: { organization: 'OCTO Technology', url: 'https://octo.com' },
+      capabilities: { streaming: false, push_notifications: false },
+      skills: [
+        {
+          id: 'echo',
+          name: 'Echo',
+          description: 'Echoes back any received message',
+          tags: ['debug', 'test'],
+          examples: ['Hello world'],
+          input_modes: ['text/plain'],
+          output_modes: ['text/plain']
+        }
+      ]
+    },
+    mp3: {
+      name: 'Audio Analyzer',
+      description: 'Task worker that analyzes audio files using AI',
+      version: '1.0.0',
+      protocol_version: '0.2.1',
+      url: 'grpc://localhost:50051',
+      preferred_transport: 'grpc',
+      provider: { organization: 'OCTO Technology', url: 'https://octo.com' },
+      capabilities: { streaming: false, push_notifications: false },
+      skills: [
+        {
+          id: 'audio_analysis',
+          name: 'Audio Analysis',
+          description: 'Analyzes MP3/M4A audio files and provides text summary',
+          tags: ['audio', 'ai', 'analysis'],
+          examples: ['Analyze this audio file: /path/to/file.mp3'],
+          input_modes: ['audio/mpeg', 'audio/mp4'],
+          output_modes: ['text/plain']
+        }
+      ]
+    }
   };
   var tooltip = document.getElementById('agent-tooltip');
 
   function showTooltip(nodeId, e) {
     var card = agentCards[nodeId];
     if (!card) return;
-    var html = '<div class="tt-name">' + escapeHtml(card.name) + '</div>';
+    var html = '';
+
+    // Header: name + version + protocol
+    html += '<div class="tt-header">';
+    html += '<span class="tt-name">' + escapeHtml(card.name) + '</span>';
     if (card.version) html += '<span class="tt-version">v' + escapeHtml(card.version) + '</span>';
+    if (card.protocol_version) html += '<span class="tt-proto">A2A ' + escapeHtml(card.protocol_version) + '</span>';
+    html += '</div>';
+
+    // Description
     html += '<div class="tt-desc">' + escapeHtml(card.description) + '</div>';
+
+    // Provider + transport
+    html += '<div class="tt-section">';
+    html += '<div class="tt-label">Agent Info</div>';
+    if (card.provider) {
+      html += '<div class="tt-field"><span class="tt-field-key">provider: </span><span class="tt-field-val">' + escapeHtml(card.provider.organization) + '</span></div>';
+    }
+    if (card.url) {
+      html += '<div class="tt-field"><span class="tt-field-key">url: </span><span class="tt-field-val">' + escapeHtml(card.url) + '</span></div>';
+    }
+    if (card.preferred_transport) {
+      html += '<div class="tt-field"><span class="tt-field-key">transport: </span><span class="tt-field-val">' + escapeHtml(card.preferred_transport) + '</span></div>';
+    }
+    html += '</div>';
+
+    // Capabilities
+    if (card.capabilities) {
+      html += '<div class="tt-section">';
+      html += '<div class="tt-label">Capabilities</div>';
+      html += '<div>';
+      if (card.capabilities.streaming) html += '<span class="tt-cap">streaming</span>';
+      if (card.capabilities.push_notifications) html += '<span class="tt-cap">push notifications</span>';
+      if (!card.capabilities.streaming && !card.capabilities.push_notifications) {
+        html += '<span style="color:#586586">none</span>';
+      }
+      html += '</div></div>';
+    }
+
+    // Skills
     if (card.skills && card.skills.length > 0) {
-      html += '<div style="margin-top:4px;font-size:11px;color:#6E7B9A">Skills:</div>';
+      html += '<div class="tt-section">';
+      html += '<div class="tt-label">Skills</div>';
       for (var i = 0; i < card.skills.length; i++) {
-        html += '<div class="tt-skill"><span class="tt-skill-name">' + escapeHtml(card.skills[i].name) + '</span>';
-        if (card.skills[i].description) html += ' — ' + escapeHtml(card.skills[i].description);
+        var s = card.skills[i];
+        html += '<div class="tt-skill">';
+        html += '<div><span class="tt-skill-name">' + escapeHtml(s.name) + '</span>';
+        if (s.id) html += ' <span style="color:#586586">(' + escapeHtml(s.id) + ')</span>';
+        html += '</div>';
+        if (s.description) html += '<div class="tt-skill-desc">' + escapeHtml(s.description) + '</div>';
+        if (s.tags && s.tags.length > 0) {
+          html += '<div class="tt-skill-meta">';
+          for (var t = 0; t < s.tags.length; t++) {
+            html += '<span class="tt-tag">' + escapeHtml(s.tags[t]) + '</span>';
+          }
+          html += '</div>';
+        }
+        if (s.input_modes && s.input_modes.length > 0) {
+          html += '<div class="tt-skill-meta"><span class="tt-field-key">in: </span>';
+          for (var m = 0; m < s.input_modes.length; m++) {
+            html += '<span class="tt-mode">' + escapeHtml(s.input_modes[m]) + '</span>';
+          }
+          html += '</div>';
+        }
+        if (s.output_modes && s.output_modes.length > 0) {
+          html += '<div class="tt-skill-meta"><span class="tt-field-key">out: </span>';
+          for (var o = 0; o < s.output_modes.length; o++) {
+            html += '<span class="tt-mode">' + escapeHtml(s.output_modes[o]) + '</span>';
+          }
+          html += '</div>';
+        }
         html += '</div>';
       }
+      html += '</div>';
     }
+
     tooltip.innerHTML = html;
     tooltip.style.display = 'block';
     positionTooltip(e);
@@ -617,9 +880,9 @@
     var g = document.getElementById('node-' + nid);
     if (!g) return;
     g.style.cursor = 'pointer';
-    g.addEventListener('mouseover', function(e) { showTooltip(nid, e); });
+    g.addEventListener('mouseenter', function(e) { showTooltip(nid, e); });
     g.addEventListener('mousemove', function(e) { positionTooltip(e); });
-    g.addEventListener('mouseout', function() { tooltip.style.display = 'none'; });
+    g.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
   });
 
   /* ── File upload ────────────────────────────── */
@@ -662,6 +925,5 @@
   });
 })();
 </script>
-<div id="agent-tooltip"></div>
 </body>
 </html>

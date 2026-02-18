@@ -32,17 +32,40 @@ type WSMessage struct {
 
 // AgentCardInfo carries A2A agent card data to the browser.
 type AgentCardInfo struct {
-	Name        string      `json:"name"`
-	Description string      `json:"description"`
-	Version     string      `json:"version"`
-	Skills      []SkillInfo `json:"skills"`
+	Name               string            `json:"name"`
+	Description        string            `json:"description"`
+	Version            string            `json:"version"`
+	ProtocolVersion    string            `json:"protocol_version,omitempty"`
+	URL                string            `json:"url,omitempty"`
+	PreferredTransport string            `json:"preferred_transport,omitempty"`
+	DocumentationURL   string            `json:"documentation_url,omitempty"`
+	IconURL            string            `json:"icon_url,omitempty"`
+	Provider           *ProviderInfo     `json:"provider,omitempty"`
+	Capabilities       *CapabilitiesInfo `json:"capabilities,omitempty"`
+	Skills             []SkillInfo       `json:"skills"`
+}
+
+// ProviderInfo describes the agent provider.
+type ProviderInfo struct {
+	Organization string `json:"organization"`
+	URL          string `json:"url,omitempty"`
+}
+
+// CapabilitiesInfo describes the agent capabilities.
+type CapabilitiesInfo struct {
+	Streaming         bool `json:"streaming"`
+	PushNotifications bool `json:"push_notifications"`
 }
 
 // SkillInfo describes a single agent skill.
 type SkillInfo struct {
+	ID          string   `json:"id,omitempty"`
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Tags        []string `json:"tags,omitempty"`
+	Examples    []string `json:"examples,omitempty"`
+	InputModes  []string `json:"input_modes,omitempty"`
+	OutputModes []string `json:"output_modes,omitempty"`
 }
 
 var upgrader = websocket.Upgrader{
