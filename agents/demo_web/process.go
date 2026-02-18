@@ -20,10 +20,20 @@ type ProcessSpec struct {
 	Delay  time.Duration // wait after start before launching the next process
 }
 
+// Mp3AgentSpec is the spec for the mp3_agent, available for dynamic start/stop.
+var Mp3AgentSpec = ProcessSpec{
+	Name:   "mp3_agent",
+	Binary: "bin/mp3_agent",
+	GoRun:  []string{"./agents/mp3_agent"},
+	Delay:  0,
+}
+
 // ProcessManager starts, monitors, and stops child processes.
 type ProcessManager struct {
 	specs  []ProcessSpec
+	mu     sync.Mutex
 	procs  []*managedProcess
+	env    []string
 	hub    *Hub
 	logger *slog.Logger
 }
@@ -54,12 +64,6 @@ func NewProcessManager(hub *Hub, logger *slog.Logger) *ProcessManager {
 			GoRun:  []string{"./agents/echo_agent"},
 			Delay:  1 * time.Second,
 		},
-		{
-			Name:   "mp3_agent",
-			Binary: "bin/mp3_agent",
-			GoRun:  []string{"./agents/mp3_agent"},
-			Delay:  1 * time.Second,
-		},
 	}
 	return &ProcessManager{
 		specs:  specs,
@@ -72,10 +76,10 @@ func NewProcessManager(hub *Hub, logger *slog.Logger) *ProcessManager {
 // It returns after all processes have been started.
 func (pm *ProcessManager) Start(ctx context.Context) error {
 	// Set common environment for child processes
-	env := os.Environ()
-	env = setEnv(env, "AGENTHUB_GRPC_PORT", "127.0.0.1:50051")
-	env = setEnv(env, "AGENTHUB_BROKER_ADDR", "127.0.0.1")
-	env = setEnv(env, "LOG_LEVEL", "DEBUG")
+	pm.env = os.Environ()
+	pm.env = setEnv(pm.env, "AGENTHUB_GRPC_PORT", "127.0.0.1:50051")
+	pm.env = setEnv(pm.env, "AGENTHUB_BROKER_ADDR", "127.0.0.1")
+	pm.env = setEnv(pm.env, "LOG_LEVEL", "DEBUG")
 
 	for _, spec := range pm.specs {
 		pm.hub.Broadcast(WSMessage{
@@ -85,7 +89,7 @@ func (pm *ProcessManager) Start(ctx context.Context) error {
 			Content: "Starting...",
 		})
 
-		cmd, err := pm.buildCmd(spec, env)
+		cmd, err := pm.buildCmd(spec, pm.env)
 		if err != nil {
 			return fmt.Errorf("failed to build command for %s: %w", spec.Name, err)
 		}
@@ -166,6 +170,123 @@ func (pm *ProcessManager) Shutdown() {
 			mp.cmd.Process.Kill()
 		}
 	}
+}
+
+// StartAgent dynamically starts a single agent process.
+func (pm *ProcessManager) StartAgent(ctx context.Context, spec ProcessSpec) error {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	for _, mp := range pm.procs {
+		if mp.spec.Name == spec.Name {
+			return fmt.Errorf("agent %s is already running", spec.Name)
+		}
+	}
+
+	pm.hub.Broadcast(WSMessage{
+		Type:    "event",
+		Source:  spec.Name,
+		Icon:    "info",
+		Content: "Starting...",
+	})
+
+	cmd, err := pm.buildCmd(spec, pm.env)
+	if err != nil {
+		return fmt.Errorf("failed to build command for %s: %w", spec.Name, err)
+	}
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("failed to get stdout pipe for %s: %w", spec.Name, err)
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to get stderr pipe for %s: %w", spec.Name, err)
+	}
+
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start %s: %w", spec.Name, err)
+	}
+
+	mp := &managedProcess{spec: spec, cmd: cmd}
+	pm.procs = append(pm.procs, mp)
+
+	go pm.streamOutput(spec.Name, stdout)
+	go pm.streamOutput(spec.Name, stderr)
+	go pm.monitorProcess(spec.Name, cmd)
+
+	pm.logger.Info("started child process", "name", spec.Name, "pid", cmd.Process.Pid)
+	pm.hub.Broadcast(WSMessage{
+		Type:    "event",
+		Source:  spec.Name,
+		Icon:    "ok",
+		Content: fmt.Sprintf("Started (PID %d)", cmd.Process.Pid),
+	})
+
+	return nil
+}
+
+// StopAgent stops a running agent by name.
+func (pm *ProcessManager) StopAgent(name string) error {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	const gracefulTimeout = 5 * time.Second
+
+	for i, mp := range pm.procs {
+		if mp.spec.Name != name {
+			continue
+		}
+		if mp.cmd.Process == nil {
+			pm.procs = append(pm.procs[:i], pm.procs[i+1:]...)
+			return nil
+		}
+
+		pm.logger.Info("stopping child process", "name", name, "pid", mp.cmd.Process.Pid)
+
+		if err := mp.cmd.Process.Signal(os.Interrupt); err != nil {
+			pm.logger.Warn("failed to send interrupt, killing", "name", name, "error", err)
+			mp.cmd.Process.Kill()
+			pm.procs = append(pm.procs[:i], pm.procs[i+1:]...)
+			return nil
+		}
+
+		done := make(chan error, 1)
+		go func() { done <- mp.cmd.Wait() }()
+
+		select {
+		case <-done:
+			pm.logger.Info("child process stopped", "name", name)
+		case <-time.After(gracefulTimeout):
+			pm.logger.Warn("child process did not stop gracefully, killing", "name", name)
+			mp.cmd.Process.Kill()
+		}
+
+		pm.procs = append(pm.procs[:i], pm.procs[i+1:]...)
+
+		pm.hub.Broadcast(WSMessage{
+			Type:    "event",
+			Source:  name,
+			Icon:    "info",
+			Content: "Stopped",
+		})
+		return nil
+	}
+
+	return fmt.Errorf("agent %s is not running", name)
+}
+
+// IsRunning checks if an agent with the given name is currently running.
+func (pm *ProcessManager) IsRunning(name string) bool {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	for _, mp := range pm.procs {
+		if mp.spec.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 func (pm *ProcessManager) buildCmd(spec ProcessSpec, env []string) (*exec.Cmd, error) {

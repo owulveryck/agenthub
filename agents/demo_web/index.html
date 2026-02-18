@@ -3,63 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgentHub Demo - OCTO</title>
+<title>AgentHub Demo - La Grosse Conf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /*
-   * OCTO Color System
-   * Marine #0E2356 | Turquoise #00D2DD | White #FFFFFF
+   * La Grosse Conf — Neo-Brutalist Style
+   * Primary #FF0F47 | Background #FFF0F5 | Text #232323 | Surface #FFFFFF
    */
+  :root {
+    --primary: #FF0F47;
+    --bg: #FFF0F5;
+    --text: #232323;
+    --surface: #FFFFFF;
+    --border: 1.5px solid #232323;
+    --muted: #888;
+    --shadow: 6px 6px 0px 0px var(--primary);
+    --shadow-sm: 4px 4px 0px 0px var(--primary);
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-    background: #0E2356;
-    color: #FFFFFF;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
     height: 100vh;
     overflow: hidden;
   }
   #layout {
     display: grid;
-    grid-template-rows: 35% 65%;
+    grid-template-rows: 1fr 2fr;
     height: 100vh;
+    padding: 16px;
+    gap: 16px;
   }
 
   /* ── Chat panel ─────────────────────────────── */
   #chat-panel {
     display: flex;
     flex-direction: column;
-    border-bottom: 2px solid #00D2DD;
+    background: var(--surface);
+    border: var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
   }
   .panel-header {
-    background: #3E4F78;
-    padding: 8px 14px;
+    background: var(--surface);
+    padding: 10px 14px;
     font-size: 13px;
-    font-weight: bold;
-    color: #FFFFFF;
-    border-bottom: 2px solid #00D2DD;
+    font-weight: 700;
+    color: var(--text);
+    border-bottom: var(--border);
     flex-shrink: 0;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 10px;
+    letter-spacing: 0.02em;
+  }
+  .window-controls {
+    display: flex;
+    gap: 6px;
+    margin-right: 4px;
+  }
+  .wdot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text);
+  }
+  .wdot.red { background: var(--primary); border: none; }
+  .wdot.empty { background: var(--surface); }
+  .panel-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
+  }
+  .panel-title .dot-accent { color: var(--primary); }
+  .panel-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   #chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 14px;
+    padding: 12px 16px;
     font-size: 14px;
     line-height: 1.6;
-    background: #0E2356;
+    background: var(--surface);
   }
   #chat-input-bar {
     display: flex;
-    border-top: 1px solid #3E4F78;
-    background: #263967;
+    border-top: var(--border);
+    background: var(--surface);
     flex-shrink: 0;
   }
   #chat-input-bar span {
     padding: 10px 4px 10px 14px;
-    color: #00D2DD;
+    color: var(--primary);
     font-size: 15px;
     font-weight: bold;
   }
@@ -68,39 +112,69 @@
     background: transparent;
     border: none;
     outline: none;
-    color: #FFFFFF;
+    color: var(--text);
     font-family: inherit;
     font-size: 14px;
     padding: 10px 6px;
   }
-  #chat-input::placeholder { color: #6E7B9A; }
+  #chat-input::placeholder { color: #aaa; }
   #upload-btn {
-    background: transparent;
-    border: 1px solid #00D2DD;
-    color: #00D2DD;
+    background: var(--primary);
+    border: var(--border);
+    color: #FFFFFF;
     font-family: inherit;
-    font-size: 13px;
-    padding: 6px 12px;
-    margin: 4px 8px 4px 0;
-    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    margin: 5px 8px 5px 0;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 3px 3px 0px 0px var(--text);
+    transition: transform 0.1s, box-shadow 0.1s;
     white-space: nowrap;
   }
-  #upload-btn:hover { background: #00D2DD22; }
+  #upload-btn:hover { opacity: 0.9; }
+  #upload-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px 0px var(--text);
+  }
   #file-input { display: none; }
+  #mp3-toggle-btn {
+    background: var(--surface);
+    border: var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px 0px var(--primary);
+    transition: transform 0.1s, box-shadow 0.1s;
+    white-space: nowrap;
+  }
+  #mp3-toggle-btn:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px 0px var(--primary);
+  }
+  #mp3-toggle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .msg { padding: 3px 0; word-wrap: break-word; }
-  .msg-user { color: #00D2DD; }
-  .msg-user::before { content: '> '; color: #00D2DD; }
-  .msg-agent { color: #FFFFFF; }
+  .msg-user { color: var(--primary); font-weight: 500; }
+  .msg-user::before { content: '> '; color: var(--primary); font-weight: 700; }
+  .msg-agent { color: var(--text); }
   .msg-agent::before { content: '\1F916 '; }
-  .msg-status { color: #9FA7BB; font-style: italic; }
+  .msg-status { color: var(--muted); font-style: italic; }
 
   /* ── Diagram panel ──────────────────────────── */
   #diagram-panel {
     display: flex;
     flex-direction: column;
+    background: var(--surface);
+    border: var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
   }
   #diagram-container {
     flex: 1;
@@ -119,32 +193,34 @@
     flex-shrink: 0;
     padding: 6px 14px;
     font-size: 11px;
-    color: #B7BDCC;
+    color: var(--muted);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-top: 1px solid #263967;
+    border-top: var(--border);
     min-height: 28px;
   }
-  #event-feed span { color: #6E7B9A; margin-right: 6px; }
+  #event-feed span { color: #aaa; margin-right: 6px; }
 
   /* ── Observability links ──────────────────────── */
-  .obs-links { display: flex; gap: 10px; }
+  .obs-links { display: flex; gap: 8px; }
   .obs-links a {
-    color: #00D2DD;
+    color: var(--text);
     text-decoration: none;
     font-size: 11px;
-    font-weight: normal;
+    font-weight: 500;
     text-transform: none;
     letter-spacing: 0;
-    padding: 2px 8px;
-    border: 1px solid #00D2DD33;
-    border-radius: 3px;
-    transition: background 0.2s, border-color 0.2s;
+    padding: 3px 10px;
+    border: var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    box-shadow: 2px 2px 0px 0px var(--primary);
+    transition: transform 0.1s, box-shadow 0.1s;
   }
   .obs-links a:hover {
-    background: #00D2DD22;
-    border-color: #00D2DD88;
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px 0px var(--primary);
   }
 
   /* ── Status indicator ───────────────────────── */
@@ -154,31 +230,31 @@
     border-radius: 50%;
     margin-right: 6px;
   }
-  #status-dot.connected    { background: #00D2DD; }
-  #status-dot.disconnected { background: #CFD3DD; }
-  #status-dot.connecting   { background: #6E7B9A; }
+  #status-dot.connected    { background: #22c55e; }
+  #status-dot.disconnected { background: #ccc; }
+  #status-dot.connecting   { background: #f59e0b; }
 
   /* ── Scrollbar ──────────────────────────────── */
   ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #0E2356; }
-  ::-webkit-scrollbar-thumb { background: #3E4F78; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #586586; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #bbb; }
 
   /* ── Agent tooltip ────────────────────────── */
   #agent-tooltip {
     display: none;
     position: fixed;
-    background: #1a2a4a;
-    border: 1px solid #00D2DD;
-    border-radius: 6px;
+    background: var(--surface);
+    border: var(--border);
+    border-radius: 12px;
     padding: 12px 16px;
-    color: #FFFFFF;
+    color: var(--text);
     font-size: 11px;
     line-height: 1.5;
     max-width: 420px;
     pointer-events: none;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    box-shadow: var(--shadow-sm);
   }
   #agent-tooltip .tt-header {
     display: flex;
@@ -187,81 +263,85 @@
     margin-bottom: 2px;
   }
   #agent-tooltip .tt-name {
-    color: #00D2DD;
-    font-weight: bold;
+    color: var(--primary);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
     font-size: 14px;
   }
-  #agent-tooltip .tt-version { color: #6E7B9A; font-size: 10px; }
-  #agent-tooltip .tt-proto { color: #586586; font-size: 10px; }
-  #agent-tooltip .tt-desc { margin: 4px 0 8px; color: #B7BDCC; }
+  #agent-tooltip .tt-version { color: var(--muted); font-size: 10px; }
+  #agent-tooltip .tt-proto { color: #aaa; font-size: 10px; }
+  #agent-tooltip .tt-desc { margin: 4px 0 8px; color: #555; }
   #agent-tooltip .tt-section {
-    border-top: 1px solid #263967;
+    border-top: 1px solid #eee;
     padding-top: 6px;
     margin-top: 6px;
   }
   #agent-tooltip .tt-label {
-    color: #6E7B9A;
+    color: var(--muted);
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 600;
     margin-bottom: 2px;
   }
   #agent-tooltip .tt-field {
     margin: 2px 0;
-    color: #B7BDCC;
+    color: #555;
   }
   #agent-tooltip .tt-field-key {
-    color: #6E7B9A;
+    color: var(--muted);
   }
   #agent-tooltip .tt-field-val {
-    color: #FFFFFF;
+    color: var(--text);
   }
   #agent-tooltip .tt-cap {
     display: inline-block;
     padding: 1px 6px;
     margin: 1px 3px 1px 0;
-    border-radius: 3px;
+    border-radius: 4px;
     font-size: 10px;
-    background: #263967;
-    color: #00D2DD;
-    border: 1px solid #3E4F78;
+    font-weight: 600;
+    background: #FFF0F5;
+    color: var(--primary);
+    border: 1px solid var(--primary);
   }
   #agent-tooltip .tt-tag {
     display: inline-block;
     padding: 1px 5px;
     margin: 1px 2px 1px 0;
-    border-radius: 3px;
+    border-radius: 4px;
     font-size: 9px;
-    background: #0E2356;
-    color: #6E7B9A;
-    border: 1px solid #263967;
+    background: #f5f5f5;
+    color: var(--muted);
+    border: 1px solid #ddd;
   }
   #agent-tooltip .tt-skill {
     margin: 4px 0;
-    padding: 4px 6px;
-    background: #0E2356;
-    border-radius: 4px;
-    border: 1px solid #263967;
+    padding: 6px 8px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #eee;
   }
-  #agent-tooltip .tt-skill-name { color: #00D2DD; font-weight: bold; }
-  #agent-tooltip .tt-skill-desc { color: #B7BDCC; margin-top: 1px; }
+  #agent-tooltip .tt-skill-name { color: var(--primary); font-weight: 700; }
+  #agent-tooltip .tt-skill-desc { color: #555; margin-top: 1px; }
   #agent-tooltip .tt-skill-meta { margin-top: 2px; }
   #agent-tooltip .tt-mode {
     display: inline-block;
     padding: 0 4px;
     margin: 1px 2px 1px 0;
-    border-radius: 2px;
+    border-radius: 3px;
     font-size: 9px;
-    background: #263967;
-    color: #9FA7BB;
+    background: #f0f0f0;
+    color: #666;
+    border: 1px solid #ddd;
   }
 
   /* ── Working indicator ───────────────────── */
   @keyframes agent-working {
-    0%, 100% { stroke: #00D2DD; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(0,210,221,0.3)); }
-    50%      { stroke: #00D2DD; stroke-width: 3.5; filter: drop-shadow(0 0 12px rgba(0,210,221,0.7)); }
+    0%, 100% { stroke: var(--primary); stroke-width: 3; filter: drop-shadow(0 0 3px rgba(255,15,71,0.3)); }
+    50%      { stroke: var(--primary); stroke-width: 3.5; filter: drop-shadow(0 0 8px rgba(255,15,71,0.6)); }
   }
-  .node-working rect {
+  .node-working rect.node-border {
     animation: agent-working 2s ease-in-out infinite;
   }
   .working-label {
@@ -271,6 +351,12 @@
   .node-working .working-label {
     opacity: 1;
   }
+
+  /* ── Draggable nodes ───────────────────────── */
+  .node-draggable { cursor: grab; }
+  .node-draggable:active { cursor: grabbing; }
+  body.dragging { cursor: grabbing !important; user-select: none; }
+  body.dragging .node-draggable { cursor: grabbing; }
 </style>
 </head>
 <body>
@@ -278,8 +364,15 @@
   <!-- Chat -->
   <div id="chat-panel">
     <div class="panel-header">
-      <span><span id="status-dot" class="connecting"></span>AgentHub Chat</span>
-      <span id="status-text" style="font-weight:normal;color:#9FA7BB">connecting...</span>
+      <div class="window-controls">
+        <span class="wdot red"></span>
+        <span class="wdot empty"></span>
+        <span class="wdot empty"></span>
+      </div>
+      <span class="panel-title"><span id="status-dot" class="connecting"></span>AgentHub Chat<span class="dot-accent">.</span></span>
+      <div class="panel-right">
+        <span id="status-text" style="font-weight:normal;color:#aaa;font-size:11px">connecting...</span>
+      </div>
     </div>
     <div id="chat-messages"></div>
     <div id="chat-input-bar">
@@ -292,98 +385,38 @@
   <!-- Diagram -->
   <div id="diagram-panel">
     <div class="panel-header">
-      <span>Architecture</span>
-      <div class="obs-links">
-        <a href="http://localhost:16686" target="_blank">Jaeger</a>
-        <a href="http://localhost:3333" target="_blank">Grafana</a>
-        <a href="http://localhost:9090" target="_blank">Prometheus</a>
+      <div class="window-controls">
+        <span class="wdot red"></span>
+        <span class="wdot empty"></span>
+        <span class="wdot empty"></span>
+      </div>
+      <span class="panel-title">Architecture<span class="dot-accent">.</span></span>
+      <div class="panel-right">
+        <button id="mp3-toggle-btn">Start Audio Agent</button>
+        <div class="obs-links">
+          <a href="http://localhost:16686" target="_blank">Jaeger</a>
+          <a href="http://localhost:3333" target="_blank">Grafana</a>
+          <a href="http://localhost:9090" target="_blank">Prometheus</a>
+        </div>
       </div>
     </div>
     <div id="diagram-container">
-      <svg id="diagram" viewBox="0 0 1000 370" preserveAspectRatio="xMidYMid meet">
+      <svg id="diagram" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="5" result="b"/>
+            <feGaussianBlur stdDeviation="4" result="b"/>
             <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
           <marker id="arrow" viewBox="0 0 10 6" refX="10" refY="3"
                   markerWidth="8" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0,0 L10,3 L0,6" fill="#3E4F78"/>
+            <path d="M0,0 L10,3 L0,6" fill="#ccc"/>
           </marker>
           <marker id="arrow-active" viewBox="0 0 10 6" refX="10" refY="3"
                   markerWidth="8" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0,0 L10,3 L0,6" fill="#00D2DD"/>
+            <path d="M0,0 L10,3 L0,6" fill="#FF0F47"/>
           </marker>
         </defs>
-
-        <!-- Connection lines -->
-        <line id="line-chat-broker"   x1="215" y1="140" x2="335" y2="140"
-              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
-        <line id="line-broker-cortex" x1="545" y1="110" x2="670" y2="65"
-              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
-        <line id="line-broker-echo"   x1="545" y1="170" x2="670" y2="215"
-              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
-        <line id="line-broker-mp3"   x1="500" y1="195" x2="670" y2="310"
-              stroke="#3E4F78" stroke-width="2" marker-end="url(#arrow)"/>
-
-        <!-- Nodes -->
-        <g id="node-chat">
-          <rect x="50" y="100" width="165" height="80" rx="10"
-                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
-          <text x="132" y="138" text-anchor="middle"
-                fill="#FFFFFF" font-size="16" font-weight="bold"
-                font-family="monospace">You</text>
-          <text id="sub-chat" x="132" y="158" text-anchor="middle"
-                fill="#6E7B9A" font-size="10" font-family="monospace">Chat Client</text>
-        </g>
-
-        <g id="node-broker">
-          <rect x="335" y="85" width="210" height="110" rx="12"
-                fill="#263967" stroke="#3E4F78" stroke-width="2.5"/>
-          <text x="440" y="130" text-anchor="middle"
-                fill="#FFFFFF" font-size="18" font-weight="bold"
-                font-family="monospace">Broker</text>
-          <text x="440" y="152" text-anchor="middle"
-                fill="#6E7B9A" font-size="11" font-family="monospace">Event Bus</text>
-          <text id="sub-broker" x="440" y="172" text-anchor="middle"
-                fill="#586586" font-size="9" font-family="monospace"></text>
-        </g>
-
-        <g id="node-cortex">
-          <rect x="670" y="25" width="190" height="80" rx="10"
-                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
-          <text x="765" y="63" text-anchor="middle"
-                fill="#FFFFFF" font-size="16" font-weight="bold"
-                font-family="monospace">Cortex</text>
-          <text id="sub-cortex" x="765" y="83" text-anchor="middle"
-                fill="#6E7B9A" font-size="10" font-family="monospace">Orchestrator</text>
-          <text class="working-label" x="765" y="98" text-anchor="middle"
-                fill="#00D2DD" font-size="9" font-family="monospace">processing...</text>
-        </g>
-
-        <g id="node-echo">
-          <rect x="670" y="175" width="190" height="80" rx="10"
-                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
-          <text x="765" y="213" text-anchor="middle"
-                fill="#FFFFFF" font-size="16" font-weight="bold"
-                font-family="monospace">Echo Agent</text>
-          <text id="sub-echo" x="765" y="233" text-anchor="middle"
-                fill="#6E7B9A" font-size="10" font-family="monospace">Task Worker</text>
-          <text class="working-label" x="765" y="248" text-anchor="middle"
-                fill="#00D2DD" font-size="9" font-family="monospace">processing...</text>
-        </g>
-
-        <g id="node-mp3">
-          <rect x="670" y="270" width="190" height="80" rx="10"
-                fill="#263967" stroke="#3E4F78" stroke-width="2"/>
-          <text x="765" y="308" text-anchor="middle"
-                fill="#FFFFFF" font-size="16" font-weight="bold"
-                font-family="monospace">Audio Analyzer</text>
-          <text id="sub-mp3" x="765" y="328" text-anchor="middle"
-                fill="#6E7B9A" font-size="10" font-family="monospace">Task Worker</text>
-          <text class="working-label" x="765" y="343" text-anchor="middle"
-                fill="#00D2DD" font-size="9" font-family="monospace">processing...</text>
-        </g>
+        <!-- Nodes and edges rendered by initDiagram() -->
       </svg>
     </div>
     <div id="event-feed"></div>
@@ -400,14 +433,244 @@
   var diagram = document.getElementById('diagram');
   var eventFeed = document.getElementById('event-feed');
 
-  /* ── Node and edge geometry ────────────────── */
-  // Edge endpoints (where dots enter/leave nodes)
-  var edges = {
-    'chat|broker':   { x1: 215, y1: 140, x2: 335, y2: 140 },
-    'broker|cortex': { x1: 545, y1: 110, x2: 670, y2: 65  },
-    'broker|echo':   { x1: 545, y1: 170, x2: 670, y2: 215 },
-    'broker|mp3':    { x1: 500, y1: 195, x2: 670, y2: 310 }
+  /* ── Theme colors (used in JS animations) ──── */
+  var COL_ACCENT  = '#FF0F47';
+  var COL_STROKE  = '#232323';
+  var COL_LINE    = '#ccc';
+
+  /* ── Node data model (single source of truth) ── */
+  var SHADOW_DX = 5, SHADOW_DY = 5;
+  var nodeData = {
+    chat:   { x: 50,  y: 100, w: 165, h: 80,  rx: 10, label: 'You',           sub: 'Chat Client',  staticSub: null,       hasWorking: false },
+    broker: { x: 335, y: 85,  w: 210, h: 110, rx: 12, label: 'Broker',         sub: '',             staticSub: 'Event Bus', hasWorking: false },
+    cortex: { x: 670, y: 25,  w: 190, h: 80,  rx: 10, label: 'Cortex',         sub: 'Orchestrator', staticSub: null,       hasWorking: true },
+    echo:   { x: 670, y: 175, w: 190, h: 80,  rx: 10, label: 'Echo Agent',     sub: 'Task Worker',  staticSub: null,       hasWorking: true }
   };
+
+  var edgeTopology = [
+    { from: 'chat',   to: 'broker' },
+    { from: 'broker', to: 'cortex' },
+    { from: 'broker', to: 'echo' }
+  ];
+
+  var edges = {};
+
+  function computeEdges() {
+    edges = {};
+    edgeTopology.forEach(function(edge) {
+      var f = nodeData[edge.from], t = nodeData[edge.to];
+      edges[edge.from + '|' + edge.to] = {
+        x1: f.x + f.w, y1: f.y + f.h / 2,
+        x2: t.x,       y2: t.y + t.h / 2
+      };
+    });
+  }
+
+  /* ── SVG rendering functions ─────────────────── */
+  function renderNode(id) {
+    var n = nodeData[id];
+    var g = document.createElementNS(SVG_NS, 'g');
+    g.setAttribute('id', 'node-' + id);
+    g.setAttribute('transform', 'translate(' + n.x + ',' + n.y + ')');
+    g.classList.add('node-draggable');
+
+    // Shadow rect
+    var shadow = document.createElementNS(SVG_NS, 'rect');
+    shadow.setAttribute('x', SHADOW_DX);
+    shadow.setAttribute('y', SHADOW_DY);
+    shadow.setAttribute('width', n.w);
+    shadow.setAttribute('height', n.h);
+    shadow.setAttribute('rx', n.rx);
+    shadow.setAttribute('fill', COL_ACCENT);
+    shadow.setAttribute('stroke', 'none');
+    g.appendChild(shadow);
+
+    // Border rect
+    var border = document.createElementNS(SVG_NS, 'rect');
+    border.setAttribute('class', 'node-border');
+    border.setAttribute('x', 0);
+    border.setAttribute('y', 0);
+    border.setAttribute('width', n.w);
+    border.setAttribute('height', n.h);
+    border.setAttribute('rx', n.rx);
+    border.setAttribute('fill', '#FFFFFF');
+    border.setAttribute('stroke', COL_STROKE);
+    border.setAttribute('stroke-width', '1.5');
+    g.appendChild(border);
+
+    // Label
+    var label = document.createElementNS(SVG_NS, 'text');
+    label.setAttribute('x', n.w / 2);
+    label.setAttribute('y', n.h * 0.45);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('fill', COL_STROKE);
+    label.setAttribute('font-size', n.h > 90 ? '18' : '16');
+    label.setAttribute('font-weight', 'bold');
+    label.setAttribute('font-family', "'Montserrat', sans-serif");
+    label.textContent = n.label;
+    g.appendChild(label);
+
+    // Static subtitle (e.g. "Event Bus" for broker — never changes)
+    if (n.staticSub) {
+      var st = document.createElementNS(SVG_NS, 'text');
+      st.setAttribute('x', n.w / 2);
+      st.setAttribute('y', n.h * 0.6);
+      st.setAttribute('text-anchor', 'middle');
+      st.setAttribute('fill', '#888');
+      st.setAttribute('font-size', '11');
+      st.setAttribute('font-family', "'Poppins', sans-serif");
+      st.textContent = n.staticSub;
+      g.appendChild(st);
+    }
+
+    // Dynamic subtitle (updated via setNodeSubtext)
+    var sub = document.createElementNS(SVG_NS, 'text');
+    sub.setAttribute('id', 'sub-' + id);
+    sub.setAttribute('x', n.w / 2);
+    sub.setAttribute('y', n.staticSub ? n.h * 0.78 : n.h * 0.7);
+    sub.setAttribute('text-anchor', 'middle');
+    sub.setAttribute('fill', n.staticSub ? '#aaa' : '#888');
+    sub.setAttribute('font-size', n.staticSub ? '9' : '10');
+    sub.setAttribute('font-family', "'Poppins', sans-serif");
+    sub.textContent = n.sub;
+    g.appendChild(sub);
+
+    // Working label
+    if (n.hasWorking) {
+      var work = document.createElementNS(SVG_NS, 'text');
+      work.setAttribute('class', 'working-label');
+      work.setAttribute('x', n.w / 2);
+      work.setAttribute('y', n.h * 0.9);
+      work.setAttribute('text-anchor', 'middle');
+      work.setAttribute('fill', COL_ACCENT);
+      work.setAttribute('font-size', '9');
+      work.setAttribute('font-family', "'Poppins', sans-serif");
+      work.textContent = 'processing...';
+      g.appendChild(work);
+    }
+
+    return g;
+  }
+
+  function renderEdge(edge) {
+    var f = nodeData[edge.from], t = nodeData[edge.to];
+    var line = document.createElementNS(SVG_NS, 'line');
+    var lineId = 'line-' + [edge.from, edge.to].sort().join('-');
+    line.setAttribute('id', lineId);
+    line.setAttribute('x1', f.x + f.w);
+    line.setAttribute('y1', f.y + f.h / 2);
+    line.setAttribute('x2', t.x);
+    line.setAttribute('y2', t.y + t.h / 2);
+    line.setAttribute('stroke', COL_LINE);
+    line.setAttribute('stroke-width', '2');
+    line.setAttribute('marker-end', 'url(#arrow)');
+    return line;
+  }
+
+  function updateEdges() {
+    computeEdges();
+    edgeTopology.forEach(function(edge) {
+      var f = nodeData[edge.from], t = nodeData[edge.to];
+      var lineId = 'line-' + [edge.from, edge.to].sort().join('-');
+      var line = document.getElementById(lineId);
+      if (line) {
+        line.setAttribute('x1', f.x + f.w);
+        line.setAttribute('y1', f.y + f.h / 2);
+        line.setAttribute('x2', t.x);
+        line.setAttribute('y2', t.y + t.h / 2);
+      }
+    });
+  }
+
+  /* ── Drag handling ───────────────────────────── */
+  var dragState = null;
+
+  function svgPoint(evt) {
+    var pt = diagram.createSVGPoint();
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+    return pt.matrixTransform(diagram.getScreenCTM().inverse());
+  }
+
+  function onNodeMouseDown(nodeId, evt) {
+    evt.preventDefault();
+    var pos = svgPoint(evt);
+    var n = nodeData[nodeId];
+    dragState = { nodeId: nodeId, offsetX: pos.x - n.x, offsetY: pos.y - n.y };
+    document.body.classList.add('dragging');
+    tooltip.style.display = 'none';
+  }
+
+  function onSvgMouseMove(evt) {
+    if (!dragState) return;
+    var pos = svgPoint(evt);
+    var n = nodeData[dragState.nodeId];
+    n.x = pos.x - dragState.offsetX;
+    n.y = pos.y - dragState.offsetY;
+    var g = document.getElementById('node-' + dragState.nodeId);
+    if (g) g.setAttribute('transform', 'translate(' + n.x + ',' + n.y + ')');
+    updateEdges();
+  }
+
+  function onMouseUp() {
+    if (!dragState) return;
+    dragState = null;
+    document.body.classList.remove('dragging');
+  }
+
+  /* ── Diagram initialization ──────────────────── */
+  function initDiagram() {
+    // Keep <defs>, remove everything else
+    var defs = diagram.querySelector('defs');
+    while (diagram.firstChild) diagram.removeChild(diagram.firstChild);
+    if (defs) diagram.appendChild(defs);
+
+    // Compute initial edges
+    computeEdges();
+
+    // Render edges first (behind nodes)
+    edgeTopology.forEach(function(edge) {
+      diagram.appendChild(renderEdge(edge));
+    });
+
+    // Render nodes
+    var ids = Object.keys(nodeData);
+    ids.forEach(function(id) {
+      var g = renderNode(id);
+      diagram.appendChild(g);
+
+      // Drag handlers (mouse)
+      g.addEventListener('mousedown', function(e) { onNodeMouseDown(id, e); });
+
+      // Drag handlers (touch)
+      g.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        var touch = e.touches[0];
+        var pos = svgPoint(touch);
+        var n = nodeData[id];
+        dragState = { nodeId: id, offsetX: pos.x - n.x, offsetY: pos.y - n.y };
+        document.body.classList.add('dragging');
+        tooltip.style.display = 'none';
+      }, { passive: false });
+
+      // Tooltip handlers
+      g.addEventListener('mouseenter', function(e) { if (!dragState) showTooltip(id, e); });
+      g.addEventListener('mousemove', function(e) { if (!dragState) positionTooltip(e); });
+      g.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
+    });
+
+    // SVG-level move handlers
+    diagram.addEventListener('mousemove', onSvgMouseMove);
+    diagram.addEventListener('touchmove', function(e) {
+      if (!dragState) return;
+      e.preventDefault();
+      onSvgMouseMove(e.touches[0]);
+    }, { passive: false });
+
+    // Global release handlers
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('touchend', onMouseUp);
+  }
 
   function getPath(from, to) {
     var k1 = from + '|' + to, k2 = to + '|' + from;
@@ -435,14 +698,14 @@
     var lineId = 'line-' + [from, to].sort().join('-');
     var line = document.getElementById(lineId);
     if (line) {
-      line.setAttribute('stroke', '#00D2DD');
+      line.setAttribute('stroke', COL_ACCENT);
       line.setAttribute('stroke-width', '3');
       line.setAttribute('marker-end', 'url(#arrow-active)');
     }
 
     var circle = document.createElementNS(SVG_NS, 'circle');
     circle.setAttribute('r', '7');
-    circle.setAttribute('fill', '#00D2DD');
+    circle.setAttribute('fill', COL_ACCENT);
     circle.setAttribute('filter', 'url(#glow)');
     circle.setAttribute('cx', p.sx);
     circle.setAttribute('cy', p.sy);
@@ -463,7 +726,7 @@
         // Reset line
         if (line) {
           setTimeout(function() {
-            line.setAttribute('stroke', '#3E4F78');
+            line.setAttribute('stroke', COL_LINE);
             line.setAttribute('stroke-width', '2');
             line.setAttribute('marker-end', 'url(#arrow)');
           }, 500);
@@ -477,13 +740,13 @@
   function highlightNode(nodeId, durationMs) {
     var g = document.getElementById('node-' + nodeId);
     if (!g) return;
-    var rect = g.querySelector('rect');
+    var rect = g.querySelector('rect.node-border');
     if (!rect) return;
-    rect.setAttribute('stroke', '#00D2DD');
+    rect.setAttribute('stroke', COL_ACCENT);
     rect.setAttribute('stroke-width', '3');
     setTimeout(function() {
-      rect.setAttribute('stroke', '#3E4F78');
-      rect.setAttribute('stroke-width', nodeId === 'broker' ? '2.5' : '2');
+      rect.setAttribute('stroke', COL_STROKE);
+      rect.setAttribute('stroke-width', '1.5');
     }, durationMs || 2000);
   }
 
@@ -819,7 +1082,7 @@
       if (card.capabilities.streaming) html += '<span class="tt-cap">streaming</span>';
       if (card.capabilities.push_notifications) html += '<span class="tt-cap">push notifications</span>';
       if (!card.capabilities.streaming && !card.capabilities.push_notifications) {
-        html += '<span style="color:#586586">none</span>';
+        html += '<span style="color:#aaa">none</span>';
       }
       html += '</div></div>';
     }
@@ -832,7 +1095,7 @@
         var s = card.skills[i];
         html += '<div class="tt-skill">';
         html += '<div><span class="tt-skill-name">' + escapeHtml(s.name) + '</span>';
-        if (s.id) html += ' <span style="color:#586586">(' + escapeHtml(s.id) + ')</span>';
+        if (s.id) html += ' <span style="color:#aaa">(' + escapeHtml(s.id) + ')</span>';
         html += '</div>';
         if (s.description) html += '<div class="tt-skill-desc">' + escapeHtml(s.description) + '</div>';
         if (s.tags && s.tags.length > 0) {
@@ -875,15 +1138,7 @@
     tooltip.style.top = y + 'px';
   }
 
-  var nodeIds = ['chat', 'broker', 'cortex', 'echo', 'mp3'];
-  nodeIds.forEach(function(nid) {
-    var g = document.getElementById('node-' + nid);
-    if (!g) return;
-    g.style.cursor = 'pointer';
-    g.addEventListener('mouseenter', function(e) { showTooltip(nid, e); });
-    g.addEventListener('mousemove', function(e) { positionTooltip(e); });
-    g.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
-  });
+  // Tooltip attachment is handled by initDiagram()
 
   /* ── File upload ────────────────────────────── */
   var uploadBtn = document.getElementById('upload-btn');
@@ -923,6 +1178,89 @@
 
     fileInput.value = '';
   });
+
+  /* ── Mp3 agent toggle ─────────────────────────── */
+  var mp3Running = false;
+  var mp3ToggleBtn = document.getElementById('mp3-toggle-btn');
+
+  var mp3NodeDef = { x: 670, y: 270, w: 190, h: 80, rx: 10, label: 'Audio Analyzer', sub: 'Task Worker', staticSub: null, hasWorking: true };
+
+  function addMp3Node() {
+    nodeData.mp3 = { x: mp3NodeDef.x, y: mp3NodeDef.y, w: mp3NodeDef.w, h: mp3NodeDef.h, rx: mp3NodeDef.rx, label: mp3NodeDef.label, sub: mp3NodeDef.sub, staticSub: mp3NodeDef.staticSub, hasWorking: mp3NodeDef.hasWorking };
+    edgeTopology.push({ from: 'broker', to: 'mp3' });
+    computeEdges();
+
+    // Render edge
+    var edgeDef = { from: 'broker', to: 'mp3' };
+    var lineEl = renderEdge(edgeDef);
+    // Insert edge before the first node group so it renders behind nodes
+    var firstNode = diagram.querySelector('g');
+    if (firstNode) {
+      diagram.insertBefore(lineEl, firstNode);
+    } else {
+      diagram.appendChild(lineEl);
+    }
+
+    // Render node
+    var g = renderNode('mp3');
+    diagram.appendChild(g);
+
+    // Attach drag handlers
+    g.addEventListener('mousedown', function(e) { onNodeMouseDown('mp3', e); });
+    g.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      var touch = e.touches[0];
+      var pos = svgPoint(touch);
+      var n = nodeData['mp3'];
+      dragState = { nodeId: 'mp3', offsetX: pos.x - n.x, offsetY: pos.y - n.y };
+      document.body.classList.add('dragging');
+      tooltip.style.display = 'none';
+    }, { passive: false });
+
+    // Attach tooltip handlers
+    g.addEventListener('mouseenter', function(e) { if (!dragState) showTooltip('mp3', e); });
+    g.addEventListener('mousemove', function(e) { if (!dragState) positionTooltip(e); });
+    g.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
+
+    updateEdges();
+  }
+
+  function removeMp3Node() {
+    var nodeEl = document.getElementById('node-mp3');
+    if (nodeEl) nodeEl.remove();
+    var lineEl = document.getElementById('line-broker-mp3');
+    if (lineEl) lineEl.remove();
+    delete nodeData.mp3;
+    edgeTopology = edgeTopology.filter(function(e) { return !(e.from === 'broker' && e.to === 'mp3'); });
+    computeEdges();
+  }
+
+  function toggleMp3Agent() {
+    mp3ToggleBtn.disabled = true;
+    mp3ToggleBtn.textContent = mp3Running ? 'Stopping...' : 'Starting...';
+
+    var url = mp3Running ? '/agent/mp3/stop' : '/agent/mp3/start';
+    fetch(url, { method: 'POST' })
+      .then(function(resp) {
+        if (!resp.ok) throw new Error('Failed');
+        mp3Running = !mp3Running;
+        if (mp3Running) {
+          addMp3Node();
+        } else {
+          removeMp3Node();
+        }
+        mp3ToggleBtn.textContent = mp3Running ? 'Stop Audio Agent' : 'Start Audio Agent';
+      })
+      .catch(function(err) {
+        mp3ToggleBtn.textContent = mp3Running ? 'Stop Audio Agent' : 'Start Audio Agent';
+      })
+      .finally(function() { mp3ToggleBtn.disabled = false; });
+  }
+
+  mp3ToggleBtn.addEventListener('click', toggleMp3Agent);
+
+  /* ── Initialize the diagram ──────────────────── */
+  initDiagram();
 })();
 </script>
 </body>
