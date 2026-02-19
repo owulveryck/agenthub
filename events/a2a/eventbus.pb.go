@@ -1312,6 +1312,102 @@ func (x *RegisterAgentResponse) GetAgentId() string {
 	return ""
 }
 
+type UnregisterAgentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"` // Agent to unregister
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UnregisterAgentRequest) Reset() {
+	*x = UnregisterAgentRequest{}
+	mi := &file_proto_eventbus_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UnregisterAgentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnregisterAgentRequest) ProtoMessage() {}
+
+func (x *UnregisterAgentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_eventbus_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UnregisterAgentRequest.ProtoReflect.Descriptor instead.
+func (*UnregisterAgentRequest) Descriptor() ([]byte, []int) {
+	return file_proto_eventbus_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *UnregisterAgentRequest) GetAgentId() string {
+	if x != nil {
+		return x.AgentId
+	}
+	return ""
+}
+
+type UnregisterAgentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UnregisterAgentResponse) Reset() {
+	*x = UnregisterAgentResponse{}
+	mi := &file_proto_eventbus_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UnregisterAgentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnregisterAgentResponse) ProtoMessage() {}
+
+func (x *UnregisterAgentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_eventbus_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UnregisterAgentResponse.ProtoReflect.Descriptor instead.
+func (*UnregisterAgentResponse) Descriptor() ([]byte, []int) {
+	return file_proto_eventbus_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UnregisterAgentResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UnregisterAgentResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
 // DEPRECATED: Use a2a.Task instead
 //
 // Deprecated: Marked as deprecated in proto/eventbus.proto.
@@ -1332,7 +1428,7 @@ type TaskMessage struct {
 
 func (x *TaskMessage) Reset() {
 	*x = TaskMessage{}
-	mi := &file_proto_eventbus_proto_msgTypes[18]
+	mi := &file_proto_eventbus_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1344,7 +1440,7 @@ func (x *TaskMessage) String() string {
 func (*TaskMessage) ProtoMessage() {}
 
 func (x *TaskMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_eventbus_proto_msgTypes[18]
+	mi := &file_proto_eventbus_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1357,7 +1453,7 @@ func (x *TaskMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskMessage.ProtoReflect.Descriptor instead.
 func (*TaskMessage) Descriptor() ([]byte, []int) {
-	return file_proto_eventbus_proto_rawDescGZIP(), []int{18}
+	return file_proto_eventbus_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *TaskMessage) GetTaskId() string {
@@ -1441,7 +1537,7 @@ type TaskResult struct {
 
 func (x *TaskResult) Reset() {
 	*x = TaskResult{}
-	mi := &file_proto_eventbus_proto_msgTypes[19]
+	mi := &file_proto_eventbus_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1453,7 +1549,7 @@ func (x *TaskResult) String() string {
 func (*TaskResult) ProtoMessage() {}
 
 func (x *TaskResult) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_eventbus_proto_msgTypes[19]
+	mi := &file_proto_eventbus_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1466,7 +1562,7 @@ func (x *TaskResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskResult.ProtoReflect.Descriptor instead.
 func (*TaskResult) Descriptor() ([]byte, []int) {
-	return file_proto_eventbus_proto_rawDescGZIP(), []int{19}
+	return file_proto_eventbus_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *TaskResult) GetTaskId() string {
@@ -1536,7 +1632,7 @@ type TaskProgress struct {
 
 func (x *TaskProgress) Reset() {
 	*x = TaskProgress{}
-	mi := &file_proto_eventbus_proto_msgTypes[20]
+	mi := &file_proto_eventbus_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1548,7 +1644,7 @@ func (x *TaskProgress) String() string {
 func (*TaskProgress) ProtoMessage() {}
 
 func (x *TaskProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_eventbus_proto_msgTypes[20]
+	mi := &file_proto_eventbus_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1561,7 +1657,7 @@ func (x *TaskProgress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskProgress.ProtoReflect.Descriptor instead.
 func (*TaskProgress) Descriptor() ([]byte, []int) {
-	return file_proto_eventbus_proto_rawDescGZIP(), []int{20}
+	return file_proto_eventbus_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *TaskProgress) GetTaskId() string {
@@ -1714,7 +1810,12 @@ const file_proto_eventbus_proto_rawDesc = "" +
 	"\x15RegisterAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x19\n" +
-	"\bagent_id\x18\x03 \x01(\tR\aagentId\"\xb4\x03\n" +
+	"\bagent_id\x18\x03 \x01(\tR\aagentId\"3\n" +
+	"\x16UnregisterAgentRequest\x12\x19\n" +
+	"\bagent_id\x18\x01 \x01(\tR\aagentId\"I\n" +
+	"\x17UnregisterAgentResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"\xb4\x03\n" +
 	"\vTaskMessage\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12\x1b\n" +
 	"\ttask_type\x18\x02 \x01(\tR\btaskType\x127\n" +
@@ -1751,7 +1852,7 @@ const file_proto_eventbus_proto_rawDesc = "" +
 	"\fPRIORITY_LOW\x10\x01\x12\x13\n" +
 	"\x0fPRIORITY_MEDIUM\x10\x02\x12\x11\n" +
 	"\rPRIORITY_HIGH\x10\x03\x12\x15\n" +
-	"\x11PRIORITY_CRITICAL\x10\x042\xb9\x06\n" +
+	"\x11PRIORITY_CRITICAL\x10\x042\x91\a\n" +
 	"\bAgentHub\x12L\n" +
 	"\x0ePublishMessage\x12\x1f.agenthub.PublishMessageRequest\x1a\x19.agenthub.PublishResponse\x12R\n" +
 	"\x11PublishTaskUpdate\x12\".agenthub.PublishTaskUpdateRequest\x1a\x19.agenthub.PublishResponse\x12V\n" +
@@ -1764,7 +1865,8 @@ const file_proto_eventbus_proto_rawDesc = "" +
 	"CancelTask\x12\x1b.agenthub.CancelTaskRequest\x1a\t.a2a.Task\x12D\n" +
 	"\tListTasks\x12\x1a.agenthub.ListTasksRequest\x1a\x1b.agenthub.ListTasksResponse\x126\n" +
 	"\fGetAgentCard\x12\x16.google.protobuf.Empty\x1a\x0e.a2a.AgentCard\x12P\n" +
-	"\rRegisterAgent\x12\x1e.agenthub.RegisterAgentRequest\x1a\x1f.agenthub.RegisterAgentResponseB\x10Z\x0eevents/a2a;a2ab\x06proto3"
+	"\rRegisterAgent\x12\x1e.agenthub.RegisterAgentRequest\x1a\x1f.agenthub.RegisterAgentResponse\x12V\n" +
+	"\x0fUnregisterAgent\x12 .agenthub.UnregisterAgentRequest\x1a!.agenthub.UnregisterAgentResponseB\x10Z\x0eevents/a2a;a2ab\x06proto3"
 
 var (
 	file_proto_eventbus_proto_rawDescOnce sync.Once
@@ -1779,7 +1881,7 @@ func file_proto_eventbus_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_eventbus_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_eventbus_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_proto_eventbus_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_proto_eventbus_proto_goTypes = []any{
 	(Priority)(0),                         // 0: agenthub.Priority
 	(*AgentEvent)(nil),                    // 1: agenthub.AgentEvent
@@ -1800,56 +1902,58 @@ var file_proto_eventbus_proto_goTypes = []any{
 	(*ListTasksResponse)(nil),             // 16: agenthub.ListTasksResponse
 	(*RegisterAgentRequest)(nil),          // 17: agenthub.RegisterAgentRequest
 	(*RegisterAgentResponse)(nil),         // 18: agenthub.RegisterAgentResponse
-	(*TaskMessage)(nil),                   // 19: agenthub.TaskMessage
-	(*TaskResult)(nil),                    // 20: agenthub.TaskResult
-	(*TaskProgress)(nil),                  // 21: agenthub.TaskProgress
-	(*timestamppb.Timestamp)(nil),         // 22: google.protobuf.Timestamp
-	(*Message)(nil),                       // 23: a2a.Message
-	(*Task)(nil),                          // 24: a2a.Task
-	(*TaskStatus)(nil),                    // 25: a2a.TaskStatus
-	(*structpb.Struct)(nil),               // 26: google.protobuf.Struct
-	(*Artifact)(nil),                      // 27: a2a.Artifact
-	(*AgentCard)(nil),                     // 28: a2a.AgentCard
-	(TaskState)(0),                        // 29: a2a.TaskState
-	(*emptypb.Empty)(nil),                 // 30: google.protobuf.Empty
+	(*UnregisterAgentRequest)(nil),        // 19: agenthub.UnregisterAgentRequest
+	(*UnregisterAgentResponse)(nil),       // 20: agenthub.UnregisterAgentResponse
+	(*TaskMessage)(nil),                   // 21: agenthub.TaskMessage
+	(*TaskResult)(nil),                    // 22: agenthub.TaskResult
+	(*TaskProgress)(nil),                  // 23: agenthub.TaskProgress
+	(*timestamppb.Timestamp)(nil),         // 24: google.protobuf.Timestamp
+	(*Message)(nil),                       // 25: a2a.Message
+	(*Task)(nil),                          // 26: a2a.Task
+	(*TaskStatus)(nil),                    // 27: a2a.TaskStatus
+	(*structpb.Struct)(nil),               // 28: google.protobuf.Struct
+	(*Artifact)(nil),                      // 29: a2a.Artifact
+	(*AgentCard)(nil),                     // 30: a2a.AgentCard
+	(TaskState)(0),                        // 31: a2a.TaskState
+	(*emptypb.Empty)(nil),                 // 32: google.protobuf.Empty
 }
 var file_proto_eventbus_proto_depIdxs = []int32{
-	22, // 0: agenthub.AgentEvent.timestamp:type_name -> google.protobuf.Timestamp
-	23, // 1: agenthub.AgentEvent.message:type_name -> a2a.Message
-	24, // 2: agenthub.AgentEvent.task:type_name -> a2a.Task
+	24, // 0: agenthub.AgentEvent.timestamp:type_name -> google.protobuf.Timestamp
+	25, // 1: agenthub.AgentEvent.message:type_name -> a2a.Message
+	26, // 2: agenthub.AgentEvent.task:type_name -> a2a.Task
 	3,  // 3: agenthub.AgentEvent.status_update:type_name -> agenthub.TaskStatusUpdateEvent
 	4,  // 4: agenthub.AgentEvent.artifact_update:type_name -> agenthub.TaskArtifactUpdateEvent
 	5,  // 5: agenthub.AgentEvent.agent_card:type_name -> agenthub.AgentCardEvent
 	2,  // 6: agenthub.AgentEvent.routing:type_name -> agenthub.AgentEventMetadata
 	0,  // 7: agenthub.AgentEventMetadata.priority:type_name -> agenthub.Priority
-	25, // 8: agenthub.TaskStatusUpdateEvent.status:type_name -> a2a.TaskStatus
-	26, // 9: agenthub.TaskStatusUpdateEvent.metadata:type_name -> google.protobuf.Struct
-	27, // 10: agenthub.TaskArtifactUpdateEvent.artifact:type_name -> a2a.Artifact
-	26, // 11: agenthub.TaskArtifactUpdateEvent.metadata:type_name -> google.protobuf.Struct
-	28, // 12: agenthub.AgentCardEvent.agent_card:type_name -> a2a.AgentCard
-	26, // 13: agenthub.AgentCardEvent.metadata:type_name -> google.protobuf.Struct
-	23, // 14: agenthub.PublishMessageRequest.message:type_name -> a2a.Message
+	27, // 8: agenthub.TaskStatusUpdateEvent.status:type_name -> a2a.TaskStatus
+	28, // 9: agenthub.TaskStatusUpdateEvent.metadata:type_name -> google.protobuf.Struct
+	29, // 10: agenthub.TaskArtifactUpdateEvent.artifact:type_name -> a2a.Artifact
+	28, // 11: agenthub.TaskArtifactUpdateEvent.metadata:type_name -> google.protobuf.Struct
+	30, // 12: agenthub.AgentCardEvent.agent_card:type_name -> a2a.AgentCard
+	28, // 13: agenthub.AgentCardEvent.metadata:type_name -> google.protobuf.Struct
+	25, // 14: agenthub.PublishMessageRequest.message:type_name -> a2a.Message
 	2,  // 15: agenthub.PublishMessageRequest.routing:type_name -> agenthub.AgentEventMetadata
 	3,  // 16: agenthub.PublishTaskUpdateRequest.update:type_name -> agenthub.TaskStatusUpdateEvent
 	2,  // 17: agenthub.PublishTaskUpdateRequest.routing:type_name -> agenthub.AgentEventMetadata
 	4,  // 18: agenthub.PublishTaskArtifactRequest.artifact:type_name -> agenthub.TaskArtifactUpdateEvent
 	2,  // 19: agenthub.PublishTaskArtifactRequest.routing:type_name -> agenthub.AgentEventMetadata
-	29, // 20: agenthub.SubscribeToTasksRequest.states:type_name -> a2a.TaskState
-	29, // 21: agenthub.ListTasksRequest.states:type_name -> a2a.TaskState
-	24, // 22: agenthub.ListTasksResponse.tasks:type_name -> a2a.Task
-	28, // 23: agenthub.RegisterAgentRequest.agent_card:type_name -> a2a.AgentCard
-	26, // 24: agenthub.TaskMessage.parameters:type_name -> google.protobuf.Struct
-	22, // 25: agenthub.TaskMessage.deadline:type_name -> google.protobuf.Timestamp
+	31, // 20: agenthub.SubscribeToTasksRequest.states:type_name -> a2a.TaskState
+	31, // 21: agenthub.ListTasksRequest.states:type_name -> a2a.TaskState
+	26, // 22: agenthub.ListTasksResponse.tasks:type_name -> a2a.Task
+	30, // 23: agenthub.RegisterAgentRequest.agent_card:type_name -> a2a.AgentCard
+	28, // 24: agenthub.TaskMessage.parameters:type_name -> google.protobuf.Struct
+	24, // 25: agenthub.TaskMessage.deadline:type_name -> google.protobuf.Timestamp
 	0,  // 26: agenthub.TaskMessage.priority:type_name -> agenthub.Priority
-	26, // 27: agenthub.TaskMessage.metadata:type_name -> google.protobuf.Struct
-	22, // 28: agenthub.TaskMessage.created_at:type_name -> google.protobuf.Timestamp
-	29, // 29: agenthub.TaskResult.status:type_name -> a2a.TaskState
-	26, // 30: agenthub.TaskResult.result:type_name -> google.protobuf.Struct
-	22, // 31: agenthub.TaskResult.completed_at:type_name -> google.protobuf.Timestamp
-	26, // 32: agenthub.TaskResult.execution_metadata:type_name -> google.protobuf.Struct
-	29, // 33: agenthub.TaskProgress.status:type_name -> a2a.TaskState
-	26, // 34: agenthub.TaskProgress.progress_data:type_name -> google.protobuf.Struct
-	22, // 35: agenthub.TaskProgress.updated_at:type_name -> google.protobuf.Timestamp
+	28, // 27: agenthub.TaskMessage.metadata:type_name -> google.protobuf.Struct
+	24, // 28: agenthub.TaskMessage.created_at:type_name -> google.protobuf.Timestamp
+	31, // 29: agenthub.TaskResult.status:type_name -> a2a.TaskState
+	28, // 30: agenthub.TaskResult.result:type_name -> google.protobuf.Struct
+	24, // 31: agenthub.TaskResult.completed_at:type_name -> google.protobuf.Timestamp
+	28, // 32: agenthub.TaskResult.execution_metadata:type_name -> google.protobuf.Struct
+	31, // 33: agenthub.TaskProgress.status:type_name -> a2a.TaskState
+	28, // 34: agenthub.TaskProgress.progress_data:type_name -> google.protobuf.Struct
+	24, // 35: agenthub.TaskProgress.updated_at:type_name -> google.protobuf.Timestamp
 	6,  // 36: agenthub.AgentHub.PublishMessage:input_type -> agenthub.PublishMessageRequest
 	7,  // 37: agenthub.AgentHub.PublishTaskUpdate:input_type -> agenthub.PublishTaskUpdateRequest
 	8,  // 38: agenthub.AgentHub.PublishTaskArtifact:input_type -> agenthub.PublishTaskArtifactRequest
@@ -1859,21 +1963,23 @@ var file_proto_eventbus_proto_depIdxs = []int32{
 	13, // 42: agenthub.AgentHub.GetTask:input_type -> agenthub.GetTaskRequest
 	14, // 43: agenthub.AgentHub.CancelTask:input_type -> agenthub.CancelTaskRequest
 	15, // 44: agenthub.AgentHub.ListTasks:input_type -> agenthub.ListTasksRequest
-	30, // 45: agenthub.AgentHub.GetAgentCard:input_type -> google.protobuf.Empty
+	32, // 45: agenthub.AgentHub.GetAgentCard:input_type -> google.protobuf.Empty
 	17, // 46: agenthub.AgentHub.RegisterAgent:input_type -> agenthub.RegisterAgentRequest
-	9,  // 47: agenthub.AgentHub.PublishMessage:output_type -> agenthub.PublishResponse
-	9,  // 48: agenthub.AgentHub.PublishTaskUpdate:output_type -> agenthub.PublishResponse
-	9,  // 49: agenthub.AgentHub.PublishTaskArtifact:output_type -> agenthub.PublishResponse
-	1,  // 50: agenthub.AgentHub.SubscribeToMessages:output_type -> agenthub.AgentEvent
-	1,  // 51: agenthub.AgentHub.SubscribeToTasks:output_type -> agenthub.AgentEvent
-	1,  // 52: agenthub.AgentHub.SubscribeToAgentEvents:output_type -> agenthub.AgentEvent
-	24, // 53: agenthub.AgentHub.GetTask:output_type -> a2a.Task
-	24, // 54: agenthub.AgentHub.CancelTask:output_type -> a2a.Task
-	16, // 55: agenthub.AgentHub.ListTasks:output_type -> agenthub.ListTasksResponse
-	28, // 56: agenthub.AgentHub.GetAgentCard:output_type -> a2a.AgentCard
-	18, // 57: agenthub.AgentHub.RegisterAgent:output_type -> agenthub.RegisterAgentResponse
-	47, // [47:58] is the sub-list for method output_type
-	36, // [36:47] is the sub-list for method input_type
+	19, // 47: agenthub.AgentHub.UnregisterAgent:input_type -> agenthub.UnregisterAgentRequest
+	9,  // 48: agenthub.AgentHub.PublishMessage:output_type -> agenthub.PublishResponse
+	9,  // 49: agenthub.AgentHub.PublishTaskUpdate:output_type -> agenthub.PublishResponse
+	9,  // 50: agenthub.AgentHub.PublishTaskArtifact:output_type -> agenthub.PublishResponse
+	1,  // 51: agenthub.AgentHub.SubscribeToMessages:output_type -> agenthub.AgentEvent
+	1,  // 52: agenthub.AgentHub.SubscribeToTasks:output_type -> agenthub.AgentEvent
+	1,  // 53: agenthub.AgentHub.SubscribeToAgentEvents:output_type -> agenthub.AgentEvent
+	26, // 54: agenthub.AgentHub.GetTask:output_type -> a2a.Task
+	26, // 55: agenthub.AgentHub.CancelTask:output_type -> a2a.Task
+	16, // 56: agenthub.AgentHub.ListTasks:output_type -> agenthub.ListTasksResponse
+	30, // 57: agenthub.AgentHub.GetAgentCard:output_type -> a2a.AgentCard
+	18, // 58: agenthub.AgentHub.RegisterAgent:output_type -> agenthub.RegisterAgentResponse
+	20, // 59: agenthub.AgentHub.UnregisterAgent:output_type -> agenthub.UnregisterAgentResponse
+	48, // [48:60] is the sub-list for method output_type
+	36, // [36:48] is the sub-list for method input_type
 	36, // [36:36] is the sub-list for extension type_name
 	36, // [36:36] is the sub-list for extension extendee
 	0,  // [0:36] is the sub-list for field type_name
@@ -1898,7 +2004,7 @@ func file_proto_eventbus_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_eventbus_proto_rawDesc), len(file_proto_eventbus_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   21,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

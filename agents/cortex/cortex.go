@@ -63,6 +63,14 @@ func (c *Cortex) RegisterAgent(agentID string, card *pb.AgentCard) {
 	c.registeredAgents[agentID] = card
 }
 
+// UnregisterAgent removes an agent from Cortex's registry.
+// This is called when an agent is stopped or unregistered from the broker.
+func (c *Cortex) UnregisterAgent(agentID string) {
+	c.agentsMu.Lock()
+	defer c.agentsMu.Unlock()
+	delete(c.registeredAgents, agentID)
+}
+
 // GetAvailableAgents returns a map of all registered agents keyed by agent ID.
 func (c *Cortex) GetAvailableAgents() map[string]*pb.AgentCard {
 	c.agentsMu.RLock()
@@ -380,6 +388,23 @@ func (c *Cortex) executeActions(ctx context.Context, traceManager *observability
 				attribute.String("target_agent", action.TargetAgent),
 			)
 
+		case "status.request":
+			if err := c.executeStatusRequest(actCtx, traceManager, conversationState, action); err != nil {
+				traceManager.RecordError(actSpan, err)
+				traceManager.AddSpanEvent(actSpan, "action_execution_failed",
+					attribute.Int("action_index", i),
+					attribute.String("action_type", action.Type),
+					attribute.String("target_agent", action.TargetAgent),
+					attribute.String("error", err.Error()),
+				)
+				return fmt.Errorf("failed to execute status request: %w", err)
+			}
+			traceManager.AddSpanEvent(actSpan, "action_executed_successfully",
+				attribute.Int("action_index", i),
+				attribute.String("action_type", "status.request"),
+				attribute.String("target_agent", action.TargetAgent),
+			)
+
 		default:
 			err := fmt.Errorf("unknown action type: %s", action.Type)
 			traceManager.RecordError(actSpan, err)
@@ -548,8 +573,13 @@ func (c *Cortex) executeTaskRequest(ctx context.Context, traceManager *observabi
 	return nil
 }
 
-// HandleTaskCompletion processes task completion notifications from delegated agents
-func (c *Cortex) HandleTaskCompletion(ctx context.Context, taskID, contextID string, status *pb.TaskStatus) {
+// HandleTaskCompletion processes task completion notifications from delegated agents.
+// For FAILED or CANCELLED tasks, it routes the error through the LLM pipeline
+// so the user receives a meaningful response instead of silence.
+func (c *Cortex) HandleTaskCompletion(ctx context.Context, traceManager *observability.TraceManager, taskID, contextID string, status *pb.TaskStatus) {
+	var shouldRoute bool
+	var errorText string
+
 	// Use WithLock to ensure thread-safe state access
 	_ = c.stateManager.WithLock(contextID, func(conversationState *state.ConversationState) error {
 		// Check if this task is pending
@@ -563,11 +593,47 @@ func (c *Cortex) HandleTaskCompletion(ctx context.Context, taskID, contextID str
 		taskContext.CompletedAt = time.Now().Unix()
 		taskContext.Result = status
 
-		// Note: We don't delete from PendingTasks yet - keep it for potential
-		// use in responding to the user with the task results
+		// For failed/cancelled tasks, extract error info and route through LLM
+		// so the user gets a response. Completed tasks are handled by HandleTaskArtifact.
+		if status.GetState() == pb.TaskState_TASK_STATE_FAILED || status.GetState() == pb.TaskState_TASK_STATE_CANCELLED {
+			shouldRoute = true
+			// Extract error text from the status update message
+			if updateMsg := status.GetUpdate(); updateMsg != nil {
+				for _, part := range updateMsg.GetContent() {
+					if text := part.GetText(); text != "" {
+						errorText = text
+						break
+					}
+				}
+			}
+			if errorText == "" {
+				errorText = fmt.Sprintf("Task %s with status: %s", taskID, status.GetState().String())
+			}
+		}
 
 		return nil
 	})
+
+	// Route failed/cancelled tasks through LLM so the user gets a response
+	if shouldRoute {
+		failureMsg := &pb.Message{
+			MessageId: fmt.Sprintf("task_failure_%d", time.Now().UnixNano()),
+			ContextId: contextID,
+			TaskId:    taskID,
+			Role:      pb.Role_ROLE_AGENT,
+			Content:   []*pb.Part{{Part: &pb.Part_Text{Text: errorText}}},
+		}
+		c.logger.DebugContext(ctx, "Routing task failure through HandleMessage",
+			"task_id", taskID,
+			"context_id", contextID,
+			"error_text", errorText)
+		if err := c.HandleMessage(ctx, traceManager, failureMsg); err != nil {
+			c.logger.ErrorContext(ctx, "Failed to route task failure through LLM",
+				"error", err,
+				"task_id", taskID,
+				"context_id", contextID)
+		}
+	}
 }
 
 // HandleTaskArtifact processes task artifact notifications from delegated agents.
@@ -644,6 +710,56 @@ func (c *Cortex) HandleTaskArtifact(ctx context.Context, traceManager *observabi
 			"should_route", shouldRoute,
 			"has_text", responseText != "")
 	}
+}
+
+// HandleAgentShutdown processes a shutdown notification from an agent.
+// It preemptively removes the agent from the registry. The broker's "unregistered"
+// event will follow shortly but this prevents any gap.
+func (c *Cortex) HandleAgentShutdown(agentID string) {
+	c.logger.Info("Agent shutdown notification received", "agent_id", agentID)
+	c.UnregisterAgent(agentID)
+}
+
+// executeStatusRequest sends a status request message to a specific agent.
+func (c *Cortex) executeStatusRequest(ctx context.Context, traceManager *observability.TraceManager, conversationState *state.ConversationState, action llm.Action) error {
+	reqCtx, reqSpan := traceManager.StartSpan(ctx, "cortex.status_request",
+		attribute.String("session_id", conversationState.SessionID),
+		attribute.String("target_agent", action.TargetAgent),
+	)
+	defer reqSpan.End()
+
+	traceManager.AddComponentAttribute(reqSpan, "cortex_orchestrator")
+
+	msg := &pb.Message{
+		MessageId: fmt.Sprintf("status_request_%d", time.Now().UnixNano()),
+		ContextId: conversationState.SessionID,
+		Role:      pb.Role_ROLE_AGENT,
+		Content: []*pb.Part{
+			{Part: &pb.Part_Text{Text: fmt.Sprintf("Status request for %s", action.TargetAgent)}},
+		},
+		Metadata: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"type":       structpb.NewStringValue("status_request"),
+				"from_agent": structpb.NewStringValue(CortexAgentID),
+			},
+		},
+	}
+
+	routing := &pb.AgentEventMetadata{
+		FromAgentId: CortexAgentID,
+		ToAgentId:   action.TargetAgent,
+		EventType:   "status_request",
+		Priority:    pb.Priority_PRIORITY_MEDIUM,
+	}
+
+	err := c.messagePublisher.PublishMessage(reqCtx, msg, routing)
+	if err != nil {
+		traceManager.RecordError(reqSpan, err)
+		return fmt.Errorf("failed to publish status request: %w", err)
+	}
+
+	traceManager.SetSpanSuccess(reqSpan)
+	return nil
 }
 
 // truncateString truncates a string to maxLen characters, adding "..." if truncated

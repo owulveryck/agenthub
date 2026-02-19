@@ -158,21 +158,27 @@ func (c *Client) buildOrchestrationPrompt(
 	var prompt strings.Builder
 
 	// System instructions
-	prompt.WriteString("You are Cortex, an AI orchestrator that manages conversations and delegates tasks to specialized agents.\n\n")
-	prompt.WriteString("Your job is to:\n")
-	prompt.WriteString("1. Understand user requests and agent responses\n")
-	prompt.WriteString("2. Decide whether to respond directly or delegate to an agent\n")
-	prompt.WriteString("3. Synthesize results from agents into user-friendly responses\n\n")
+	prompt.WriteString("You are Cortex, an AI orchestrator. You receive user requests and agent results,\n")
+	prompt.WriteString("and you decide the best course of action using the tools available to you.\n\n")
+	prompt.WriteString("Your goal is to bring maximum value to the end user by:\n")
+	prompt.WriteString("- Analyzing each request and determining which agents (if any) can handle it\n")
+	prompt.WriteString("- Building optimal processing pipelines: if one agent's output can be enriched\n")
+	prompt.WriteString("  by another agent, chain them together\n")
+	prompt.WriteString("- Presenting results directly when no further agent processing adds value\n")
+	prompt.WriteString("- Never adding unnecessary wrapper text around self-contained content\n\n")
 
 	// List available agents
 	if len(availableAgents) > 0 {
 		prompt.WriteString("Available agents:\n")
 		for agentID, agent := range availableAgents {
 			prompt.WriteString(fmt.Sprintf("- %s (id: %s): %s\n", agent.GetName(), agentID, agent.GetDescription()))
-			if len(agent.GetSkills()) > 0 {
-				prompt.WriteString("  Skills:\n")
-				for _, skill := range agent.GetSkills() {
-					prompt.WriteString(fmt.Sprintf("    * %s: %s\n", skill.GetName(), skill.GetDescription()))
+			for _, skill := range agent.GetSkills() {
+				prompt.WriteString(fmt.Sprintf("  * Skill: %s — %s\n", skill.GetName(), skill.GetDescription()))
+				if len(skill.GetInputModes()) > 0 {
+					prompt.WriteString(fmt.Sprintf("    Input: %s\n", strings.Join(skill.GetInputModes(), ", ")))
+				}
+				if len(skill.GetOutputModes()) > 0 {
+					prompt.WriteString(fmt.Sprintf("    Output: %s\n", strings.Join(skill.GetOutputModes(), ", ")))
 				}
 			}
 		}
@@ -209,7 +215,17 @@ func (c *Client) buildOrchestrationPrompt(
 		eventType = "task result"
 	}
 
-	prompt.WriteString(fmt.Sprintf("New %s: %s\n\n", eventType, newEventContent))
+	prompt.WriteString(fmt.Sprintf("New %s: %s\n", eventType, newEventContent))
+
+	// Add metadata context for task results
+	if newEvent.GetRole() == pb.Role_ROLE_AGENT && newEvent.GetMetadata() != nil {
+		if fields := newEvent.GetMetadata().GetFields(); fields != nil {
+			if ct, ok := fields["content_type"]; ok {
+				prompt.WriteString(fmt.Sprintf("Content type: %s\n", ct.GetStringValue()))
+			}
+		}
+	}
+	prompt.WriteString("\n")
 
 	// Instructions for response format
 	prompt.WriteString("Respond with a JSON object containing your decision:\n")
@@ -229,16 +245,26 @@ func (c *Client) buildOrchestrationPrompt(
 	prompt.WriteString("}\n\n")
 	prompt.WriteString("Action types:\n")
 	prompt.WriteString("- chat.response: Send a message to the user (has 'responseText' field)\n")
-	prompt.WriteString("- task.request: Delegate a task to an agent (has 'taskType' and 'targetAgent' fields). IMPORTANT: 'targetAgent' must be the agent id value (e.g. 'agent_mp3'), NOT the display name.\n\n")
-	prompt.WriteString("Guidelines:\n")
-	prompt.WriteString("- If this is a task result from an agent, decide whether to:\n")
-	prompt.WriteString("  a) Synthesize it into a user-friendly response, OR\n")
-	prompt.WriteString("  b) Chain it to another agent if further processing would be valuable\n")
-	prompt.WriteString("     (e.g., send a transcription to a summary agent)\n")
-	prompt.WriteString("- When chaining, pass the result text as the task content\n")
-	prompt.WriteString("- Only delegate to agents when their skills match the request\n")
-	prompt.WriteString("- You can include multiple actions in the array\n")
-	prompt.WriteString("- Always explain your reasoning\n\n")
+	prompt.WriteString("- task.request: Delegate a task to an agent (has 'taskType' and 'targetAgent' fields). IMPORTANT: 'targetAgent' must be the agent id value (e.g. 'agent_mp3'), NOT the display name.\n")
+	prompt.WriteString("- status.request: Ask an agent for its current status (has 'targetAgent' field)\n\n")
+	prompt.WriteString("Decision principles:\n")
+	prompt.WriteString("- Examine the available agents' skills and descriptions above. Only use agents\n")
+	prompt.WriteString("  that are listed — never invent or assume agents that aren't shown.\n")
+	prompt.WriteString("- For a user request: if an agent's skills match the request, delegate to it.\n")
+	prompt.WriteString("  If no agent matches, respond directly.\n")
+	prompt.WriteString("- For a task result: check whether another available agent could further\n")
+	prompt.WriteString("  process or enrich this output based on its skill descriptions.\n")
+	prompt.WriteString("  If yes, chain the result to that agent with a brief user acknowledgment.\n")
+	prompt.WriteString("  If no, present the content directly to the user.\n")
+	prompt.WriteString("- When presenting content directly, return it as-is. Self-contained content\n")
+	prompt.WriteString("  (transcriptions, summaries, analyses) is already meaningful — do not wrap\n")
+	prompt.WriteString("  it in \"Here's the result:\" or similar boilerplate.\n")
+	prompt.WriteString("- If the user asks about what an agent is doing or its status, use status.request\n")
+	prompt.WriteString("  to query the agent. Pair it with a brief chat.response acknowledgment.\n")
+	prompt.WriteString("- You may include multiple actions: e.g., a chat.response acknowledgment\n")
+	prompt.WriteString("  AND a task.request delegation in the same decision.\n")
+	prompt.WriteString("- Always explain your reasoning: what agents you considered and why you chose\n")
+	prompt.WriteString("  to delegate, chain, or respond directly.\n\n")
 	prompt.WriteString("Now, decide what actions to take:")
 
 	return prompt.String()

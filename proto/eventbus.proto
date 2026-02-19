@@ -216,6 +216,11 @@ service AgentHub {
   // RegisterAgent registers an agent with the broker for event routing.
   // Enables the broker to route events to the agent and track its capabilities.
   rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
+
+  // UnregisterAgent removes an agent from the broker's registry.
+  // Broadcasts an "unregistered" AgentCardEvent so other agents (e.g. cortex)
+  // can update their view of available capabilities.
+  rpc UnregisterAgent(UnregisterAgentRequest) returns (UnregisterAgentResponse);
 }
 
 // ===== Agent Registration (EDA-specific) =====
@@ -230,6 +235,15 @@ message RegisterAgentResponse {
   bool success = 1;
   string error = 2;
   string agent_id = 3;                   // Assigned/confirmed agent ID
+}
+
+message UnregisterAgentRequest {
+  string agent_id = 1;                   // Agent to unregister
+}
+
+message UnregisterAgentResponse {
+  bool success = 1;
+  string error = 2;
 }
 
 // ===== Legacy Support (DEPRECATED - for migration) =====

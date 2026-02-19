@@ -294,6 +294,10 @@ func (ts *A2ATaskSubscriber) processTask(ctx context.Context, task *pb.Task) {
 // publishTaskCompletion publishes task completion with artifact
 func (ts *A2ATaskSubscriber) publishTaskCompletion(ctx context.Context, task *pb.Task, artifact *pb.Artifact, status pb.TaskState, errorMessage string) {
 	// Create completion message
+	contentText := fmt.Sprintf("Task completed with status: %s", status.String())
+	if errorMessage != "" {
+		contentText = fmt.Sprintf("Task failed: %s", errorMessage)
+	}
 	completionMessage := &pb.Message{
 		MessageId: fmt.Sprintf("completion_%s_%d", task.GetId(), time.Now().Unix()),
 		ContextId: task.GetContextId(),
@@ -302,7 +306,7 @@ func (ts *A2ATaskSubscriber) publishTaskCompletion(ctx context.Context, task *pb
 		Content: []*pb.Part{
 			{
 				Part: &pb.Part_Text{
-					Text: fmt.Sprintf("Task completed with status: %s", status.String()),
+					Text: contentText,
 				},
 			},
 		},

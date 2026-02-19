@@ -133,6 +133,23 @@ func main() {
 							continue
 						}
 					}
+
+					// Handle special message types
+					if msgType, exists := messageEvent.Metadata.Fields["type"]; exists {
+						switch msgType.GetStringValue() {
+						case "agent_shutting_down":
+							agentID := ""
+							if aid, ok := messageEvent.Metadata.Fields["agent_id"]; ok {
+								agentID = aid.GetStringValue()
+							}
+							if agentID != "" {
+								cortexInstance.HandleAgentShutdown(agentID)
+							}
+							continue
+						case "status_reply":
+							// Route through normal message handler so LLM presents it to user
+						}
+					}
 				}
 
 				// Extract parent trace context from the event for distributed tracing
@@ -154,7 +171,7 @@ func main() {
 	go func() {
 		stream, err := client.Client.SubscribeToAgentEvents(ctx, &pb.SubscribeToAgentEventsRequest{
 			AgentId:    cortexAgentID,
-			EventTypes: []string{"agent.registered", "agent.updated"},
+			EventTypes: []string{"agent.registered", "agent.updated", "agent.unregistered"},
 		})
 
 		if err != nil {
@@ -322,6 +339,16 @@ func handleAgentCardEvent(ctx context.Context, client *agenthub.AgentHubClient, 
 		"skills_count", len(agentCard.GetSkills()),
 	)
 
+	// Handle unregistration
+	if eventType == "unregistered" {
+		cortexInstance.UnregisterAgent(agentID)
+		client.Logger.InfoContext(ctx, "Agent unregistered from Cortex orchestrator",
+			"agent_id", agentID,
+			"total_agents", len(cortexInstance.GetAvailableAgents()),
+		)
+		return
+	}
+
 	// Register the agent with Cortex
 	cortexInstance.RegisterAgent(agentID, agentCard)
 
@@ -360,7 +387,7 @@ func handleTaskStatusUpdate(ctx context.Context, client *agenthub.AgentHubClient
 
 	// Notify Cortex about the task completion
 	if statusUpdate.GetFinal() {
-		cortexInstance.HandleTaskCompletion(ctx, taskID, contextID, status)
+		cortexInstance.HandleTaskCompletion(ctx, client.TraceManager, taskID, contextID, status)
 	}
 }
 

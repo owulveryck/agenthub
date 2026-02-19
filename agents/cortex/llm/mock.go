@@ -161,6 +161,16 @@ func IntelligentDecider() func(context.Context, []*pb.Message, map[string]*pb.Ag
 						},
 					}, nil
 				}
+				// No summary agent available — return transcription content directly
+				return &Decision{
+					Reasoning: "Received transcription result. No summary agent available, presenting transcription directly.",
+					Actions: []Action{
+						{
+							Type:         "chat.response",
+							ResponseText: resultText,
+						},
+					},
+				}, nil
 			}
 
 			// No chaining — synthesize final response
@@ -184,6 +194,41 @@ func IntelligentDecider() func(context.Context, []*pb.Message, map[string]*pb.Ag
 		// Normalize text for intent detection
 		normalizedText := strings.ToLower(strings.TrimSpace(userText))
 
+		// Check if user is asking about agent status
+		isStatusRequest := strings.Contains(normalizedText, "status") ||
+			strings.Contains(normalizedText, "what is") && strings.Contains(normalizedText, "doing")
+
+		if isStatusRequest {
+			// Try to find a matching agent in the text
+			for agentID := range agents {
+				if strings.Contains(normalizedText, agentID) {
+					return &Decision{
+						Reasoning: fmt.Sprintf("User is asking about the status of '%s'. Sending a status request.", agentID),
+						Actions: []Action{
+							{
+								Type:         "chat.response",
+								ResponseText: fmt.Sprintf("Let me check what %s is doing...", agentID),
+							},
+							{
+								Type:        "status.request",
+								TargetAgent: agentID,
+							},
+						},
+					}, nil
+				}
+			}
+			// No matching agent found — respond directly
+			return &Decision{
+				Reasoning: "User asked about agent status but no matching agent was found in the request.",
+				Actions: []Action{
+					{
+						Type:         "chat.response",
+						ResponseText: "I couldn't identify which agent you're asking about, or it's not currently running.",
+					},
+				},
+			}, nil
+		}
+
 		// Check if user wants audio analysis
 		isAudioRequest := strings.Contains(normalizedText, "mp3") ||
 			strings.Contains(normalizedText, "m4a") ||
@@ -193,20 +238,31 @@ func IntelligentDecider() func(context.Context, []*pb.Message, map[string]*pb.Ag
 			strings.Contains(normalizedText, "analyze")
 
 		if isAudioRequest {
+			if _, hasMp3 := agents["agent_mp3"]; hasMp3 {
+				return &Decision{
+					Reasoning: fmt.Sprintf("User message '%s' contains an audio analysis request (detected keywords: mp3/m4a/audio/music/song/analyze). Dispatching to the audio analyzer agent.", userText),
+					Actions: []Action{
+						{
+							Type:         "chat.response",
+							ResponseText: "I'm sending this to the audio analyzer agent to extract the file metadata.",
+						},
+						{
+							Type:        "task.request",
+							TaskType:    "Analyze Audio",
+							TargetAgent: "agent_mp3",
+							TaskPayload: map[string]interface{}{
+								"input": userText,
+							},
+						},
+					},
+				}, nil
+			}
 			return &Decision{
-				Reasoning: fmt.Sprintf("User message '%s' contains an audio analysis request (detected keywords: mp3/m4a/audio/music/song/analyze). Dispatching to the audio analyzer agent.", userText),
+				Reasoning: fmt.Sprintf("User message '%s' contains an audio analysis request, but the audio analyzer agent is not currently running.", userText),
 				Actions: []Action{
 					{
 						Type:         "chat.response",
-						ResponseText: "I'm sending this to the audio analyzer agent to extract the file metadata.",
-					},
-					{
-						Type:        "task.request",
-						TaskType:    "Analyze Audio",
-						TargetAgent: "agent_mp3",
-						TaskPayload: map[string]interface{}{
-							"input": userText,
-						},
+						ResponseText: "The audio analyzer agent is not currently running. Please start it first and try again.",
 					},
 				},
 			}, nil
@@ -218,21 +274,32 @@ func IntelligentDecider() func(context.Context, []*pb.Message, map[string]*pb.Ag
 			strings.Contains(normalizedText, "say back")
 
 		if isEchoRequest {
-			// User explicitly wants an echo - dispatch to echo_agent
+			if _, hasEcho := agents["agent_echo"]; hasEcho {
+				// User explicitly wants an echo - dispatch to echo_agent
+				return &Decision{
+					Reasoning: fmt.Sprintf("User message '%s' contains an explicit echo request (detected keywords: echo/repeat/say back). I'm dispatching this to the echo_agent which specializes in repeating messages back.", userText),
+					Actions: []Action{
+						{
+							Type:         "chat.response",
+							ResponseText: "I detected you want me to echo something. I'm asking the echo agent to handle this for you.",
+						},
+						{
+							Type:        "task.request",
+							TaskType:    "echo",
+							TargetAgent: "agent_echo",
+							TaskPayload: map[string]interface{}{
+								"input": userText,
+							},
+						},
+					},
+				}, nil
+			}
 			return &Decision{
-				Reasoning: fmt.Sprintf("User message '%s' contains an explicit echo request (detected keywords: echo/repeat/say back). I'm dispatching this to the echo_agent which specializes in repeating messages back.", userText),
+				Reasoning: fmt.Sprintf("User message '%s' contains an echo request, but the echo agent is not currently running.", userText),
 				Actions: []Action{
 					{
 						Type:         "chat.response",
-						ResponseText: "I detected you want me to echo something. I'm asking the echo agent to handle this for you.",
-					},
-					{
-						Type:        "task.request",
-						TaskType:    "echo",
-						TargetAgent: "agent_echo",
-						TaskPayload: map[string]interface{}{
-							"input": userText,
-						},
+						ResponseText: "The echo agent is not currently running. Please start it first and try again.",
 					},
 				},
 			}, nil

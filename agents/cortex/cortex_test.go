@@ -15,6 +15,7 @@ import (
 // MockAgentHubClient is a mock of the AgentHub client for testing
 type MockAgentHubClient struct {
 	PublishedMessages []*pb.Message
+	PublishedRouting  []*pb.AgentEventMetadata
 	PublishError      error
 }
 
@@ -23,6 +24,7 @@ func (m *MockAgentHubClient) PublishMessage(ctx context.Context, msg *pb.Message
 		return m.PublishError
 	}
 	m.PublishedMessages = append(m.PublishedMessages, msg)
+	m.PublishedRouting = append(m.PublishedRouting, routing)
 	return nil
 }
 
@@ -203,6 +205,200 @@ func TestCortex_HandleTaskResult(t *testing.T) {
 	// Verify response was published
 	if len(mockClient.PublishedMessages) != 1 {
 		t.Fatalf("Expected 1 published message, got %d", len(mockClient.PublishedMessages))
+	}
+}
+
+func TestCortex_UnregisterAgent(t *testing.T) {
+	sm := state.NewInMemoryStateManager()
+	llmClient := llm.NewMockClient()
+	mockClient := &MockAgentHubClient{}
+
+	c := NewCortex(sm, llmClient, mockClient, slog.Default())
+
+	// Register an agent
+	agentCard := &pb.AgentCard{
+		Name:        "test-agent",
+		Description: "A test agent",
+		Skills: []*pb.AgentSkill{
+			{Id: "s1", Name: "Skill1", Description: "Does stuff"},
+		},
+	}
+	c.RegisterAgent("test-agent", agentCard)
+
+	// Verify it's registered
+	agents := c.GetAvailableAgents()
+	if len(agents) != 1 {
+		t.Fatalf("Expected 1 agent after registration, got %d", len(agents))
+	}
+
+	// Unregister the agent
+	c.UnregisterAgent("test-agent")
+
+	// Verify it's gone
+	agents = c.GetAvailableAgents()
+	if len(agents) != 0 {
+		t.Errorf("Expected 0 agents after unregistration, got %d", len(agents))
+	}
+
+	// Unregistering a non-existent agent should not panic
+	c.UnregisterAgent("nonexistent-agent")
+}
+
+func TestCortex_HandleTaskFailure(t *testing.T) {
+	sm := state.NewInMemoryStateManager()
+
+	// Set up a pending task in the state
+	taskContext := &state.TaskContext{
+		TaskID:      "task-fail-1",
+		TaskType:    "mp3_analysis",
+		RequestedAt: time.Now().Unix(),
+		OriginalInput: &pb.Message{
+			MessageId: "original-msg",
+			Content:   []*pb.Part{{Part: &pb.Part_Text{Text: "Analyze this audio"}}},
+		},
+		UserNotified: true,
+	}
+
+	initialState := &state.ConversationState{
+		SessionID: "session-fail",
+		Messages:  []*pb.Message{},
+		PendingTasks: map[string]*state.TaskContext{
+			"task-fail-1": taskContext,
+		},
+		RegisteredAgents: make(map[string]*pb.AgentCard),
+	}
+	sm.Set("session-fail", initialState)
+
+	// Mock LLM that relays the failure to the user
+	llmClient := llm.NewMockClientWithFunc(func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*llm.Decision, error) {
+		return &llm.Decision{
+			Reasoning: "Task failed, informing user",
+			Actions: []llm.Action{
+				{
+					Type:         "chat.response",
+					ResponseText: "The audio analysis failed: No file path provided in message",
+				},
+			},
+		}, nil
+	})
+
+	mockClient := &MockAgentHubClient{}
+	c := NewCortex(sm, llmClient, mockClient, slog.Default())
+
+	// Simulate a FAILED task status with an error message
+	failedStatus := &pb.TaskStatus{
+		State: pb.TaskState_TASK_STATE_FAILED,
+		Update: &pb.Message{
+			Role: pb.Role_ROLE_AGENT,
+			Content: []*pb.Part{
+				{Part: &pb.Part_Text{Text: "Task failed: No file path provided in message"}},
+			},
+		},
+	}
+
+	traceManager := observability.NewTraceManager("cortex_test")
+	c.HandleTaskCompletion(context.Background(), traceManager, "task-fail-1", "session-fail", failedStatus)
+
+	// Verify a response was published to the user
+	if len(mockClient.PublishedMessages) != 1 {
+		t.Fatalf("Expected 1 published message, got %d", len(mockClient.PublishedMessages))
+	}
+
+	published := mockClient.PublishedMessages[0]
+	if published.Role != pb.Role_ROLE_AGENT {
+		t.Errorf("Expected published message role to be AGENT, got %v", published.Role)
+	}
+	if published.ContextId != "session-fail" {
+		t.Errorf("Expected context ID 'session-fail', got '%s'", published.ContextId)
+	}
+
+	responseText := published.Content[0].GetText()
+	if responseText != "The audio analysis failed: No file path provided in message" {
+		t.Errorf("Unexpected response text: %s", responseText)
+	}
+
+	// Verify the pending task was removed from state
+	sessionState, err := sm.Get("session-fail")
+	if err != nil {
+		t.Fatalf("Failed to get state: %v", err)
+	}
+	if len(sessionState.PendingTasks) != 0 {
+		t.Errorf("Expected pending task to be removed, but %d tasks remain", len(sessionState.PendingTasks))
+	}
+}
+
+func TestCortex_HandleAgentShutdown(t *testing.T) {
+	sm := state.NewInMemoryStateManager()
+	llmClient := llm.NewMockClient()
+	mockClient := &MockAgentHubClient{}
+
+	c := NewCortex(sm, llmClient, mockClient, slog.Default())
+
+	// Register an agent
+	c.RegisterAgent("agent_mp3", &pb.AgentCard{
+		Name:        "agent_mp3",
+		Description: "Audio analyzer",
+	})
+
+	// Verify it's registered
+	agents := c.GetAvailableAgents()
+	if len(agents) != 1 {
+		t.Fatalf("Expected 1 agent after registration, got %d", len(agents))
+	}
+
+	// Handle shutdown notification
+	c.HandleAgentShutdown("agent_mp3")
+
+	// Verify the agent is removed
+	agents = c.GetAvailableAgents()
+	if len(agents) != 0 {
+		t.Errorf("Expected 0 agents after shutdown, got %d", len(agents))
+	}
+
+	// Calling HandleAgentShutdown for a non-existent agent should not panic
+	c.HandleAgentShutdown("nonexistent-agent")
+}
+
+func TestCortex_ExecuteStatusRequest(t *testing.T) {
+	sm := state.NewInMemoryStateManager()
+	llmClient := llm.NewMockClient()
+	mockClient := &MockAgentHubClient{}
+
+	c := NewCortex(sm, llmClient, mockClient, slog.Default())
+
+	traceManager := observability.NewTraceManager("cortex_test")
+
+	convState := &state.ConversationState{
+		SessionID:        "session-1",
+		Messages:         []*pb.Message{},
+		PendingTasks:     make(map[string]*state.TaskContext),
+		RegisteredAgents: make(map[string]*pb.AgentCard),
+	}
+
+	action := llm.Action{
+		Type:        "status.request",
+		TargetAgent: "agent_mp3",
+	}
+
+	err := c.executeStatusRequest(context.Background(), traceManager, convState, action)
+	if err != nil {
+		t.Fatalf("executeStatusRequest failed: %v", err)
+	}
+
+	// Verify a message was published
+	if len(mockClient.PublishedMessages) != 1 {
+		t.Fatalf("Expected 1 published message, got %d", len(mockClient.PublishedMessages))
+	}
+
+	published := mockClient.PublishedMessages[0]
+
+	// Verify metadata type
+	if published.GetMetadata() == nil || published.GetMetadata().GetFields() == nil {
+		t.Fatal("Expected metadata to be set")
+	}
+	msgType := published.GetMetadata().GetFields()["type"].GetStringValue()
+	if msgType != "status_request" {
+		t.Errorf("Expected metadata type 'status_request', got '%s'", msgType)
 	}
 }
 

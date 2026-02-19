@@ -31,6 +31,7 @@ const (
 	AgentHub_ListTasks_FullMethodName              = "/agenthub.AgentHub/ListTasks"
 	AgentHub_GetAgentCard_FullMethodName           = "/agenthub.AgentHub/GetAgentCard"
 	AgentHub_RegisterAgent_FullMethodName          = "/agenthub.AgentHub/RegisterAgent"
+	AgentHub_UnregisterAgent_FullMethodName        = "/agenthub.AgentHub/UnregisterAgent"
 )
 
 // AgentHubClient is the client API for AgentHub service.
@@ -71,6 +72,10 @@ type AgentHubClient interface {
 	// RegisterAgent registers an agent with the broker for event routing.
 	// Enables the broker to route events to the agent and track its capabilities.
 	RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error)
+	// UnregisterAgent removes an agent from the broker's registry.
+	// Broadcasts an "unregistered" AgentCardEvent so other agents (e.g. cortex)
+	// can update their view of available capabilities.
+	UnregisterAgent(ctx context.Context, in *UnregisterAgentRequest, opts ...grpc.CallOption) (*UnregisterAgentResponse, error)
 }
 
 type agentHubClient struct {
@@ -218,6 +223,16 @@ func (c *agentHubClient) RegisterAgent(ctx context.Context, in *RegisterAgentReq
 	return out, nil
 }
 
+func (c *agentHubClient) UnregisterAgent(ctx context.Context, in *UnregisterAgentRequest, opts ...grpc.CallOption) (*UnregisterAgentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UnregisterAgentResponse)
+	err := c.cc.Invoke(ctx, AgentHub_UnregisterAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentHubServer is the server API for AgentHub service.
 // All implementations must embed UnimplementedAgentHubServer
 // for forward compatibility.
@@ -256,6 +271,10 @@ type AgentHubServer interface {
 	// RegisterAgent registers an agent with the broker for event routing.
 	// Enables the broker to route events to the agent and track its capabilities.
 	RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error)
+	// UnregisterAgent removes an agent from the broker's registry.
+	// Broadcasts an "unregistered" AgentCardEvent so other agents (e.g. cortex)
+	// can update their view of available capabilities.
+	UnregisterAgent(context.Context, *UnregisterAgentRequest) (*UnregisterAgentResponse, error)
 	mustEmbedUnimplementedAgentHubServer()
 }
 
@@ -298,6 +317,9 @@ func (UnimplementedAgentHubServer) GetAgentCard(context.Context, *emptypb.Empty)
 }
 func (UnimplementedAgentHubServer) RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterAgent not implemented")
+}
+func (UnimplementedAgentHubServer) UnregisterAgent(context.Context, *UnregisterAgentRequest) (*UnregisterAgentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnregisterAgent not implemented")
 }
 func (UnimplementedAgentHubServer) mustEmbedUnimplementedAgentHubServer() {}
 func (UnimplementedAgentHubServer) testEmbeddedByValue()                  {}
@@ -497,6 +519,24 @@ func _AgentHub_RegisterAgent_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentHub_UnregisterAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnregisterAgentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentHubServer).UnregisterAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentHub_UnregisterAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentHubServer).UnregisterAgent(ctx, req.(*UnregisterAgentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AgentHub_ServiceDesc is the grpc.ServiceDesc for AgentHub service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -535,6 +575,10 @@ var AgentHub_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterAgent",
 			Handler:    _AgentHub_RegisterAgent_Handler,
+		},
+		{
+			MethodName: "UnregisterAgent",
+			Handler:    _AgentHub_UnregisterAgent_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

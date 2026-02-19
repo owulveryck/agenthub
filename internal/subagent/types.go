@@ -12,6 +12,10 @@ import (
 // It returns an artifact (optional), task state, and error message (if failed)
 type TaskHandler func(ctx context.Context, task *pb.Task, message *pb.Message) (*pb.Artifact, pb.TaskState, string)
 
+// StatusProvider is a function that returns the agent's current status description.
+// It is called when the agent receives a status request.
+type StatusProvider func() string
+
 // Skill represents a capability that the agent can perform
 type Skill struct {
 	Name        string

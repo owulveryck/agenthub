@@ -693,6 +693,66 @@ func (s *AgentHubService) RegisterAgent(ctx context.Context, req *pb.RegisterAge
 	}, nil
 }
 
+// UnregisterAgent removes an agent from the broker's registry and broadcasts an unregistered event
+func (s *AgentHubService) UnregisterAgent(ctx context.Context, req *pb.UnregisterAgentRequest) (*pb.UnregisterAgentResponse, error) {
+	agentID := req.GetAgentId()
+	if agentID == "" {
+		return &pb.UnregisterAgentResponse{
+			Success: false,
+			Error:   "agent_id is required",
+		}, nil
+	}
+
+	s.agentsMu.Lock()
+	agentCard, exists := s.registeredAgents[agentID]
+	if !exists {
+		s.agentsMu.Unlock()
+		return &pb.UnregisterAgentResponse{
+			Success: false,
+			Error:   fmt.Sprintf("agent %s is not registered", agentID),
+		}, nil
+	}
+	delete(s.registeredAgents, agentID)
+	s.agentsMu.Unlock()
+
+	s.Server.Logger.InfoContext(ctx, "Agent unregistered",
+		"agent_id", agentID,
+	)
+
+	// Broadcast agent unregistration event for discovery
+	agentCardEvent := &pb.AgentCardEvent{
+		AgentId:   agentID,
+		AgentCard: agentCard,
+		EventType: "unregistered",
+	}
+
+	event := &pb.AgentEvent{
+		EventId:   fmt.Sprintf("agent_unregistered_%s_%d", agentID, time.Now().UnixNano()),
+		Timestamp: timestamppb.Now(),
+		Payload: &pb.AgentEvent_AgentCard{
+			AgentCard: agentCardEvent,
+		},
+		Routing: &pb.AgentEventMetadata{
+			FromAgentId: agentID,
+			ToAgentId:   "", // Broadcast to all subscribers
+			EventType:   "agent.unregistered",
+			Priority:    pb.Priority_PRIORITY_HIGH,
+		},
+	}
+
+	// Route the event to all subscribers
+	if err := s.routeEvent(ctx, event); err != nil {
+		s.Server.Logger.WarnContext(ctx, "Failed to route agent unregistration event",
+			"agent_id", agentID,
+			"error", err,
+		)
+	}
+
+	return &pb.UnregisterAgentResponse{
+		Success: true,
+	}, nil
+}
+
 // ===== Helper Methods =====
 
 // routeEvent routes an agent event to appropriate subscribers

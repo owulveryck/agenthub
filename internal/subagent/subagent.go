@@ -3,6 +3,7 @@ package subagent
 import (
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -11,6 +12,7 @@ import (
 
 	pb "github.com/owulveryck/agenthub/events/a2a"
 	"github.com/owulveryck/agenthub/internal/agenthub"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // SubAgent encapsulates the common functionality for building A2A-compliant agents.
@@ -28,10 +30,12 @@ import (
 type SubAgent struct {
 	config         *Config
 	client         *agenthub.AgentHubClient
+	grpcClient     pb.AgentHubClient // direct gRPC client for message publishing (testable)
 	taskSubscriber *agenthub.A2ATaskSubscriber
 	skills         map[string]*Skill
 	agentCard      *pb.AgentCard
 	running        bool
+	statusProvider StatusProvider
 }
 
 // New creates a new SubAgent with the given configuration.
@@ -173,13 +177,33 @@ func (s *SubAgent) Run(ctx context.Context) error {
 		s.running = false
 	}()
 
-	// Ensure cleanup happens
+	// Ensure cleanup happens (defers run LIFO: unregister first, then shutdown connection)
 	defer func() {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()
 		if err := s.client.Shutdown(shutdownCtx); err != nil {
 			s.client.Logger.ErrorContext(shutdownCtx, "Error during shutdown", "error", err)
 		}
+	}()
+
+	defer func() {
+		unregCtx, unregCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer unregCancel()
+		_, err := s.client.Client.UnregisterAgent(unregCtx, &pb.UnregisterAgentRequest{
+			AgentId: s.config.AgentID,
+		})
+		if err != nil {
+			s.client.Logger.ErrorContext(unregCtx, "Failed to unregister agent", "agent_id", s.config.AgentID, "error", err)
+		} else {
+			s.client.Logger.InfoContext(unregCtx, "Agent unregistered from broker", "agent_id", s.config.AgentID)
+		}
+	}()
+
+	// Send shutdown notification BEFORE unregistering (defers run LIFO)
+	defer func() {
+		notifyCtx, notifyCancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer notifyCancel()
+		s.sendShutdownNotification(notifyCtx)
 	}()
 
 	s.client.Logger.InfoContext(ctx, "Agent started successfully",
@@ -222,6 +246,7 @@ func (s *SubAgent) initialize(ctx context.Context) error {
 		return fmt.Errorf("failed to create AgentHub client: %w", err)
 	}
 	s.client = client
+	s.grpcClient = client.Client
 
 	// Start the client
 	if err := client.Start(ctx); err != nil {
@@ -236,6 +261,11 @@ func (s *SubAgent) initialize(ctx context.Context) error {
 	// Setup task subscription with handlers
 	if err := s.setupTaskSubscription(ctx); err != nil {
 		return fmt.Errorf("failed to setup task subscription: %w", err)
+	}
+
+	// Setup message subscription for status requests
+	if err := s.setupMessageSubscription(ctx); err != nil {
+		return fmt.Errorf("failed to setup message subscription: %w", err)
 	}
 
 	return nil
@@ -433,4 +463,129 @@ func (s *SubAgent) GetClient() *agenthub.AgentHubClient {
 //	fmt.Printf("Health Port: %s\n", config.HealthPort)
 func (s *SubAgent) GetConfig() *Config {
 	return s.config
+}
+
+// SetStatusProvider registers a function that returns the agent's current status.
+// When a status request is received, this function is called to get the response text.
+// If no provider is set, the agent reports "idle".
+func (s *SubAgent) SetStatusProvider(provider StatusProvider) {
+	s.statusProvider = provider
+}
+
+// sendShutdownNotification broadcasts a message explaining the agent is leaving.
+// This is best-effort: errors are logged but don't fail the shutdown.
+func (s *SubAgent) sendShutdownNotification(ctx context.Context) {
+	msg := &pb.Message{
+		MessageId: fmt.Sprintf("shutdown_%s_%d", s.config.AgentID, time.Now().UnixNano()),
+		Role:      pb.Role_ROLE_AGENT,
+		Content: []*pb.Part{
+			{Part: &pb.Part_Text{Text: fmt.Sprintf("Agent %s is shutting down.", s.config.AgentID)}},
+		},
+		Metadata: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"type":     structpb.NewStringValue("agent_shutting_down"),
+				"agent_id": structpb.NewStringValue(s.config.AgentID),
+			},
+		},
+	}
+
+	routing := &pb.AgentEventMetadata{
+		FromAgentId: s.config.AgentID,
+		EventType:   "agent_shutting_down",
+		Priority:    pb.Priority_PRIORITY_HIGH,
+	}
+
+	_, err := s.grpcClient.PublishMessage(ctx, &pb.PublishMessageRequest{
+		Message: msg,
+		Routing: routing,
+	})
+	if err != nil {
+		logger := s.GetLogger()
+		logger.ErrorContext(ctx, "Failed to send shutdown notification", "agent_id", s.config.AgentID, "error", err)
+	}
+}
+
+// handleStatusRequest replies to a status request message with the agent's current status.
+func (s *SubAgent) handleStatusRequest(ctx context.Context, msg *pb.Message) {
+	status := "idle"
+	if s.statusProvider != nil {
+		status = s.statusProvider()
+	}
+
+	reply := &pb.Message{
+		MessageId: fmt.Sprintf("status_reply_%s_%d", s.config.AgentID, time.Now().UnixNano()),
+		ContextId: msg.GetContextId(),
+		Role:      pb.Role_ROLE_AGENT,
+		Content: []*pb.Part{
+			{Part: &pb.Part_Text{Text: status}},
+		},
+		Metadata: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"type":     structpb.NewStringValue("status_reply"),
+				"agent_id": structpb.NewStringValue(s.config.AgentID),
+			},
+		},
+	}
+
+	routing := &pb.AgentEventMetadata{
+		FromAgentId: s.config.AgentID,
+		ToAgentId:   "cortex",
+		EventType:   "status_reply",
+		Priority:    pb.Priority_PRIORITY_MEDIUM,
+	}
+
+	_, err := s.grpcClient.PublishMessage(ctx, &pb.PublishMessageRequest{
+		Message: reply,
+		Routing: routing,
+	})
+	if err != nil {
+		logger := s.GetLogger()
+		logger.ErrorContext(ctx, "Failed to send status reply", "agent_id", s.config.AgentID, "error", err)
+	}
+}
+
+// setupMessageSubscription subscribes to messages and handles status requests.
+func (s *SubAgent) setupMessageSubscription(ctx context.Context) error {
+	go func() {
+		stream, err := s.grpcClient.SubscribeToMessages(ctx, &pb.SubscribeToMessagesRequest{
+			AgentId: s.config.AgentID,
+		})
+		if err != nil {
+			s.client.Logger.ErrorContext(ctx, "Failed to subscribe to messages", "agent_id", s.config.AgentID, "error", err)
+			return
+		}
+
+		for {
+			event, err := stream.Recv()
+			if err != nil {
+				if err == io.EOF {
+					s.client.Logger.InfoContext(ctx, "Message stream ended", "agent_id", s.config.AgentID)
+					break
+				}
+				s.client.Logger.ErrorContext(ctx, "Error receiving message", "agent_id", s.config.AgentID, "error", err)
+				break
+			}
+
+			messageEvent := event.GetMessage()
+			if messageEvent == nil {
+				continue
+			}
+
+			// Check metadata for message type
+			if messageEvent.GetMetadata() == nil || messageEvent.GetMetadata().GetFields() == nil {
+				continue
+			}
+			msgType, exists := messageEvent.GetMetadata().GetFields()["type"]
+			if !exists {
+				continue
+			}
+
+			switch msgType.GetStringValue() {
+			case "status_request":
+				s.handleStatusRequest(ctx, messageEvent)
+			}
+		}
+	}()
+
+	return nil
 }
