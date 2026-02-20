@@ -23,7 +23,7 @@ func main() {
 		Name:        "Audio Analyzer",
 		Description: "Analyzes MP3 and M4A audio files: extracts metadata and optionally transcribes via Gemini",
 		Version:     "1.1.0",
-		HealthPort:  "8086",
+		HealthPort:  "8089",
 	}
 
 	agent, err := subagent.New(config)

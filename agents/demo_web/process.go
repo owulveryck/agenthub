@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -47,8 +48,10 @@ type ProcessManager struct {
 }
 
 type managedProcess struct {
-	spec ProcessSpec
-	cmd  *exec.Cmd
+	spec    ProcessSpec
+	cmd     *exec.Cmd
+	done    chan struct{}
+	waitErr error
 }
 
 // NewProcessManager creates a manager for the given process specs.
@@ -115,7 +118,7 @@ func (pm *ProcessManager) Start(ctx context.Context) error {
 			return fmt.Errorf("failed to start %s: %w", spec.Name, err)
 		}
 
-		mp := &managedProcess{spec: spec, cmd: cmd}
+		mp := &managedProcess{spec: spec, cmd: cmd, done: make(chan struct{})}
 		pm.procs = append(pm.procs, mp)
 
 		// Stream stdout and stderr to the WebSocket hub
@@ -123,7 +126,7 @@ func (pm *ProcessManager) Start(ctx context.Context) error {
 		go pm.streamOutput(spec.Name, stderr)
 
 		// Monitor for unexpected exit
-		go pm.monitorProcess(spec.Name, cmd)
+		go pm.monitorProcess(spec.Name, mp)
 
 		pm.logger.Info("started child process", "name", spec.Name, "pid", cmd.Process.Pid)
 		pm.hub.Broadcast(WSMessage{
@@ -157,25 +160,23 @@ func (pm *ProcessManager) Shutdown() {
 			continue
 		}
 		name := mp.spec.Name
-		pm.logger.Info("stopping child process", "name", name, "pid", mp.cmd.Process.Pid)
+		pid := mp.cmd.Process.Pid
+		pm.logger.Info("stopping child process", "name", name, "pid", pid)
 
-		// Send SIGINT first for graceful shutdown
-		if err := mp.cmd.Process.Signal(os.Interrupt); err != nil {
-			pm.logger.Warn("failed to send interrupt", "name", name, "error", err)
-			mp.cmd.Process.Kill()
+		// Send SIGINT to the entire process group for graceful shutdown
+		if err := signalProcessGroup(pid, syscall.SIGINT); err != nil {
+			pm.logger.Warn("failed to send interrupt to process group", "name", name, "error", err)
+			signalProcessGroup(pid, syscall.SIGKILL)
 			continue
 		}
 
-		// Wait with timeout
-		done := make(chan error, 1)
-		go func() { done <- mp.cmd.Wait() }()
-
+		// Wait with timeout using the done channel (single Wait owner)
 		select {
-		case <-done:
+		case <-mp.done:
 			pm.logger.Info("child process stopped", "name", name)
 		case <-time.After(gracefulTimeout):
 			pm.logger.Warn("child process did not stop gracefully, killing", "name", name)
-			mp.cmd.Process.Kill()
+			signalProcessGroup(pid, syscall.SIGKILL)
 		}
 	}
 }
@@ -216,12 +217,12 @@ func (pm *ProcessManager) StartAgent(ctx context.Context, spec ProcessSpec) erro
 		return fmt.Errorf("failed to start %s: %w", spec.Name, err)
 	}
 
-	mp := &managedProcess{spec: spec, cmd: cmd}
+	mp := &managedProcess{spec: spec, cmd: cmd, done: make(chan struct{})}
 	pm.procs = append(pm.procs, mp)
 
 	go pm.streamOutput(spec.Name, stdout)
 	go pm.streamOutput(spec.Name, stderr)
-	go pm.monitorProcess(spec.Name, cmd)
+	go pm.monitorProcess(spec.Name, mp)
 
 	pm.logger.Info("started child process", "name", spec.Name, "pid", cmd.Process.Pid)
 	pm.hub.Broadcast(WSMessage{
@@ -250,24 +251,22 @@ func (pm *ProcessManager) StopAgent(name string) error {
 			return nil
 		}
 
-		pm.logger.Info("stopping child process", "name", name, "pid", mp.cmd.Process.Pid)
+		pid := mp.cmd.Process.Pid
+		pm.logger.Info("stopping child process", "name", name, "pid", pid)
 
-		if err := mp.cmd.Process.Signal(os.Interrupt); err != nil {
-			pm.logger.Warn("failed to send interrupt, killing", "name", name, "error", err)
-			mp.cmd.Process.Kill()
+		if err := signalProcessGroup(pid, syscall.SIGINT); err != nil {
+			pm.logger.Warn("failed to send interrupt to process group, killing", "name", name, "error", err)
+			signalProcessGroup(pid, syscall.SIGKILL)
 			pm.procs = append(pm.procs[:i], pm.procs[i+1:]...)
 			return nil
 		}
 
-		done := make(chan error, 1)
-		go func() { done <- mp.cmd.Wait() }()
-
 		select {
-		case <-done:
+		case <-mp.done:
 			pm.logger.Info("child process stopped", "name", name)
 		case <-time.After(gracefulTimeout):
 			pm.logger.Warn("child process did not stop gracefully, killing", "name", name)
-			mp.cmd.Process.Kill()
+			signalProcessGroup(pid, syscall.SIGKILL)
 		}
 
 		pm.procs = append(pm.procs[:i], pm.procs[i+1:]...)
@@ -303,6 +302,7 @@ func (pm *ProcessManager) buildCmd(spec ProcessSpec, env []string) (*exec.Cmd, e
 		args := append([]string{"run"}, spec.GoRun...)
 		cmd := exec.Command("go", args...)
 		cmd.Env = env
+		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 		return cmd, nil
 	}
 
@@ -310,10 +310,18 @@ func (pm *ProcessManager) buildCmd(spec ProcessSpec, env []string) (*exec.Cmd, e
 	if _, err := os.Stat(spec.Binary); err == nil {
 		cmd := exec.Command("./" + spec.Binary)
 		cmd.Env = env
+		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 		return cmd, nil
 	}
 
 	return nil, fmt.Errorf("no go run path or binary for %s", spec.Name)
+}
+
+// signalProcessGroup sends a signal to the entire process group identified by
+// the given PID. Using a negative PID targets the group, ensuring both the
+// parent (e.g. "go run") and its children receive the signal.
+func signalProcessGroup(pid int, sig syscall.Signal) error {
+	return syscall.Kill(-pid, sig)
 }
 
 func (pm *ProcessManager) streamOutput(source string, r io.Reader) {
@@ -326,16 +334,17 @@ func (pm *ProcessManager) streamOutput(source string, r io.Reader) {
 	}
 }
 
-func (pm *ProcessManager) monitorProcess(name string, cmd *exec.Cmd) {
-	err := cmd.Wait()
-	if err != nil {
-		pm.logger.Warn("child process exited", "name", name, "error", err)
+func (pm *ProcessManager) monitorProcess(name string, mp *managedProcess) {
+	mp.waitErr = mp.cmd.Wait()
+	close(mp.done)
+	if mp.waitErr != nil {
+		pm.logger.Warn("child process exited", "name", name, "error", mp.waitErr)
 		pm.hub.Broadcast(WSMessage{
 			Type:    "event",
 			Source:  name,
 			Icon:    "err",
 			Content: "Process exited",
-			Detail:  err.Error(),
+			Detail:  mp.waitErr.Error(),
 			Status:  "error",
 		})
 	}
@@ -343,15 +352,9 @@ func (pm *ProcessManager) monitorProcess(name string, cmd *exec.Cmd) {
 
 // WaitAll blocks until all child processes have exited.
 func (pm *ProcessManager) WaitAll() {
-	var wg sync.WaitGroup
 	for _, mp := range pm.procs {
-		wg.Add(1)
-		go func(cmd *exec.Cmd) {
-			defer wg.Done()
-			cmd.Wait()
-		}(mp.cmd)
+		<-mp.done
 	}
-	wg.Wait()
 }
 
 func setEnv(env []string, key, value string) []string {
