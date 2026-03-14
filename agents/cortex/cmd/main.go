@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -67,12 +68,6 @@ func main() {
 		}
 	}()
 
-	// Start the client
-	if err := client.Start(ctx); err != nil {
-		client.Logger.ErrorContext(ctx, "Failed to start client", "error", err)
-		panic(err)
-	}
-
 	// Create state manager (in-memory for POC)
 	stateManager := state.NewInMemoryStateManager()
 
@@ -86,8 +81,21 @@ func main() {
 	// Create message publisher adapter
 	messagePublisher := &AgentHubMessagePublisher{client: client}
 
-	// Create Cortex instance
+	// Create Cortex instance (before client.Start so we can register HTTP handlers)
 	cortexInstance := cortex.NewCortex(stateManager, llmClient, messagePublisher, client.Logger)
+
+	// Register /prompt handler on health server (before Start launches the HTTP server)
+	client.HealthServer.HandleFunc("/prompt", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		fmt.Fprint(w, cortexInstance.GetCurrentPrompt())
+	})
+
+	// Start the client (connects gRPC, starts health server)
+	if err := client.Start(ctx); err != nil {
+		client.Logger.ErrorContext(ctx, "Failed to start client", "error", err)
+		panic(err)
+	}
 
 	llmType := "mock"
 	if os.Getenv("GCP_PROJECT") != "" && os.Getenv("GCP_PROJECT") != "your-project" {

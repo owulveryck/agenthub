@@ -73,6 +73,7 @@ func main() {
 	mux.HandleFunc("/agent/summary/start", handleAgentStart(pm, ctx, SummaryAgentSpec))
 	mux.HandleFunc("/agent/summary/stop", handleAgentStop(pm, "summary_agent"))
 	mux.HandleFunc("/agent/summary/status", handleAgentStatus(pm, "summary_agent"))
+	mux.HandleFunc("/agent/cortex/prompt", handleCortexPrompt(logger))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data, err := staticFS.ReadFile("index.html")
 		if err != nil {
@@ -188,6 +189,24 @@ func handleAgentStop(pm *ProcessManager, agentName string) http.HandlerFunc {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"status": "stopped"})
+	}
+}
+
+func handleCortexPrompt(logger *slog.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		resp, err := http.Get("http://127.0.0.1:8086/prompt")
+		if err != nil {
+			logger.Error("failed to proxy cortex prompt", "error", err)
+			http.Error(w, "cortex not reachable", http.StatusBadGateway)
+			return
+		}
+		defer resp.Body.Close()
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		io.Copy(w, resp.Body)
 	}
 }
 

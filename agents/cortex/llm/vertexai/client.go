@@ -149,6 +149,16 @@ func (c *Client) Decide(
 	return decision, nil
 }
 
+// BuildPrompt returns the system prompt for introspection, using a snapshot
+// placeholder instead of a real conversation event.
+func (c *Client) BuildPrompt(availableAgents map[string]*pb.AgentCard) string {
+	placeholder := &pb.Message{
+		Role:    pb.Role_ROLE_USER,
+		Content: []*pb.Part{{Part: &pb.Part_Text{Text: "<prompt snapshot>"}}},
+	}
+	return c.buildOrchestrationPrompt(nil, availableAgents, placeholder)
+}
+
 // buildOrchestrationPrompt creates the prompt for the LLM orchestrator
 func (c *Client) buildOrchestrationPrompt(
 	conversationHistory []*pb.Message,

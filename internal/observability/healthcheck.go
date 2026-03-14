@@ -37,26 +37,33 @@ type HealthChecker interface {
 }
 
 type HealthServer struct {
-	port        string
-	serviceName string
-	version     string
-	startTime   time.Time
-	checkers    map[string]HealthChecker
-	server      *http.Server
+	port           string
+	serviceName    string
+	version        string
+	startTime      time.Time
+	checkers       map[string]HealthChecker
+	customHandlers map[string]http.HandlerFunc
+	server         *http.Server
 }
 
 func NewHealthServer(port, serviceName, version string) *HealthServer {
 	return &HealthServer{
-		port:        port,
-		serviceName: serviceName,
-		version:     version,
-		startTime:   time.Now(),
-		checkers:    make(map[string]HealthChecker),
+		port:           port,
+		serviceName:    serviceName,
+		version:        version,
+		startTime:      time.Now(),
+		checkers:       make(map[string]HealthChecker),
+		customHandlers: make(map[string]http.HandlerFunc),
 	}
 }
 
 func (hs *HealthServer) AddChecker(name string, checker HealthChecker) {
 	hs.checkers[name] = checker
+}
+
+// HandleFunc registers a custom HTTP handler on the health server's mux.
+func (hs *HealthServer) HandleFunc(pattern string, handler http.HandlerFunc) {
+	hs.customHandlers[pattern] = handler
 }
 
 func (hs *HealthServer) Start(ctx context.Context) error {
@@ -70,6 +77,11 @@ func (hs *HealthServer) Start(ctx context.Context) error {
 
 	// Metrics endpoint
 	mux.Handle("/metrics", promhttp.Handler())
+
+	// Custom handlers
+	for pattern, handler := range hs.customHandlers {
+		mux.HandleFunc(pattern, handler)
+	}
 
 	hs.server = &http.Server{
 		Addr:    ":" + hs.port,

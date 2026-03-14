@@ -83,6 +83,25 @@ func (m *MockClient) Decide(
 	}, nil
 }
 
+// BuildPrompt returns a mock system prompt listing available agents.
+func (m *MockClient) BuildPrompt(availableAgents map[string]*pb.AgentCard) string {
+	var b strings.Builder
+	b.WriteString("Mock Cortex System Prompt\n\n")
+	b.WriteString("You are Cortex, an AI orchestrator (mock mode).\n\n")
+	if len(availableAgents) > 0 {
+		b.WriteString("Available agents:\n")
+		for id, agent := range availableAgents {
+			b.WriteString(fmt.Sprintf("- %s (id: %s): %s\n", agent.GetName(), id, agent.GetDescription()))
+			for _, skill := range agent.GetSkills() {
+				b.WriteString(fmt.Sprintf("  * Skill: %s — %s\n", skill.GetName(), skill.GetDescription()))
+			}
+		}
+	} else {
+		b.WriteString("No agents are currently available.\n")
+	}
+	return b.String()
+}
+
 // SimpleEchoDecider returns a decision function that echoes user messages.
 func SimpleEchoDecider() func(context.Context, []*pb.Message, map[string]*pb.AgentCard, *pb.Message) (*Decision, error) {
 	return func(ctx context.Context, history []*pb.Message, agents map[string]*pb.AgentCard, event *pb.Message) (*Decision, error) {

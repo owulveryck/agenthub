@@ -46,4 +46,8 @@ type Client interface {
 		availableAgents map[string]*pb.AgentCard,
 		newEvent *pb.Message,
 	) (*Decision, error)
+
+	// BuildPrompt returns the system prompt that would be sent to the LLM,
+	// given the currently available agents. Used for introspection.
+	BuildPrompt(availableAgents map[string]*pb.AgentCard) string
 }

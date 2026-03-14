@@ -84,6 +84,12 @@ func (c *Cortex) GetAvailableAgents() map[string]*pb.AgentCard {
 	return agents
 }
 
+// GetCurrentPrompt returns the system prompt that Cortex would send to the LLM
+// with the currently registered agents. Useful for introspection/debugging.
+func (c *Cortex) GetCurrentPrompt() string {
+	return c.llmClient.BuildPrompt(c.GetAvailableAgents())
+}
+
 // HandleMessage is the main entry point for processing messages.
 // It handles:
 // - Chat requests from users

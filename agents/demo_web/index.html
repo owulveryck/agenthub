@@ -444,6 +444,76 @@
   .node-draggable:active { cursor: grabbing; }
   body.dragging { cursor: grabbing !important; user-select: none; }
   body.dragging .node-draggable { cursor: grabbing; }
+
+  /* ── Cortex click hint ──────────────────────── */
+  #node-cortex { cursor: pointer; }
+
+  /* ── Prompt modal ───────────────────────────── */
+  #prompt-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(35,35,35,0.45);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+  #prompt-modal-overlay.visible { display: flex; }
+  #prompt-modal {
+    background: var(--surface);
+    border: var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    width: 680px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #prompt-modal-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: var(--border);
+    flex-shrink: 0;
+  }
+  #prompt-modal-header .pm-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  #prompt-modal-header .pm-title .dot-accent { color: var(--primary); }
+  #prompt-modal-close {
+    margin-left: auto;
+    background: none;
+    border: var(--border);
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+    box-shadow: 2px 2px 0px 0px var(--primary);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  #prompt-modal-close:hover {
+    transform: translate(1px,1px);
+    box-shadow: 1px 1px 0px 0px var(--primary);
+  }
+  #prompt-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--text);
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
@@ -513,6 +583,15 @@
   </div>
 </div>
 <div id="agent-tooltip"></div>
+<div id="prompt-modal-overlay">
+  <div id="prompt-modal">
+    <div id="prompt-modal-header">
+      <span class="pm-title">Cortex System Prompt<span class="dot-accent">.</span></span>
+      <button id="prompt-modal-close">&times;</button>
+    </div>
+    <div id="prompt-modal-body">Loading...</div>
+  </div>
+</div>
 <script>
 (function() {
   var SVG_NS = 'http://www.w3.org/2000/svg';
@@ -682,11 +761,14 @@
     return pt.matrixTransform(diagram.getScreenCTM().inverse());
   }
 
+  var clickState = null;
+
   function onNodeMouseDown(nodeId, evt) {
     evt.preventDefault();
     var pos = svgPoint(evt);
     var n = nodeData[nodeId];
     dragState = { nodeId: nodeId, offsetX: pos.x - n.x, offsetY: pos.y - n.y };
+    clickState = { nodeId: nodeId, startX: evt.clientX, startY: evt.clientY };
     document.body.classList.add('dragging');
     tooltip.style.display = 'none';
   }
@@ -702,9 +784,19 @@
     updateEdges();
   }
 
-  function onMouseUp() {
+  function onMouseUp(evt) {
     if (!dragState) return;
+    // Detect click (not drag) on cortex node
+    if (clickState && evt) {
+      var dx = evt.clientX - clickState.startX;
+      var dy = evt.clientY - clickState.startY;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 5 && clickState.nodeId === 'cortex') {
+        openPromptModal();
+      }
+    }
     dragState = null;
+    clickState = null;
     document.body.classList.remove('dragging');
   }
 
@@ -758,8 +850,8 @@
     }, { passive: false });
 
     // Global release handlers
-    document.addEventListener('mouseup', onMouseUp);
-    document.addEventListener('touchend', onMouseUp);
+    document.addEventListener('mouseup', function(e) { onMouseUp(e); });
+    document.addEventListener('touchend', function(e) { onMouseUp(e); });
   }
 
   function getPath(from, to) {
@@ -1456,6 +1548,35 @@
   }
 
   summaryToggleBtn.addEventListener('click', toggleSummaryAgent);
+
+  /* ── Prompt modal ──────────────────────────── */
+  var promptOverlay = document.getElementById('prompt-modal-overlay');
+  var promptBody = document.getElementById('prompt-modal-body');
+  var promptCloseBtn = document.getElementById('prompt-modal-close');
+
+  function openPromptModal() {
+    promptBody.textContent = 'Loading...';
+    promptOverlay.classList.add('visible');
+    fetch('/agent/cortex/prompt')
+      .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.text();
+      })
+      .then(function(text) { promptBody.textContent = text; })
+      .catch(function(err) { promptBody.textContent = 'Error: ' + err.message; });
+  }
+
+  function closePromptModal() {
+    promptOverlay.classList.remove('visible');
+  }
+
+  promptCloseBtn.addEventListener('click', closePromptModal);
+  promptOverlay.addEventListener('click', function(e) {
+    if (e.target === promptOverlay) closePromptModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closePromptModal();
+  });
 
   /* ── Initialize the diagram ──────────────────── */
   initDiagram();
